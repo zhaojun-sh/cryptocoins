@@ -23,7 +23,7 @@ Research all coins hash, address and signature algorithm.
 | 18 | Zcash | https://z.cash/ | https://explorer.zcha.in/ | https://github.com/zcash/ | ECDSA/secp256k1 | ED25519/Curve25519 |  | t1aZ2DGuiokCxHVfb4cGQqXghxy9hUpE6xQ |  |  |  |  |  |
 | 19 | VeChain | https://www.vechain.org/ | https://explore.veforge.com/ | https://github.com/vechain/ | ECDSA/secp256k1 |  | SHA3-keccak256 | 0xdde1C7AD4Cca5672a5c6DB767B7ed79794bF7ca8 |  |  |  |  |  |
 | 20 | Bitcoin Gold |  |  |  |  |  |  |  |  |  |  |  |  |
-| 21 | Decred | https://www.decred.org/ | https://mainnet.decred.org | https://github.com/decred/dcrd | ECDSA/secp256k1 | ED25519/Curve25519 | SHA256 | DsoPvDrJ6RajmUGwuqv2Xt1Pzb3VSbaGCCn |  |  | https://faucet.decred.org/ |  | https://github.com/decred/dcrd/tree/master/dcrec |
+| 21 | Decred | https://www.decred.org/ | https://mainnet.decred.org | https://github.com/decred/dcrd | ECDSA/secp256k1 | ED25519/Curve25519 | BLAKE-256 | DsoPvDrJ6RajmUGwuqv2Xt1Pzb3VSbaGCCn |  |  | https://faucet.decred.org/ |  | https://github.com/decred/dcrd/tree/master/dcrec |
 | 22 | Dogecoin |  |  |  |  |  |  |  |  |  |  |  |  |
 | 23 | Qtum |  |  |  |  |  |  |  |  |  |  |  |  |
 | 24 | Ontology |  |  |  |  |  |  |  |  |  |  |  |  |
