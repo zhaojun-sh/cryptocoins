@@ -10,7 +10,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	rcrypto "github.com/rubblelabs/ripple/crypto"
+	tcrypto "github.com/cryptocoins/src/go/trx/crypto"
 
 	httputils "github.com/cryptocoins/src/go/trx/httputils"
 	"github.com/cryptocoins/src/go/trx/config"
@@ -63,7 +63,7 @@ func (pk *PublicKey) Address() (address, address21 string, err error) {
 	sha := crypto.Keccak256(data)
 	address21bytes := append([]byte{prefix}, sha[len(sha)-20:]...)
 	address21 = hex.EncodeToString(address21bytes)
-	address = rcrypto.Base58Encode(address21bytes, ALPHABET)
+	address = tcrypto.Base58Encode(address21bytes, ALPHABET)
 	return
 }
 
@@ -128,7 +128,7 @@ func (tf *Transfer) MarshalJSON() (ret string, err error) {
 
 func BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, args ...interface{}) (transaction interface{}, digests []string, err error) {
 	if len(fromAddress) != 42 {
-		b, err1 := rcrypto.Base58Decode(fromAddress, ALPHABET)
+		b, err1 := tcrypto.Base58Decode(fromAddress, ALPHABET)
 		if err1 != nil {
 			err = err1
 			return
@@ -137,7 +137,7 @@ func BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amou
 	}
 
 	if len(toAddress) != 42 {
-		b, err2 := rcrypto.Base58Decode(toAddress, ALPHABET)
+		b, err2 := tcrypto.Base58Decode(toAddress, ALPHABET)
 		if err2 != nil {
 			err = err2
 			return
