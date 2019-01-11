@@ -6,7 +6,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	"cryptocoins/src/go/trx/api"
+	"github.com/cryptocoins/src/go/trx/api"
 )
 
 type Seed struct {}

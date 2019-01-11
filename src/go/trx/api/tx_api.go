@@ -12,8 +12,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	rcrypto "github.com/rubblelabs/ripple/crypto"
 
-	httputils "cryptocoins/src/go/trx/httputils"
-	"cryptocoins/src/go/trx/config"
+	httputils "github.com/cryptocoins/src/go/trx/httputils"
+	"github.com/cryptocoins/src/go/trx/config"
 )
 
 const (
