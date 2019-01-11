@@ -1,0 +1,215 @@
+crypto type
+
+________________________________________________________________________________________________________________________
+检查公钥to地址
+https://tronscan.org/#/tools/tron-convert-tool
+
+________________________________________________________________________________________________________________________
+水龙头
+https://www.trongrid.io/shasta/#request
+
+________________________________________________________________________________________________________________________
+测试网HTTP API
+https://api.shasta.trongrid.io
+
+________________________________________________________________________________________________________________________
+查询交易
+curl https://api.shasta.trongrid.io/event/transaction/5c3747ffa94fc87a2188708a9e0758cbd01f000d3d01f6589651921930183f6a
+
+或
+curl -X POST  https://api.shasta.trongrid.io/walletsolidity/gettransactionbyid -d '{"value" : "713c2cf6db2e35e8f25dcff932f1614228c24bef3583a4d01b3782a0c2f7fc27"}'
+
+{
+  "ret":[{"contractRet":"SUCCESS"}],
+  "signature":[
+     "494797ea067c6014bcdd2d958c1bae3ad3ec8f106e419ab2023f67b3364f3963adfe1d04c24f8bc1b1e37c9b4dd8e4f6971b59cff51cabff9d3579f960c781d400"
+  ],
+  "txID":"713c2cf6db2e35e8f25dcff932f1614228c24bef3583a4d01b3782a0c2f7fc27",
+  "raw_data":{
+    "contract":[
+      {
+        "parameter":{
+          "value":{
+            "amount":10,
+            "owner_address":"417e5f4552091a69125d5dfcb7b8c2659029395bdf",
+            "to_address":"41062ae7be408a0cd83a1cb44874d1e748e374d50c"
+          },
+          "type_url":"type.googleapis.com/protocol.TransferContract"
+        },
+      "type":"TransferContract"}
+    ],
+    "ref_block_bytes":"d426",
+    "ref_block_hash":"9f09b8059aed64d5",
+    "expiration":1547189289000,
+    "timestamp":1547189231293
+  }
+}
+
+________________________________________________________________________________________________________________________
+查询最新区块
+/walletsolidity/getnowblock
+Function：Query the latest block
+demo: curl -X POST https://api.shasta.trongrid.io/walletsolidity/getnowblock
+Parameters：None
+Return value：Latest block on solidityNode
+
+Ret
+{
+  "blockID":"0000000000060757233fc2c59c2f92e7d4482fbb4b7daa09b536e1452b341bb6",
+  "block_header":{
+    "raw_data":{
+    "number":395095,
+    "txTrieRoot":"0000000000000000000000000000000000000000000000000000000000000000",
+    "witness_address":"41928c9af0651632157ef27a2cf17ca72c575a4d21",
+    "parentHash":"0000000000060756bf450f13438feea3260b5923d224548137163bebef836907",
+    "version":6,
+    "timestamp":1547031888000
+    },
+    "witness_signature":"f099593e60c4fe518c1a4fc6b56bfa8bc03a63edb7477d5eb66ea9b10f4dc75a0768301006617e883756dd34f9d11e9dd635e1a458cc2f770d2d0a28203c191c01"
+  }
+}
+
+________________________________________________________________________________________________________________________
+block hash
+32字节 0000000000060757233fc2c59c2f92e7d4482fbb4b7daa09b536e1452b341bb6
+8字节 ???
+________________________________________________________________________________________________________________________
+block size
+???
+
+________________________________________________________________________________________________________________________
+64/65字节公钥
+(04)E657EE43DDADBA5AF1F1AD4E8098D996C2F3C397E807C9255B0850EA2D151D050F4A0D6451231DD35F0FF653F166C35BCAA0E817520B4DB87DE7E060A72D578E
+
+21字节地址
+公钥做sha3-256, 取最后20字节, 开头加0x41
+
+34字节T开头地址
+21字节地址做两次sha256, 取前4字节作为校验码
+21字节地址+4位校验码做base58 主网34字节, 测试网35字节
+base58字母表 "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
+________________________________________________________________________________________________________________________
+用api构建交易
+
+curl -X POST  https://api.shasta.trongrid.io/wallet/createtransaction -d '{"to_address": "41e9d79cc47518930bc322d9bf7cddd260a0260a8d", "owner_address": "41D1E7A6BC354106CB410E65FF8B181C600FF14292", "amount": 1000 }'
+
+return
+{"txID":"79b6952a7772d4507c667df132a31b19791507d8244babea3961e7c1b9b19824","raw_data":{"contract":[{"parameter":{"value":{"amount":1000,"owner_address":"41d1e7a6bc354106cb410e65ff8b181c600ff14292","to_address":"41e9d79cc47518930bc322d9bf7cddd260a0260a8d"},"type_url":"type.googleapis.com/protocol.TransferContract"},"type":"TransferContract"}],"ref_block_bytes":"7cbc","ref_block_hash":"adaa6515c39d219e","expiration":1547122137000,"timestamp":1547122079827}}
+
+________________________________________________________________________________________________________________________
+发送交易
+/wallet/broadcasttransaction
+Function：Broadcast the signed transaction
+demo：curl -X POST  https://api.shasta.trongrid.io/wallet/broadcasttransaction -d '{"signature":["97c825b41c77de2a8bd65b3df55cd4c0df59c307c0187e42321dcc1cc455ddba583dd9502e17cfec5945b34cad0511985a6165999092a6dec84c2bdd97e649fc01"],"txID":"454f156bf1256587ff6ccdbc56e64ad0c51e4f8efea5490dcbc720ee606bc7b8","raw_data":{"contract":[{"parameter":{"value":{"amount":1000,"owner_address":"41e552f6487585c2b58bc2c9bb4492bc1f17132cd0","to_address":"41d1e7a6bc354106cb410e65ff8b181c600ff14292"},"type_url":"type.googleapis.com/protocol.TransferContract"},"type":"TransferContract"}],"ref_block_bytes":"267e","ref_block_hash":"9a447d222e8de9f2","expiration":1530893064000,"timestamp":1530893006233}}'
+Parameters：Signed Transaction contract data
+Return value：broadcast success or failure
+
+失败返回
+{"code": "SIGERROR","message": "76616c6964617465207369676e6174757265206572726f72"}
+{"code": "OTHER_ERROR","message": "6f74686572206572726f72203a206e756c6c"}  // 可能是 r, s 位数问题
+
+正确返回
+{"result": true}
+
+'{
+  "signature":["97c825b41c77de2a8bd65b3df55cd4c0df59c307c0187e42321dcc1cc455ddba583dd9502e17cfec5945b34cad0511985a6165999092a6dec84c2bdd97e649fc01"],
+  "txID":"454f156bf1256587ff6ccdbc56e64ad0c51e4f8efea5490dcbc720ee606bc7b8",
+  "raw_data":{
+    "contract":[
+      {
+        "parameter":{
+          "value":{
+            "amount":1000,
+            "owner_address":"41e552f6487585c2b58bc2c9bb4492bc1f17132cd0",
+            "to_address":"41d1e7a6bc354106cb410e65ff8b181c600ff14292"
+          },
+          "type_url":"type.googleapis.com/protocol.TransferContract"
+        },
+        "type":"TransferContract"
+      }
+    ],
+    "ref_block_bytes":"267e",
+    "ref_block_hash":"9a447d222e8de9f2",
+    "expiration":1530893064000,
+    "timestamp":1530893006233
+  }
+}'
+
+signature 65字节rsv
+D1FFFB01D5B87BF980E35546F0B61A64272D0AB31D6A570379DEBDBF0BA139A464C109D12B1A6F250B5CB1AC1AEF3F92E55815968575E84DD7D6BBAD0EE2732D00
+
+txid 32字节hash sha256hash(raw)
+  raw: protobuf ???
+
+address 41开头21字节地址
+
+amt 单位 sun
+
+type_url "type.googleapis.com/protocol.TransferContract" ???
+
+ref_block_bytes 字节数, 几千到几万, hex
+
+ref_block_hash 8字节hash
+
+expiration unix时间
+
+timestamp unix时间
+
+expiration - timestamp = 1分钟
+
+________________________________________________________________________________________________________________________
+查询交易
+
+________________________________________________________________________________________________________________________
+查询账户余额
+
+________________________________________________________________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+有八种账户类型合约：AccountCreateContract，TransferContract，TransferAssetContract，VoteAssetContract，VoteWitnessContract，WitnessCreateContract，AssetIssueContract 和DeployContract
+https://github.com/tronprotocol/java-tron/blob/develop/src/main/protos/core/Tron.proto
+
+
+
+TRON protobuf 协议
+https://dn-peiwo-web.qbox.me/TRON%20Protobuf%20Protocol%20Document.pdf
+
+protobuf使用:
+1 安装 protobuf 和 protobuf-gen-go
+2 下载 TRON 的 .proto 文件
+3 生成 .pb.go 文件
+4 在go代码中import "github.com/golang/protobuf/proto" 和 .pb.go 文件的位置
+5 go代码中使用 proto.Marhsal, proto.Unmarshal 等方法
+
+
+
+
+
+这个方法暂时不能用
+curl -X POST  http://47.89.187.247:8091/walletextension/gettransactionstothis -d '{"account" : {"address" : "41E552F6487585C2B58BC2C9BB4492BC1F17132CD0"}, "offset": 0, "limit": 10}'
+
+
+
+
+curl -X POST  https://api.shasta.trongrid.io/walletsolidity/gettransactionbyid -d '{"value" : "fc131dce7a720d4c0e1b669582018b26b48130df5f29057e11258ec3d88d10ec"}'
+
+
+
+
+
+
+
+
