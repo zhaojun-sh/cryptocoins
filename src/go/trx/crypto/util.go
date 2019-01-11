@@ -4,7 +4,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 
-	"golang.org/x/crypto/ripemd160"
+	//"golang.org/x/crypto/ripemd160"
 )
 
 // Write operations in a hash.Hash never return an error
@@ -32,6 +32,7 @@ func DoubleSha256(b []byte) []byte {
 	return hasher.Sum(nil)
 }
 
+/*
 func Sha256RipeMD160(b []byte) []byte {
 	ripe := ripemd160.New()
 	sha := sha256.New()
@@ -39,3 +40,4 @@ func Sha256RipeMD160(b []byte) []byte {
 	ripe.Write(sha.Sum(nil))
 	return ripe.Sum(nil)
 }
+*/
