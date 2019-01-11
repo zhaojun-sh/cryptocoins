@@ -13,10 +13,11 @@ import (
 	rcrypto "github.com/rubblelabs/ripple/crypto"
 
 	httputils "cryptocoins/src/go/trx/httputils"
+	"cryptocoins/src/go/trx/config"
 )
 
 const (
-	URL = "https://api.shasta.trongrid.io"
+	URL = config.SOLIDITY_NODE_HTTP
 	ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 	prefix = byte(0x41)  // MainNet
 	//prefix = byte(0xA0)
