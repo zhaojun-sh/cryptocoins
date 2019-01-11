@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"crypto/ecdsa"
@@ -11,6 +11,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 	rcrypto "github.com/rubblelabs/ripple/crypto"
+
+	httputils "cryptocoins/src/go/trx/httputils"
 )
 
 const (
@@ -25,13 +27,13 @@ type PublicKey struct {
 	*ecdsa.PublicKey
 }
 
-func publicKeyToHex (pk *PublicKey) (ret string) {
+func PublicKeyToHex (pk *PublicKey) (ret string) {
 	b := elliptic.Marshal(crypto.S256(), pk.X, pk.Y)
 	ret = hex.EncodeToString(b)
 	return
 }
 
-func hexToPublicKey(pubKeyHex string) (pk *PublicKey, err error) {
+func HexToPublicKey(pubKeyHex string) (pk *PublicKey, err error) {
 	pub, err := hex.DecodeString(pubKeyHex)
 	if len(pub) == 65 {
 		x := new(big.Int).SetBytes(pub[1:33])
@@ -65,7 +67,7 @@ func (pk *PublicKey) Address() (address, address21 string, err error) {
 }
 
 func PublicKeyToAddress (pubKeyHex string) (address, address21 string, err error) {
-	pk, err := hexToPublicKey(pubKeyHex)
+	pk, err := HexToPublicKey(pubKeyHex)
 	if err != nil {
 		return
 	}
@@ -153,7 +155,7 @@ func BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amou
 		panic(err.Error())
 	}
 
-	ret := DoCurlRequest(URL, "wallet/createtransaction", tfJson)
+	ret := httputils.DoCurlRequest(URL, "wallet/createtransaction", tfJson)
 	//fmt.Printf("%s\n\n", ret)
 
 	transaction = &Transaction{}
@@ -201,7 +203,7 @@ func MakeSignedTransaction (rsv []string, transaction interface{}) (signedTransa
 func SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
 	req, err := signedTransaction.(*Transaction).MarshalJson()
 	fmt.Printf("request data : %s\n\n", req)
-	ret = DoCurlRequest(URL, "wallet/broadcasttransaction", req)
+	ret = httputils.DoCurlRequest(URL, "wallet/broadcasttransaction", req)
 	var result interface{}
 	err = json.Unmarshal([]byte(ret), &result)
 	if err != nil {
@@ -213,7 +215,7 @@ func SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
 	return
 }
 
-func GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, err error){
+func GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, err error) {
 	data, err := json.Marshal(struct{
 		Value string `json:"value"`
 	}{
@@ -221,7 +223,7 @@ func GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferA
 	})
 	reqData := string(data)
 	//fmt.Println("reqData ", reqData)
-	ret := DoPostRequest(URL, "walletsolidity/gettransactionbyid", reqData)
+	ret := httputils.DoPostRequest(URL, "walletsolidity/gettransactionbyid", reqData)
 	//fmt.Printf("ret %s\n\n", ret)
 	tx := &Transaction{}
 	tx.UnmarshalJson(ret)
@@ -234,7 +236,7 @@ func GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferA
 	return
 }
 
-func GetAddressBalance(address string) (balance *big.Int, err error){
+func GetAddressBalance(address string) (balance *big.Int, err error) {
 	// TODO
 	return
 }
