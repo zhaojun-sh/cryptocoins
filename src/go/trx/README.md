@@ -1,5 +1,5 @@
-# 方法列表
-| 方法签名 | 描述 |
+# API列表
+| API | 描述 |
 |:----------:|-------------|
 |PublicKeyToAddress (pubKeyHex string) (address, address21 string, err error)|通过公钥生成地址  |
 |BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, args ...interface{}) (transaction interface{}, digests []string, err error)|构建未签名交易  |
@@ -10,5 +10,10 @@
 |GetAddressBalance(address string) (balance *big.Int, err error)|查询地址余额  |
 
 # 运行demo程序
-$ cd ./src/go/trx  
-$ go run *.go  
+## 编译
+在GOPATH下执行：  
+ $   git clone -b tron https://github.com/zhaojun-sh/cryptocoins.git  
+ $   cd ./cryptocoins/src/go/trx  
+ $   go build demo.go  
+## 运行
+ $   ./demo  
