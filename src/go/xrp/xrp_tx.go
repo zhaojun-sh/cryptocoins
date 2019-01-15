@@ -1,18 +1,23 @@
 package xrp
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"math/big"
 	"net/http"
 	"strings"
+	"github.com/btcsuite/btcd/btcec"
 	"github.com/rubblelabs/ripple/crypto"
 	"github.com/rubblelabs/ripple/data"
+
+	"github.com/cryptocoins/src/go/config"
+	rpcutils "github.com/cryptocoins/src/go/rpcutils"
 )
 
 const (
-	url = "https://s.altnet.rippletest.net:51234"
+	url = config.XRP_GATEWAY
 )
 
 func checkErr(err error) {
@@ -20,6 +25,107 @@ func checkErr(err error) {
 		fmt.Println(err.Error())
 		return
 	}
+}
+
+type XRPTransactionHandler struct {}
+
+func (h XRPTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, msg string, err error) {
+	pub, err := hex.DecodeString(pubKeyHex)
+	address = XRP_publicKeyToAddress(pub)
+	return
+}
+
+//args[0]: fee int64
+func (h XRPTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, args ...interface{}) (transaction interface{}, digests []string, err error) {
+	if fromAddress == "" {
+		fromAddress, _, err = h.PublicKeyToAddress(fromPublicKey)
+		if err != nil {
+			return
+		}
+	}
+	pub, err := hex.DecodeString(fromPublicKey)
+	xrp_pubKey := XRP_importPublicKey(pub)
+	amt := amount.String()
+	txseq := getSeq(fromAddress)
+	transaction, hash, _ := XRP_newUnsignedPaymentTransaction(xrp_pubKey, nil, txseq, toAddress, amt, *args[0].(*int64), "", false, false, false)
+	digests = append(digests, hash.String())
+	return
+}
+
+func (h XRPTransactionHandler) SignTransaction(hash []string, seed interface{}) (rsv []string, err error) {
+	key := XRP_importKeyFromSeed(seed.(string), "ecdsa")
+	keyseq := uint32(0)
+
+	hashBytes, err := hex.DecodeString(hash[0])
+	if err != nil {
+		return
+	}
+
+	sig, err := crypto.Sign(key.Private(&keyseq), hashBytes, nil)
+	if err != nil {
+		return
+	}
+	signature, err := btcec.ParseSignature(sig, btcec.S256())
+	if err != nil {
+		return
+	}
+	rx := fmt.Sprintf("%X", signature.R)
+	sx := fmt.Sprintf("%X", signature.S)
+	rsv = append(rsv, rx + sx + "00")
+	fmt.Printf("rsv : %v\n\n", rsv)
+	return
+}
+
+func (h XRPTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
+	sig := rsvToSig(rsv[0])
+	signedTransaction = XRP_makeSignedTx(transaction.(data.Transaction), sig)
+	return
+}
+
+func (h XRPTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
+	ret = XRP_submitTx(signedTransaction.(data.Transaction))
+
+	fmt.Printf("ret : %s\n\n", ret)
+	var retStruct interface{}
+	json.Unmarshal([]byte(ret), &retStruct)
+	fmt.Printf("retStruct is %+v\n\n", retStruct)
+	result := retStruct.(map[string]interface{})["result"].(map[string]interface{})
+	fmt.Printf("result is %+v\n\n", result)
+	if result["error"] != nil {
+		ret = ""
+		err = fmt.Errorf("%v, %v Error message: %v", result["error"], result["error_exception"], result["error_message"])
+		return
+	}
+	if result["engine_result_message"].(string) == "The transaction was applied. Only final in a validated ledger." {
+		ret = "success/" + result["tx_json"].(map[string]interface{})["hash"].(string)
+	}
+
+	return
+}
+
+func (h XRPTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+	data := "{\"method\":\"tx\", \"params\":[{\"transaction\":\"" + txhash + "\", \"binary\":false}]}"
+	ret := rpcutils.DoPostRequest(url, "", data)
+	fmt.Printf("ret : %s", ret)
+
+	var retStruct interface{}
+	json.Unmarshal([]byte(ret), &retStruct)
+	result := retStruct.(map[string]interface{})["result"].(map[string]interface{})
+
+	if result["error"] != nil {
+		err = fmt.Errorf("%v, error code: %v,  error message: %v", result["error"].(string), result["error_code"].(float64), result["error_message"].(string))
+		return
+	}
+
+	fromAddress = result["Account"].(string)
+	toAddress = result["Destination"].(string)
+	amt := result["Amount"].(string)
+	transferAmount, _ = new(big.Int).SetString(amt, 10)
+	return
+}
+
+func (h XRPTransactionHandler) GetAddressBalance(address string, args ...interface{}) (balance *big.Int, err error) {
+	return
 }
 
 func parseAccount(s string) *data.Account {
@@ -60,7 +166,7 @@ type Account struct {
 func getAccount (address string) (Account) {
 	// TODO
 	reader := strings.NewReader("{\"method\":\"account_info\",\"params\":[{\"account\":\"" + address + "\"}]}")
-        request, err := http.NewRequest("POST", "https://s.altnet.rippletest.net:51234", reader)
+        request, err := http.NewRequest("POST", url, reader)
         checkErr(err)
         client := &http.Client{}
         resp, err := client.Do(request)
@@ -120,15 +226,6 @@ func XRP_FundAddress(toaddress string) {
         XRP_makeSignedTx(tx, sig)
         res := XRP_submitTx(tx)
         fmt.Printf("%v\n",res)
-}
-
-func XRP_newUnsignedCrossCurrencyPayment (fromaddress string, pubkey []byte, toaddress string, fromcurrency, tocurrency) (data.Transaction, data.Hash256, []byte) {
-	// TODO
-	key := XRP_importPublicKey(pubkey)
-	path := ""  // getPath(...)
-	txseq := getSeq(fromaddress)
-	amt := ""
-	return XRP_newUnsignedPaymentTransaction(key, nil, txseq, toaddress, amt, int64(10), path, true, true, true)
 }
 
 // keyseq is only supported by ecdsa, leave nil when key crypto type is ed25519
@@ -194,13 +291,7 @@ func XRP_submitTx(signedTx data.Transaction) string {
 	checkErr(err)
 	txBlob := fmt.Sprintf("%X", raw)
 
-	reader := strings.NewReader("{\"method\":\"submit\",\"params\":[{\"tx_blob\":\"" + txBlob + "\"}]}")
-	request, err := http.NewRequest("POST", url, reader)
-	checkErr(err)
-	client := &http.Client{}
-	resp, err := client.Do(request)
-	checkErr(err)
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	return string(body)
+	data := "{\"method\":\"submit\",\"params\":[{\"tx_blob\":\"" + txBlob + "\"}]}"
+
+	return rpcutils.DoPostRequest(url, "", data)
 }
