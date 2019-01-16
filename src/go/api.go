@@ -6,6 +6,7 @@ import (
 	"github.com/cryptocoins/src/go/erc20"
 	"github.com/cryptocoins/src/go/xrp"
 	"github.com/cryptocoins/src/go/eos"
+	"github.com/cryptocoins/src/go/trx"
 )
 
 type TransactionHandler interface {
@@ -50,6 +51,8 @@ func NewTransactionHandler(coinType string) (txHandler TransactionHandler) {
 		return &xrp.XRPTransactionHandler{}
 	case "EOS":
 		return &eos.EOSTransactionHandler{}
+	case "TRX":
+		return &trx.TRXTransactionHandler{}
 /*
 	case "BTC":
 		return &BTCTransactionHandler{}
