@@ -47,7 +47,7 @@ var tokens map[string]string = map[string]string{
 type ERC20TransactionHandler struct {
 }
 
-func (h ERC20TransactionHandler) PublicKeyToAddress (pubKeyHex string) (address string, msg string, err error) {
+func (h *ERC20TransactionHandler) PublicKeyToAddress (pubKeyHex string) (address string, msg string, err error) {
 	data := hexEncPubkey(pubKeyHex[2:])
 
 	pub, err := decodePubkey(data)
@@ -59,7 +59,7 @@ func (h ERC20TransactionHandler) PublicKeyToAddress (pubKeyHex string) (address 
 //args[0]: gasPrice	*big.Int
 //args[1]: gasLimit	uint64
 //args[2]: tokenType	string
-func (h ERC20TransactionHandler) BuildUnsignedTransaction (fromAddress, fromPublicKey, toAddress string, amount *big.Int, args ...interface{}) (transaction interface{}, digests []string, err error) {
+func (h *ERC20TransactionHandler) BuildUnsignedTransaction (fromAddress, fromPublicKey, toAddress string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
@@ -79,7 +79,7 @@ func SignTransaction(hash string, address string) (rsv string, err error) {
 }
 */
 
-func (h ERC20TransactionHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
+func (h *ERC20TransactionHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
 	hashBytes, err := hex.DecodeString(hash[0])
 	if err != nil {
 		return
@@ -95,7 +95,7 @@ func (h ERC20TransactionHandler) SignTransaction(hash []string, privateKey inter
 	return
 }
 
-func (h ERC20TransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
+func (h *ERC20TransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
@@ -103,7 +103,7 @@ func (h ERC20TransactionHandler) MakeSignedTransaction(rsv []string, transaction
 	return makeSignedTransaction(client, transaction.(*types.Transaction), rsv[0])
 }
 
-func (h ERC20TransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
+func (h *ERC20TransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
@@ -111,7 +111,7 @@ func (h ERC20TransactionHandler) SubmitTransaction(signedTransaction interface{}
 	return erc20_sendTx(client, signedTransaction.(*types.Transaction))
 }
 
-func (h ERC20TransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+func (h *ERC20TransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
@@ -137,7 +137,7 @@ func (h ERC20TransactionHandler) GetTransactionInfo(txhash string) (fromAddress,
 }
 
 // args[0] coinType string
-func (h ERC20TransactionHandler) GetAddressBalance(address string, args ...interface{}) (balance *big.Int, err error) {
+func (h *ERC20TransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error) {
 	if args[0] == nil {
 		err = fmt.Errorf("Unspecified coin type")
 		return
