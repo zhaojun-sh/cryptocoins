@@ -4,6 +4,7 @@ import (
 	"math/big"
 
 	"github.com/cryptocoins/src/go/erc20"
+	"github.com/cryptocoins/src/go/eth"
 	"github.com/cryptocoins/src/go/xrp"
 	"github.com/cryptocoins/src/go/eos"
 	"github.com/cryptocoins/src/go/trx"
@@ -56,9 +57,9 @@ func NewTransactionHandler(coinType string) (txHandler TransactionHandler) {
 /*
 	case "BTC":
 		return &BTCTransactionHandler{}
-	case "ETH":
-		return &ETHTransactionHandler{}
 */
+	case "ETH":
+		return &eth.ETHTransactionHandler{}
 	}
 	return nil
 }

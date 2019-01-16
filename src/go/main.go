@@ -14,9 +14,10 @@ import (
 
 func main() {
 	//test_eos()
+	test_eth()
 	//test_erc20()
 	//test_xrp()
-	test_tron()
+	//test_tron()
 }
 
 func test_common (h TransactionHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, build_tx_args []interface{}, queryTxHash, queryAddress string, query_balance_args []interface{}) {
@@ -71,7 +72,6 @@ func test_common (h TransactionHandler, fromPrivateKey interface{}, fromPubKeyHe
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("balance: %v\n\n", balance)
-
 }
 
 func test_eos () {
@@ -86,9 +86,30 @@ func test_eos () {
 	build_tx_args = append(build_tx_args, memo)
 	queryTxHash := "08b08184f13242e2e884db3979118aff5fb232b3d1fe2589fc056c548bbd45e5"
 	queryAcct := "degtjwol11u3"
-	var query_balance_args []interface{}
 
-	test_common (h, fromPrivateKey, fromPubKeyHex, fromAcctName, toAcctName, build_tx_args, queryTxHash, queryAcct, query_balance_args)
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAcctName, toAcctName, build_tx_args, queryTxHash, queryAcct, nil)
+}
+
+func test_eth () {
+	h := NewTransactionHandler("ETH")
+
+	fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
+	pub := crypto.FromECDSAPub(&fromPrivateKey.PublicKey)
+	fromPubKeyHex := hex.EncodeToString(pub)
+
+	fromAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
+
+	toAddress := 0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
+
+	var build_tx_args []interface{}
+	build_tx_args = append(build_tx_args, big.NewInt(1), uint64(4000000))
+
+	queryTxHash := "0xf9e16303a1b5a59b12e18be82aaed2363621844d8b78961db57d1af7aa89419f"
+
+//	queryAddress := "0xEc430068f392e5FBcE92016758C5111375d16f7D"
+	queryAddress := fromAddress
+
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, nil)
 }
 
 func test_erc20 () {
@@ -103,7 +124,7 @@ func test_erc20 () {
 	toAddress := "0xA8dC61209400C9A23bf1fe625c2919c3626Bc157"
 
 	var build_tx_args []interface{}
-	build_tx_args = append(build_tx_args, big.NewInt(10), uint64(4000000), "BNB")
+	build_tx_args = append(build_tx_args, big.NewInt(1), uint64(4000000), "BNB")
 
 	queryTxHash := "0xf9e16303a1b5a59b12e18be82aaed2363621844d8b78961db57d1af7aa89419f"
 
