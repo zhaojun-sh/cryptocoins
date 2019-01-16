@@ -5,19 +5,20 @@ import (
 
 	"github.com/cryptocoins/src/go/erc20"
 	"github.com/cryptocoins/src/go/xrp"
+	"github.com/cryptocoins/src/go/eos"
 )
 
 type TransactionHandler interface {
 
 	// 公钥to地址
 	// eos的address是随机生成的账户名, msg是eos格式的公钥: EOS6JUDHVf4mbrbMNXxhMVJUj5Tz14d1jYpdjC8ZvRgFb4jhrBKEe
-	PublicKeyToAddress(pubKeyHex string) (address string, msg string, err error)
+	PublicKeyToAddress(pubKeyHex string) (address_or_account_name string, msg string, err error)
 
 	// 构造未签名交易
 	// btc, ripple需要fromPublicKey
 	// eth, erc20需要fromAddress
 	// eos需要账户名(fromAddress)和fromPublicKey
-	BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, args ...interface{}) (transaction interface{}, digests []string, err error)
+	BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error)
 
 	// 签名函数 txhash 输出 rsv
 	//SignTransaction(hash []string, address string) (rsv []string, err error)
@@ -33,7 +34,7 @@ type TransactionHandler interface {
 	GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error)
 
 	// 账户查账户余额
-	GetAddressBalance(address string, args ...interface{}) (balance *big.Int, err error)
+	GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error)
 
 	//SetCrypto(cryptoType string)  // ecdsa, ed25519
 	//GetCrypto() string
@@ -47,13 +48,13 @@ func NewTransactionHandler(coinType string) (txHandler TransactionHandler) {
 		return &erc20.ERC20TransactionHandler{}
 	case "XRP":
 		return &xrp.XRPTransactionHandler{}
+	case "EOS":
+		return &eos.EOSTransactionHandler{}
 /*
 	case "BTC":
 		return &BTCTransactionHandler{}
 	case "ETH":
 		return &ETHTransactionHandler{}
-	case "EOS":
-		return &EOSTransactionHandler{}
 */
 	}
 	return nil
