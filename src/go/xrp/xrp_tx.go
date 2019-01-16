@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"math/big"
 	"net/http"
+	"strconv"
 	"strings"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/rubblelabs/ripple/crypto"
@@ -29,14 +30,14 @@ func checkErr(err error) {
 
 type XRPTransactionHandler struct {}
 
-func (h XRPTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, msg string, err error) {
+func (h *XRPTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, msg string, err error) {
 	pub, err := hex.DecodeString(pubKeyHex)
 	address = XRP_publicKeyToAddress(pub)
 	return
 }
 
 //args[0]: fee int64
-func (h XRPTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, args ...interface{}) (transaction interface{}, digests []string, err error) {
+func (h *XRPTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
 	if fromAddress == "" {
 		fromAddress, _, err = h.PublicKeyToAddress(fromPublicKey)
 		if err != nil {
@@ -52,9 +53,16 @@ func (h XRPTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicK
 	return
 }
 
-func (h XRPTransactionHandler) SignTransaction(hash []string, seed interface{}) (rsv []string, err error) {
-	key := XRP_importKeyFromSeed(seed.(string), "ecdsa")
-	keyseq := uint32(0)
+func (h *XRPTransactionHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
+	seed := strings.Split(privateKey.(string), "/")[0]
+	keySeqStr := strings.Split(privateKey.(string), "/")[1]
+	key := XRP_importKeyFromSeed(seed, "ecdsa")
+	ki, err1 := strconv.Atoi(keySeqStr)
+	if err1 != nil {
+		err = fmt.Errorf("invalid key sequence")
+		return
+	}
+	keyseq := uint32(ki)
 
 	hashBytes, err := hex.DecodeString(hash[0])
 	if err != nil {
@@ -66,31 +74,28 @@ func (h XRPTransactionHandler) SignTransaction(hash []string, seed interface{}) 
 		return
 	}
 	signature, err := btcec.ParseSignature(sig, btcec.S256())
+	fmt.Printf("==================\n!!!!! signature is %+v\n==================\n\n", signature)
 	if err != nil {
 		return
 	}
 	rx := fmt.Sprintf("%X", signature.R)
 	sx := fmt.Sprintf("%X", signature.S)
 	rsv = append(rsv, rx + sx + "00")
-	fmt.Printf("rsv : %v\n\n", rsv)
 	return
 }
 
-func (h XRPTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
+func (h *XRPTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
 	sig := rsvToSig(rsv[0])
 	signedTransaction = XRP_makeSignedTx(transaction.(data.Transaction), sig)
 	return
 }
 
-func (h XRPTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
+func (h *XRPTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
 	ret = XRP_submitTx(signedTransaction.(data.Transaction))
 
-	fmt.Printf("ret : %s\n\n", ret)
 	var retStruct interface{}
 	json.Unmarshal([]byte(ret), &retStruct)
-	fmt.Printf("retStruct is %+v\n\n", retStruct)
 	result := retStruct.(map[string]interface{})["result"].(map[string]interface{})
-	fmt.Printf("result is %+v\n\n", result)
 	if result["error"] != nil {
 		ret = ""
 		err = fmt.Errorf("%v, %v Error message: %v", result["error"], result["error_exception"], result["error_message"])
@@ -103,10 +108,9 @@ func (h XRPTransactionHandler) SubmitTransaction(signedTransaction interface{}) 
 	return
 }
 
-func (h XRPTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+func (h *XRPTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
 	data := "{\"method\":\"tx\", \"params\":[{\"transaction\":\"" + txhash + "\", \"binary\":false}]}"
 	ret := rpcutils.DoPostRequest(url, "", data)
-	fmt.Printf("ret : %s", ret)
 
 	var retStruct interface{}
 	json.Unmarshal([]byte(ret), &retStruct)
@@ -124,7 +128,9 @@ func (h XRPTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, t
 	return
 }
 
-func (h XRPTransactionHandler) GetAddressBalance(address string, args ...interface{}) (balance *big.Int, err error) {
+func (h *XRPTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error) {
+	account := getAccount(address)
+	balance, _ = new(big.Int).SetString(account.Balance, 10)
 	return
 }
 
@@ -152,6 +158,19 @@ func parsePaths(s string) *data.PathSet {
 
 type JsonRet struct {
 	Result Account_info_Res
+}
+
+func rsvToSig(rsv string) []byte {
+	b, _ := hex.DecodeString(rsv)
+	rx := hex.EncodeToString(b[:32])
+	sx := hex.EncodeToString(b[32:64])
+	r, _ := new(big.Int).SetString(rx, 16)
+	s, _ := new(big.Int).SetString(sx, 16)
+	signature := &btcec.Signature{
+		R: r,
+		S: s,
+	}
+	return signature.Serialize()
 }
 
 type Account_info_Res struct {
