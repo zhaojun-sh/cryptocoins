@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
 	"math/big"
@@ -8,12 +9,14 @@ import (
 
 	"github.com/cryptocoins/src/go/xrp"
 	"github.com/cryptocoins/src/go/eos"
+	"github.com/cryptocoins/src/go/trx"
 )
 
 func main() {
-	test_eos()
+	//test_eos()
 	//test_erc20()
 	//test_xrp()
+	test_tron()
 }
 
 func test_common (h TransactionHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, build_tx_args []interface{}, queryTxHash, queryAddress string, query_balance_args []interface{}) {
@@ -126,4 +129,23 @@ func test_xrp () {
 	queryAddress := "raF1e6TSKtB34MZ9USrKphQAW5hYbARFWK"
 
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, nil)
+}
+
+type Seed struct {}
+
+func (s *Seed) Read(p []byte) (n int, err error) {
+	n = 1
+	return
+}
+
+func test_tron() {
+	h := NewTransactionHandler("TRX")
+	fromPrivateKey, _ := ecdsa.GenerateKey(crypto.S256(), &Seed{})
+	fromPubKeyHex := trx.PublicKeyToHex(&trx.PublicKey{&fromPrivateKey.PublicKey})
+	fromAddress := "417e5f4552091a69125d5dfcb7b8c2659029395bdf"
+	toAddress := "41062ae7be408a0cd83a1cb44874d1e748e374d50c"
+	queryTxHash := "4ec77591400e30c729f10a11d6b33ef75ea565d46b6314f2fa8d170a4b8f74e1"
+	queryAddress := fromAddress
+
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, nil, queryTxHash, queryAddress, nil)
 }
