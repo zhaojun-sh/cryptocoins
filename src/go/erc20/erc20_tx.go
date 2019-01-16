@@ -119,7 +119,7 @@ func (h *ERC20TransactionHandler) GetTransactionInfo(txhash string) (fromAddress
 	hash := common.HexToHash(txhash)
 	tx, isPending, err1 := client.TransactionByHash(context.Background(), hash)
 	if err1 == nil && isPending == false && tx != nil {
-		msg, err2 := tx.AsMessage(types.MakeSigner(chainConfig, big.NewInt(3504188)))
+		msg, err2 := tx.AsMessage(types.MakeSigner(chainConfig, GetLastBlock()))
 		err = err2
 		fromAddress = msg.From().Hex()
 		data := msg.Data()
@@ -197,6 +197,15 @@ func (h *ERC20TransactionHandler) GetAddressBalance(address string, args []inter
 	fmt.Printf("balance1: %v\n\n", balance1)
 
 	return
+}
+
+func GetLastBlock() *big.Int {
+	client, err := ethclient.Dial(url)
+	if err != nil {
+		return nil
+	}
+	blk, _ := client.BlockByNumber(context.Background(), nil)
+	return blk.Number()
 }
 
 func hexEncPubkey(h string) (ret [64]byte) {
