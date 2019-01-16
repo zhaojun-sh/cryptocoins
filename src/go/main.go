@@ -7,11 +7,12 @@ import (
 	"github.com/fusion/go-fusion/crypto"
 
 	"github.com/cryptocoins/src/go/xrp"
+	"github.com/cryptocoins/src/go/eos"
 )
 
 func main() {
-	//test_eos()
-	test_erc20()
+	test_eos()
+	//test_erc20()
 	//test_xrp()
 }
 
@@ -67,12 +68,14 @@ func test_common (h TransactionHandler, fromPrivateKey interface{}, fromPubKeyHe
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("balance: %v\n\n", balance)
+
 }
 
 func test_eos () {
 	h := NewTransactionHandler("EOS")
 	fromPrivateKey := "5JqBVZS4shWHBhcht6bn3ecWDoZXPk3TRSVpsLriQz5J3BKZtqH"
-	fromPubKeyHex := "EOS7EXiYEgNaxgc8ABX5YTATs4fC9nEuCa9fna61X2nZ8Z8KDEMLg"
+	fromPubKey := "EOS7EXiYEgNaxgc8ABX5YTATs4fC9nEuCa9fna61X2nZ8Z8KDEMLg"
+	fromPubKeyHex, _ := eos.PubKeyToHex(fromPubKey)
 	fromAcctName := "gzx123454321"
 	toAcctName := "degtjwol11u3"
 	var build_tx_args []interface{}

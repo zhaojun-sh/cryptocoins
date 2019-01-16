@@ -25,7 +25,11 @@ type EOSTransactionHandler struct {
 func (h *EOSTransactionHandler) PublicKeyToAddress(pubKeyHex string) (acctName string, msg string, err error) {
 	acctName = GenRandomAccountName(pubKeyHex)
 	msg = "this account name is not expected to be seen on chain, and the public key is not delegated by any existed account. it is possible to create an account with this name and delegate the public key."
-	accounts, err := GetAccountNameByPubKey(pubKeyHex)
+	pubKey, err := HexToPubKey(pubKeyHex)
+	if err != nil {
+		return
+	}
+	accounts, err := GetAccountNameByPubKey(pubKey.String())
 	if len(accounts) != 0 {
 		msg = "this public key is delegated by accounts: "
 		for _, acct := range accounts {
@@ -183,7 +187,20 @@ func GetHeadBlockID(nodeos string) (chainID string, err error) {
 	return fmt.Sprintf("%v",m["head_block_id"]), nil
 }
 
+func PubKeyToHex(pk string) (pubKeyHex string, _ error) {
+	pubKey, err := ecc.NewPublicKey(pk)
+	if err != nil {
+		return "", err
+	}
+	pubKeyHex = "0x" + hex.EncodeToString(pubKey.Content)
+	return
+}
+
 func HexToPubKey(pubKeyHex string) (ecc.PublicKey, error) {
+	fmt.Printf("hex is %v\nlen(hex) is %v\n\n", pubKeyHex, len(pubKeyHex))
+	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
+		pubKeyHex = pubKeyHex[2:]
+	}
 	// TODO 判断长度
 	if len(pubKeyHex) == 130 {
 		uBytes, err := hex.DecodeString(pubKeyHex)
@@ -252,6 +269,7 @@ func hexToChecksum256(data string) eos.Checksum256 {
 // 根据公钥生成随机的账户名
 func GenRandomAccountName(pubKeyHex string) string {
 	b, _ := hex.DecodeString(pubKeyHex)
+	fmt.Printf("!!! %v \n!!! %v\n\n", pubKeyHex, b)
 
 	r, _ := rand.Int(rand.Reader, big.NewInt(256))
 	b = append(b, byte(r.Uint64()))
