@@ -7,14 +7,15 @@ import (
 	"math/big"
 	"github.com/fusion/go-fusion/crypto"
 
-	"github.com/cryptocoins/src/go/xrp"
 	"github.com/cryptocoins/src/go/eos"
+	"github.com/cryptocoins/src/go/xrp"
 	"github.com/cryptocoins/src/go/trx"
 )
 
 func main() {
+	test_btc()
 	//test_eos()
-	test_eth()
+	//test_eth()
 	//test_erc20()
 	//test_xrp()
 	//test_tron()
@@ -72,6 +73,20 @@ func test_common (h TransactionHandler, fromPrivateKey interface{}, fromPubKeyHe
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("balance: %v\n\n", balance)
+
+}
+
+func test_btc () {
+	h := NewTransactionHandler("BTC")
+	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
+	fromPubKeyHex := "03c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fd"
+	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
+	toAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
+	var build_tx_args []interface{}
+	build_tx_args = append(build_tx_args, float64(0), "")
+	queryTxHash := "26fdbccea16ffec1bdc3a5becb44cda518c1edc0633b94c0cb9339285bf19c9c"
+	queryAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, nil)
 }
 
 func test_eos () {
@@ -99,7 +114,7 @@ func test_eth () {
 
 	fromAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
 
-	toAddress := 0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
+	toAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
 
 	var build_tx_args []interface{}
 	build_tx_args = append(build_tx_args, big.NewInt(1), uint64(4000000))

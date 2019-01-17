@@ -3,10 +3,11 @@ package main
 import (
 	"math/big"
 
-	"github.com/cryptocoins/src/go/erc20"
-	"github.com/cryptocoins/src/go/eth"
-	"github.com/cryptocoins/src/go/xrp"
+	"github.com/cryptocoins/src/go/btc"
 	"github.com/cryptocoins/src/go/eos"
+	"github.com/cryptocoins/src/go/eth"
+	"github.com/cryptocoins/src/go/erc20"
+	"github.com/cryptocoins/src/go/xrp"
 	"github.com/cryptocoins/src/go/trx"
 )
 
@@ -46,20 +47,18 @@ type TransactionHandler interface {
 
 func NewTransactionHandler(coinType string) (txHandler TransactionHandler) {
 	switch coinType {
+	case "BTC":
+		return &btc.BTCTransactionHandler{}
+	case "EOS":
+		return &eos.EOSTransactionHandler{}
+	case "ETH":
+		return &eth.ETHTransactionHandler{}
 	case "ERC20":
 		return &erc20.ERC20TransactionHandler{}
 	case "XRP":
 		return &xrp.XRPTransactionHandler{}
-	case "EOS":
-		return &eos.EOSTransactionHandler{}
 	case "TRX":
 		return &trx.TRXTransactionHandler{}
-/*
-	case "BTC":
-		return &BTCTransactionHandler{}
-*/
-	case "ETH":
-		return &eth.ETHTransactionHandler{}
 	}
 	return nil
 }
