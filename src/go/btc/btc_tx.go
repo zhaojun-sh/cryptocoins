@@ -44,11 +44,17 @@ func (h *BTCTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address st
 	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
 		pubKeyHex = pubKeyHex[2:]
 	}
-	b, err := hex.DecodeString(pubKeyHex)
+	bb, err := hex.DecodeString(pubKeyHex)
 	if err != nil {
 		return
 	}
+	pubKey, err := btcec.ParsePubKey(bb, btcec.S256())
+	if err != nil {
+		return
+	}
+	b := pubKey.SerializeCompressed()
 	pkHash := btcutil.Hash160(b)
+	fmt.Printf("!!!!!\n%v\n!!!!!\n\n", pkHash)
 	addressPubKeyHash, err := btcutil.NewAddressPubKeyHash(pkHash, &ChainConfig)
 	if err != nil {
 		return
@@ -168,7 +174,16 @@ func (h *BTCTransactionHandler) SignTransaction(hash []string, wif interface{}) 
 			err = err2
 			return
 		}
-		str := fmt.Sprintf("%X%X00", signature.R, signature.S)
+		rr := fmt.Sprintf("%X", signature.R)
+		ss := fmt.Sprintf("%X", signature.S)
+		for len(rr) < 64 {
+			rr = "0" + rr
+		}
+		for len(ss) < 64 {
+			ss = "0" + ss
+		}
+		str := fmt.Sprintf("%s%s00", rr, ss)
+		fmt.Printf("#################\n%s##################\n\n", str)
 		rsv = append(rsv, str)
 	}
 	return
@@ -205,18 +220,18 @@ func (h *BTCTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 
 		// 从rsv中恢复公钥
 		rsv_bytes, _ := hex.DecodeString(rsv[i])
-		v, _ := hex.DecodeString(rsv[i][l:])
-		rsv_bytes = append(rsv_bytes, v...)
+		fmt.Println("*******************")
+		fmt.Printf("%v\n\n", len(rsv_bytes))
 		txhashbytes, _ := hex.DecodeString(transaction.(*AuthoredTx).Digests[i])
-		fmt.Printf("============ 1111 ============\n\nlen(txhashbytes) is %v\n\nlen(rsv_bytes) is %v\n\n", len(txhashbytes), len(rsv_bytes))
 		pkData, err1 := crypto.Ecrecover(txhashbytes, rsv_bytes)
 		if err1 != nil {
 			err = err1
 			return
 		}
+		pk, _ := btcec.ParsePubKey(pkData, btcec.S256())
+		cPkData := pk.SerializeCompressed()
 
-		fmt.Printf("============ 2222 ============\n\n")
-		sigScript, err2 := txscript.NewScriptBuilder().AddData(signbytes).AddData(pkData).Script()
+		sigScript, err2 := txscript.NewScriptBuilder().AddData(signbytes).AddData(cPkData).Script()
 		if err2 != nil {
 			err = err2
 			return
@@ -376,13 +391,12 @@ func sendRawTransaction (tx *wire.MsgTx, allowHighFees bool) (string, error){
         }
 	cmd := btcjson.NewSendRawTransactionCmd(txHex, &allowHighFees)
 
-	marshalledJSON, err := btcjson.MarshalCmd(99, cmd)
+	marshalledJSON, err := btcjson.MarshalCmd(1, cmd)
         if err != nil {
                 return "", err
         }
 
 	c, _ := dcrm.NewClient(dcrm.SERVER_HOST,dcrm.SERVER_PORT,dcrm.USER,dcrm.PASSWD,dcrm.USESSL)
-
 	retJSON, err := c.Send(string(marshalledJSON))
 
 	if err != nil {
@@ -616,28 +630,28 @@ func loginPre1(method string, url string) string {
     reqest.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0")
     response, err := c.Do(reqest)
     defer response.Body.Close()
- 
+
     if err != nil {
 	    fmt.Println("Fatal error ", err.Error())
 	    return ""
     }
- 
+
     if response.StatusCode == 200 {
- 
+
 	    var body string
- 
+
 	    switch response.Header.Get("Content-Encoding") {
 	    case "gzip":
 		    reader, _ := gzip.NewReader(response.Body)
 		    for {
 			    buf := make([]byte, 1024)
 			    n, err := reader.Read(buf)
- 
+
 			    if err != nil && err != io.EOF {
 				 panic(err)
 				return ""
 			    }
- 
+
 			    if n == 0 {
 				 break
 			    }
@@ -647,11 +661,11 @@ func loginPre1(method string, url string) string {
 		    bodyByte, _ := ioutil.ReadAll(response.Body)
 		    body = string(bodyByte)
 	    }
- 
+
 	    return body
     }
- 
-    return "" 
+
+    return ""
 }
 //+++++++++++++++++++++end++++++++++++++++++++++
 
