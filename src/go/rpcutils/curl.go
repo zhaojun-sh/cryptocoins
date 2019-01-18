@@ -1,4 +1,4 @@
-package utils
+package rpcutils
 import (
 	"bytes"
 	"log"
