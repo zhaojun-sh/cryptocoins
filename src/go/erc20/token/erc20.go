@@ -7,12 +7,12 @@ import (
 	"math/big"
 	"strings"
 
-	ethereum "github.com/fusion/go-fusion"
-	"github.com/fusion/go-fusion/accounts/abi"
-	"github.com/fusion/go-fusion/accounts/abi/bind"
-	"github.com/fusion/go-fusion/common"
-	"github.com/fusion/go-fusion/core/types"
-	"github.com/fusion/go-fusion/event"
+	ethereum "github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/event"
 )
 
 // TokenABI is the input ABI used to generate the binding from.

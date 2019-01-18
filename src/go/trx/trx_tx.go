@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/fusion/go-fusion/crypto"
+	"github.com/ethereum/go-ethereum/crypto"
 	tcrypto "github.com/cryptocoins/src/go/trx/crypto"
 
 	rpcutils "github.com/cryptocoins/src/go/rpcutils"

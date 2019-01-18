@@ -12,17 +12,17 @@ import  (
 	"math/big"
 	"strings"
 
-	"github.com/fusion/go-fusion/params"
+	"github.com/ethereum/go-ethereum/params"
 
 
-	"github.com/fusion/go-fusion"
-	"github.com/fusion/go-fusion/accounts/abi"
-	"github.com/fusion/go-fusion/accounts/abi/bind"
-	"github.com/fusion/go-fusion/common"
-	"github.com/fusion/go-fusion/core/types"
-	ethcrypto "github.com/fusion/go-fusion/crypto"
-	"github.com/fusion/go-fusion/crypto/sha3"
-	"github.com/fusion/go-fusion/ethclient"
+	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	ethcrypto "github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/crypto/sha3"
+	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/cryptocoins/src/go/config"
 	rpcutils "github.com/cryptocoins/src/go/rpcutils"

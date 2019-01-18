@@ -24,8 +24,9 @@ import (
 	"github.com/btcsuite/btcwallet/wallet/txauthor"
 	"github.com/btcsuite/btcwallet/wallet/txrules"
 
-	"github.com/fusion/go-fusion/crypto"
-	"github.com/fusion/go-fusion/crypto/dcrm"
+	"github.com/ethereum/go-ethereum/crypto"
+	rpcutils "github.com/cryptocoins/src/go/rpcutils"
+	"github.com/cryptocoins/src/go/config"
 )
 
 var ChainConfig = chaincfg.TestNet3Params
@@ -396,7 +397,7 @@ func sendRawTransaction (tx *wire.MsgTx, allowHighFees bool) (string, error){
                 return "", err
         }
 
-	c, _ := dcrm.NewClient(dcrm.SERVER_HOST,dcrm.SERVER_PORT,dcrm.USER,dcrm.PASSWD,dcrm.USESSL)
+	c, _ := rpcutils.NewClient(config.BTC_SERVER_HOST,config.BTC_SERVER_PORT,config.BTC_USER,config.BTC_PASSWD,config.BTC_USESSL)
 	retJSON, err := c.Send(string(marshalledJSON))
 
 	if err != nil {
