@@ -1,5 +1,5 @@
 # cryptocoins
-Research all coins hash, address and signature algorithm.
+Research most crypto coins hash, address and signature algorithm.
 
 | No | Name | Website | Explorer | Source code | Signature | Sig2 | Hash | Address | Address format | bip44 | testnet faucet | example | reference |
 |-----|------------------|------------------------------|--------------------------------------|-------------------------------------|---------------------|--------------------|----------------|----------------------------------------------------------------------------------------------------------|----------------|-------|--------------------------------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------|
@@ -27,15 +27,15 @@ Research all coins hash, address and signature algorithm.
 | 22 | Dogecoin |  |  |  |  |  |  |  |  |  |  |  |  |
 | 23 | Qtum |  |  |  |  |  |  |  |  |  |  |  |  |
 | 24 | Ontology |  |  |  |  |  |  |  |  |  |  |  |  |
-| 25 | Lisk |  |  |  |  |  |  |  |  |  |  |  |  |
+| 25 | Lisk |  |  |  |  |  |  | 16116311465312421834L |  |  |  |  |  |
 | 26 | Bitcoin Diamond |  |  |  |  |  |  |  |  |  |  |  |  |
 | 27 | ICON |  |  |  |  |  |  |  |  |  |  |  |  |
-| 28 | BitShares |  |  |  |  |  |  |  |  |  |  |  |  |
+| 28 | BitShares |  |  |  |  |  |  | binance-bts-1 |  |  |  |  |  |
 | 29 | Bytecoin |  |  |  |  |  |  |  |  |  |  |  |  |
-| 30 | Nano |  |  |  |  |  |  |  |  |  |  |  |  |
+| 30 | Nano |  |  |  |  |  |  | xrb_1iw67bkxky6gxhu76h73dzb7rfei83th575m5fig9hgod9sj5eabjrkwnukz |  |  |  |  |  |
 | 31 | DigiByte |  |  |  |  |  |  |  |  |  |  |  |  |
-| 32 | Siacoin |  |  |  |  |  |  |  |  |  |  |  |  |
-| 33 | Steem |  |  |  |  |  |  |  |  |  |  |  |  |
+| 32 | Siacoin |  |  |  |  |  |  | 4d7a3cec093f94829ae66c8f5d0c0c9b93b78e60a9f560feb02f702054daf9d886d199289638 |  |  |  |  |  |
+| 33 | Steem |  |  |  |  |  |  | deepcrypto8 |  |  |  |  |  |
 | 34 | Verge |  |  |  |  |  |  |  |  |  |  |  |  |
 | 35 | Bytom |  |  |  |  |  |  |  |  |  |  |  |  |
 | 36 | Waves |  |  |  |  |  |  |  |  |  |  |  |  |
@@ -69,7 +69,7 @@ Research all coins hash, address and signature algorithm.
 | 64 | WaykiChain |  |  |  |  |  |  |  |  |  |  |  |  |
 | 65 | Emercoin |  |  |  |  |  |  |  |  |  |  |  |  |
 | 66 | Peercoin |  |  |  |  |  |  |  |  |  |  |  |  |
-| 67 | Nexus |  |  |  |  |  |  |  |  |  |  |  |  |
+| 67 | Nexus |  |  |  |  |  |  | 2R1X4eeys3gX6mX5PHgEb7aDmiKbudTYyaQFsyZXz73KQ853Vdp |  |  |  |  |  |
 | 68 | Groestlcoin |  |  |  |  |  |  |  |  |  |  |  |  |
 | 69 | Byteball Bytes |  |  |  |  |  |  |  |  |  |  |  |  |
 | 70 | Neblio |  |  |  |  |  |  |  |  |  |  |  |  |
