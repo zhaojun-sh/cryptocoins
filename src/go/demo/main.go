@@ -81,14 +81,13 @@ func test_btc () {
 	fmt.Printf("=========================\n           BTC           \n=========================\n\n")
 	h := api.NewTransactionHandler("BTC")
 	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
-	//fromPubKeyHex := "03c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fd"
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
-	toAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
+	toAddress := "2MteNic4ttfvkYCJYEaYMuqrNcnc6xzwoBL"
 	var build_tx_args []interface{}
 	build_tx_args = append(build_tx_args, float64(0), "")
 	queryTxHash := "1d77755a038f6a63f015ecedafdc7827a7f82cf2540f2e5e18054fdc8a523d2d"
-	queryAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
+	queryAddress := "2MteNic4ttfvkYCJYEaYMuqrNcnc6xzwoBL"
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, nil)
 }
 

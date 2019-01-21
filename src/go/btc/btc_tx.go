@@ -94,10 +94,19 @@ func (h *BTCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublic
 		if unspentOutput.Confirmations < RequiredConfirmations {
 			continue
 		}
+		b, _ := hex.DecodeString(unspentOutput.ScriptPubKey)
+		pkScript, err := txscript.ParsePkScript(b)
+		if err != nil {
+			continue
+		}
+		class := pkScript.Class().String()
+		if class != "pubkeyhash" {
+			continue
+		}
 		sourceAddressOutputs := sourceOutputs[unspentOutput.Address]
 		sourceOutputs[unspentOutput.Address] = append(sourceAddressOutputs, unspentOutput)
 	}
-	// 设置交易输出                r
+	// 设置交易输出
 	// 生成锁定脚本
 	var txOuts []*wire.TxOut
 	toAddr, _ := btcutil.DecodeAddress(toAddress, &ChainConfig)
@@ -105,7 +114,7 @@ func (h *BTCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublic
 	txOut := wire.NewTxOut(amount.Int64(), pkscript)
 	txOuts = append(txOuts,txOut)
 	if len(sourceOutputs) < 1 {
-		err = errContext(err, "this error never occurs")
+		err = errContext(err, "cannot find p2pkh utxo")
 		return
 	}
 	previousOutputs := sourceOutputs[fromAddress]
@@ -381,7 +390,6 @@ type AuthoredTx struct {
 // BUGS: Fee estimation may be off when redeeming non-compressed P2PKH outputs.
 func newUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb btcutil.Amount,
 	fetchInputs txauthor.InputSource, fetchChange txauthor.ChangeSource) (*AuthoredTx, error) {
-
 	targetAmount := SumOutputValues(outputs)
 	estimatedSize := EstimateVirtualSize(0, 1, 0, outputs, true)
 	targetFee := txrules.FeeForSerializeSize(relayFeePerKb, estimatedSize)
@@ -394,7 +402,6 @@ func newUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb btcutil.Amount,
 		if inputAmount < targetAmount+targetFee {
 			return nil, fmt.Errorf("insufficient funds")
 		}
-
 		// We count the types of inputs, which we'll use to estimate
 		// the vsize of the transaction.
 		var nested, p2wpkh, p2pkh int
@@ -410,7 +417,6 @@ func newUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb btcutil.Amount,
 				p2pkh++
 			}
 		}
-
 		maxSignedSize := EstimateVirtualSize(p2pkh, p2wpkh,
 			nested, outputs, true)
 		maxRequiredFee := txrules.FeeForSerializeSize(relayFeePerKb, maxSignedSize)
@@ -465,6 +471,7 @@ func sendRawTransaction (tx *wire.MsgTx, allowHighFees bool) (string, error){
 	cmd := btcjson.NewSendRawTransactionCmd(txHex, &allowHighFees)
 
 	marshalledJSON, err := btcjson.MarshalCmd(1, cmd)
+	fmt.Printf("%v\n\n", string(marshalledJSON))
         if err != nil {
 		return "", err
 	}
