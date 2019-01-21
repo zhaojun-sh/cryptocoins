@@ -56,7 +56,7 @@ func (h *BTCTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address st
 	}
 	b := pubKey.SerializeCompressed()
 	pkHash := btcutil.Hash160(b)
-	fmt.Printf("!!!!!\n%v\n!!!!!\n\n", pkHash)
+	fmt.Printf("pubkey hash is %v\n\n", hex.EncodeToString(pkHash))
 	addressPubKeyHash, err := btcutil.NewAddressPubKeyHash(pkHash, &ChainConfig)
 	if err != nil {
 		return
@@ -106,10 +106,6 @@ func (h *BTCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublic
 	pkscript, _ := txscript.PayToAddrScript(toAddr)
 	txOut := wire.NewTxOut(amount.Int64(), pkscript)
 	txOuts = append(txOuts,txOut)
-	for _, txo := range txOuts {
-		fmt.Printf("txo is %v\n",txo)
-		fmt.Printf("txo value is %v\n",txo.Value)
-	}
 	if len(sourceOutputs) < 1 {
 		err = errContext(err, "this error never occurs")
 		return
@@ -185,7 +181,6 @@ func (h *BTCTransactionHandler) SignTransaction(hash []string, wif interface{}) 
 			ss = "0" + ss
 		}
 		str := fmt.Sprintf("%s%s00", rr, ss)
-		fmt.Printf("#################\n%s##################\n\n", str)
 		rsv = append(rsv, str)
 	}
 	return
@@ -222,17 +217,23 @@ func (h *BTCTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 
 		// 从rsv中恢复公钥
 		rsv_bytes, _ := hex.DecodeString(rsv[i])
-		fmt.Println("*******************")
-		fmt.Printf("%v\n\n", len(rsv_bytes))
 		txhashbytes, _ := hex.DecodeString(transaction.(*AuthoredTx).Digests[i])
 		pkData, err1 := crypto.Ecrecover(txhashbytes, rsv_bytes)
+		fmt.Printf("rsv[i] is %v\n\n", rsv[i])
 		if err1 != nil {
 			err = err1
 			return
 		}
 		pk, _ := btcec.ParsePubKey(pkData, btcec.S256())
 		cPkData := pk.SerializeCompressed()
-
+		fmt.Printf("recovered pk is %s\n\n", hex.EncodeToString(cPkData))
+/*
+		cPkData1, _ := hex.DecodeString("03c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fd")
+		if string(cPkData) != string(cPkData1) {
+			err = fmt.Errorf("recover public key error: got %v, want %v", cPkData, cPkData1)
+			return
+		}
+*/
 		sigScript, err2 := txscript.NewScriptBuilder().AddData(signbytes).AddData(cPkData).Script()
 		if err2 != nil {
 			err = err2
@@ -259,11 +260,10 @@ func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 
 	c, _ := rpcutils.NewClient(config.BTC_SERVER_HOST,config.BTC_SERVER_PORT,config.BTC_USER,config.BTC_PASSWD,config.BTC_USESSL)
 	retJSON, err := c.Send(string(marshalledJSON))
-
+	fmt.Printf("%v\n\n", retJSON)
 	if err != nil {
 		return
 	}
-	fmt.Println(retJSON)
 
 	var rawTx interface{}
 	json.Unmarshal([]byte(retJSON), &rawTx)
@@ -277,7 +277,6 @@ func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 	}
 
 	retJSON2, err := c.Send(string(marshalledJSON2))
-	fmt.Println(retJSON2)
 
 	var tx interface{}
 	json.Unmarshal([]byte(retJSON2), &tx)
@@ -303,7 +302,6 @@ func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 
 	var rawTx2 interface{}
 	json.Unmarshal([]byte(retJSON3), &rawTx2)
-	fmt.Printf("rawTx: %+v\n\n", rawTx2)
 	rawTxStr2 := rawTx.(map[string]interface{})["result"].(string)
 
 	cmd4 := btcjson.NewDecodeRawTransactionCmd(rawTxStr2)
@@ -326,6 +324,10 @@ func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 func (h *BTCTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error){
 	addrsUrl := "https://api.blockcypher.com/v1/btc/test3/addrs/" + address
 	resstr := loginPre1("GET",addrsUrl)
+	if resstr == "" {
+		err = fmt.Errorf("cannot get address balance, blockcypher didnt response")
+		return
+	}
 
 	addrApiResult := parseAddrApiResult(resstr)
 	balance = big.NewInt(int64(addrApiResult.Balance))
@@ -472,6 +474,7 @@ func sendRawTransaction (tx *wire.MsgTx, allowHighFees bool) (string, error){
         if err != nil {
 		return "", err
 	}
+	fmt.Printf("!!!marshalledJSON: %v\n\n", string(marshalledJSON))
 
 	c, _ := rpcutils.NewClient(config.BTC_SERVER_HOST,config.BTC_SERVER_PORT,config.BTC_USER,config.BTC_PASSWD,config.BTC_USESSL)
 	retJSON, err := c.Send(string(marshalledJSON))
@@ -627,6 +630,9 @@ func parseTxApiResult (resstr string) *TxApiResult {
 func listUnspent(dcrmaddr string) ([]btcjson.ListUnspentResult, error) {
 	addrsUrl := "https://api.blockcypher.com/v1/btc/test3/addrs/" + dcrmaddr
 	resstr := loginPre1("GET",addrsUrl)
+	if resstr == "" {
+		return nil, fmt.Errorf("cannont get address's utxo, blockcypher didnt response")
+	}
 
 	addrApiResult := parseAddrApiResult(resstr)
 
@@ -706,6 +712,9 @@ func loginPre1(method string, url string) string {
     reqest.Header.Add("Referer", "http://weibo.com/")
     reqest.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0")
     response, err := c.Do(reqest)
+    if response == nil {
+	    return ""
+    }
     defer response.Body.Close()
 
     if err != nil {

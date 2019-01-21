@@ -15,11 +15,11 @@ import (
 
 func main() {
 	test_btc()
-	test_eos()
-	test_eth()
-	test_erc20()
-	test_xrp()
-	test_tron()
+	//test_eos()
+	//test_eth()
+	//test_erc20()
+	//test_xrp()
+	//test_tron()
 }
 
 func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, build_tx_args []interface{}, queryTxHash, queryAddress string, query_balance_args []interface{}) {
@@ -103,7 +103,7 @@ func test_eos () {
 	var build_tx_args []interface{}
 	memo := "hi there"
 	build_tx_args = append(build_tx_args, memo)
-	queryTxHash := "08b08184f13242e2e884db3979118aff5fb232b3d1fe2589fc056c548bbd45e5"
+	queryTxHash := "d8205bbb6e4c131c8a2bc3c6092f8416a291a453b597ddfbc8bae75060678331"
 	queryAcct := "degtjwol11u3"
 
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAcctName, toAcctName, build_tx_args, queryTxHash, queryAcct, nil)
