@@ -15,11 +15,11 @@ import (
 
 func main() {
 	test_btc()
-	//test_eos()
-	//test_eth()
-	//test_erc20()
-	//test_xrp()
-	//test_tron()
+	test_eos()
+	test_eth()
+	test_erc20()
+	test_xrp()
+	test_tron()
 }
 
 func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, build_tx_args []interface{}, queryTxHash, queryAddress string, query_balance_args []interface{}) {
@@ -78,6 +78,7 @@ func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubK
 }
 
 func test_btc () {
+	fmt.Printf("=========================\n           BTC           \n=========================\n\n")
 	h := api.NewTransactionHandler("BTC")
 	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
 	//fromPubKeyHex := "03c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fd"
@@ -92,6 +93,7 @@ func test_btc () {
 }
 
 func test_eos () {
+	fmt.Printf("=========================\n           EOS           \n=========================\n\n")
 	h := api.NewTransactionHandler("EOS")
 	fromPrivateKey := "5JqBVZS4shWHBhcht6bn3ecWDoZXPk3TRSVpsLriQz5J3BKZtqH"
 	fromPubKey := "EOS7EXiYEgNaxgc8ABX5YTATs4fC9nEuCa9fna61X2nZ8Z8KDEMLg"
@@ -108,6 +110,7 @@ func test_eos () {
 }
 
 func test_eth () {
+	fmt.Printf("=========================\n           ETH           \n=========================\n\n")
 	h := api.NewTransactionHandler("ETH")
 
 	fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
@@ -130,6 +133,7 @@ func test_eth () {
 }
 
 func test_erc20 () {
+	fmt.Printf("=========================\n           ERC20           \n=========================\n\n")
 	h := api.NewTransactionHandler("ERC20")
 
 	fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
@@ -153,6 +157,7 @@ func test_erc20 () {
 }
 
 func test_xrp () {
+	fmt.Printf("=========================\n           XRP           \n=========================\n\n")
 	h := api.NewTransactionHandler("XRP")
 	fromKey := xrp.XRP_importKeyFromSeed("ssfL5tmpTTqCw5sHjnRHQ4yyUCQKf", "ecdsa")
 	keyseq := uint32(0)
@@ -177,6 +182,7 @@ func (s *Seed) Read(p []byte) (n int, err error) {
 }
 
 func test_tron() {
+	fmt.Printf("=========================\n           TRX           \n=========================\n\n")
 	h := api.NewTransactionHandler("TRX")
 	fromPrivateKey, _ := ecdsa.GenerateKey(crypto.S256(), &Seed{})
 	fromPubKeyHex := trx.PublicKeyToHex(&trx.PublicKey{&fromPrivateKey.PublicKey})

@@ -9,7 +9,7 @@ import (
 	"github.com/btcsuite/btcd/btcjson"
 )
 
-var addr string = "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
+//var addr string = "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
 
 /*func main() {
 	ls, err := listUnspent_blockchaininfo(addr)

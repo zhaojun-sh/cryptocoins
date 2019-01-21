@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"sort"
 	"strings"
+	"strconv"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
@@ -249,10 +250,85 @@ func (h *BTCTransactionHandler) SubmitTransaction(signedTransaction interface{})
 }
 
 func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+	cmd := btcjson.NewGetRawTransactionCmd(txhash, nil)
+
+	marshalledJSON, err := btcjson.MarshalCmd(1, cmd)
+	if err != nil {
+		return
+	}
+
+	c, _ := rpcutils.NewClient(config.BTC_SERVER_HOST,config.BTC_SERVER_PORT,config.BTC_USER,config.BTC_PASSWD,config.BTC_USESSL)
+	retJSON, err := c.Send(string(marshalledJSON))
+
+	if err != nil {
+		return
+	}
+	fmt.Println(retJSON)
+
+	var rawTx interface{}
+	json.Unmarshal([]byte(retJSON), &rawTx)
+	rawTxStr := rawTx.(map[string]interface{})["result"].(string)
+
+	cmd2 := btcjson.NewDecodeRawTransactionCmd(rawTxStr)
+
+	marshalledJSON2, err := btcjson.MarshalCmd(1, cmd2)
+	if err != nil {
+		return
+	}
+
+	retJSON2, err := c.Send(string(marshalledJSON2))
+	fmt.Println(retJSON2)
+
+	var tx interface{}
+	json.Unmarshal([]byte(retJSON2), &tx)
+	toAddress = tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["scriptPubKey"].(map[string]interface{})["addresses"].([]interface{})[0].(string)
+	transferAmount = big.NewInt(int64(tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["value"].(float64)*100000000))
+
+	vintx := tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["txid"].(string)
+	vinvoutStr := tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["txid"].(string)
+	vinvout, _ := strconv.Atoi(vinvoutStr)
+
+	cmd3 := btcjson.NewGetRawTransactionCmd(vintx, nil)
+
+	marshalledJSON3, err := btcjson.MarshalCmd(1, cmd3)
+	if err != nil {
+		return
+	}
+
+	retJSON3, err := c.Send(string(marshalledJSON3))
+
+	if err != nil {
+		return
+	}
+
+	var rawTx2 interface{}
+	json.Unmarshal([]byte(retJSON3), &rawTx2)
+	fmt.Printf("rawTx: %+v\n\n", rawTx2)
+	rawTxStr2 := rawTx.(map[string]interface{})["result"].(string)
+
+	cmd4 := btcjson.NewDecodeRawTransactionCmd(rawTxStr2)
+
+	marshalledJSON4, err := btcjson.MarshalCmd(1, cmd4)
+	if err != nil {
+		return
+	}
+
+	retJSON4, err := c.Send(string(marshalledJSON4))
+
+	var tx2 interface{}
+	json.Unmarshal([]byte(retJSON4), &tx2)
+
+	fromAddress = tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[vinvout].(map[string]interface{})["scriptPubKey"].(map[string]interface{})["addresses"].([]interface{})[0].(string)
+
 	return
 }
 
 func (h *BTCTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error){
+	addrsUrl := "https://api.blockcypher.com/v1/btc/test3/addrs/" + address
+	resstr := loginPre1("GET",addrsUrl)
+
+	addrApiResult := parseAddrApiResult(resstr)
+	balance = big.NewInt(int64(addrApiResult.Balance))
 	return
 }
 
@@ -394,8 +470,8 @@ func sendRawTransaction (tx *wire.MsgTx, allowHighFees bool) (string, error){
 
 	marshalledJSON, err := btcjson.MarshalCmd(1, cmd)
         if err != nil {
-                return "", err
-        }
+		return "", err
+	}
 
 	c, _ := rpcutils.NewClient(config.BTC_SERVER_HOST,config.BTC_SERVER_PORT,config.BTC_USER,config.BTC_PASSWD,config.BTC_USESSL)
 	retJSON, err := c.Send(string(marshalledJSON))
