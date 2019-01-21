@@ -62,11 +62,11 @@ func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubK
 	fmt.Printf("%s\n\n", ret)
 
 	fmt.Printf("========== %s ==========\n\n", "test get transaction info")
-	fromAddress, toAddress, amount, _, err := h.GetTransactionInfo(queryTxHash)
+	fromAddress2, toAddress2, amount, _, err := h.GetTransactionInfo(queryTxHash)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
-	fmt.Printf("from: %v\nto: %v\namount: %v\n\n", fromAddress, toAddress, amount)
+	fmt.Printf("from: %v\nto: %v\namount: %v\n\n", fromAddress2, toAddress2, amount)
 
 	fmt.Printf("========== %s ==========\n\n", "test get balance")
 	balance, err := h.GetAddressBalance(queryAddress, query_balance_args)
@@ -87,7 +87,7 @@ func test_btc () {
 	toAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
 	var build_tx_args []interface{}
 	build_tx_args = append(build_tx_args, float64(0), "")
-	queryTxHash := "26fdbccea16ffec1bdc3a5becb44cda518c1edc0633b94c0cb9339285bf19c9c"
+	queryTxHash := "1d77755a038f6a63f015ecedafdc7827a7f82cf2540f2e5e18054fdc8a523d2d"
 	queryAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, nil)
 }
