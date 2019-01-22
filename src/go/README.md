@@ -1,18 +1,11 @@
 # golang version 
-### clone and build demo 
-#### 1. ensure dependences:  
-`github.com/btcsuite/btcd`  
-`github.com/btcsuite/btcutil`  
-`github.com/btcsuite/btcwallet`  
-`github.com/ethereum/go-ethereum`  
-`github.com/eoscanada/eos-go`  
-`github.com/rubblelabs/ripple`  
-#### 2. clone this project 
-`$ git clone https://github.com/gaozhengxin/cryptocoins.git`  
-#### 3. build demo program 
-`$ cd ./cryptocoins/src/go`  
+### clone and build demo   
+#### 1. download and build 
+`$ go get -u -d github.com/gaozhengxin/cryptocoins/src/go`  
+#### 2. compile the demo program 
+`$ cd $GOPATH/src/github.com/gaozhengxin/cryptocoins/src/go`  
 `$ go build ./demo/main.go`  
-#### 4. run demo program 
+#### 3. run demo program 
 `$ ./main`  
 
   
