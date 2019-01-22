@@ -159,6 +159,19 @@ func (h *BTCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublic
 	}
 	transaction.(*AuthoredTx).Digests = digests
 
+	if fromPublicKey[:2] == "0x" || fromPublicKey[:2] == "0X" {
+		fromPublicKey = fromPublicKey[2:]
+	}
+	bb, err := hex.DecodeString(fromPublicKey)
+	if err != nil {
+		return
+	}
+	pubKey, err := btcec.ParsePubKey(bb, btcec.S256())
+	if err != nil {
+		return
+	}
+	transaction.(*AuthoredTx).PubKeyData = pubKey.SerializeCompressed()
+
 	return
 }
 
@@ -232,13 +245,14 @@ func (h *BTCTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 		}
 		pk, _ := btcec.ParsePubKey(pkData, btcec.S256())
 		cPkData := pk.SerializeCompressed()
-/*
-		cPkData1, _ := hex.DecodeString("03c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fd")
+
+		cPkData1 := transaction.(*AuthoredTx).PubKeyData
 		if string(cPkData) != string(cPkData1) {
-			err = fmt.Errorf("recover public key error: got %v, want %v", cPkData, cPkData1)
-			return
+			//err = fmt.Errorf("recover public key error: got %v, want %v", cPkData, cPkData1)
+			//return
+			cPkData = cPkData1
 		}
-*/
+
 		sigScript, err2 := txscript.NewScriptBuilder().AddData(signbytes).AddData(cPkData).Script()
 		if err2 != nil {
 			err = err2
@@ -279,9 +293,9 @@ func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 	if err != nil {
 		return
 	}
-
+fmt.Printf("%v\n\n", string(marshalledJSON2))
 	retJSON2, err := c.Send(string(marshalledJSON2))
-
+fmt.Printf("%v\n\n", retJSON2)
 	var tx interface{}
 	json.Unmarshal([]byte(retJSON2), &tx)
 	toAddress = tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["scriptPubKey"].(map[string]interface{})["addresses"].([]interface{})[0].(string)
@@ -366,6 +380,7 @@ type AuthoredTx struct {
 	TotalInput      btcutil.Amount
 	ChangeIndex     int // negative if no change
 	Digests		[]string
+	PubKeyData	[]byte
 }
 
 // newUnsignedTransaction creates an unsigned transaction paying to one or more
