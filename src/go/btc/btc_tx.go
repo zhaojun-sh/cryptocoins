@@ -293,16 +293,14 @@ func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 	if err != nil {
 		return
 	}
-fmt.Printf("%v\n\n", string(marshalledJSON2))
 	retJSON2, err := c.Send(string(marshalledJSON2))
-fmt.Printf("%v\n\n", retJSON2)
 	var tx interface{}
 	json.Unmarshal([]byte(retJSON2), &tx)
 	toAddress = tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["scriptPubKey"].(map[string]interface{})["addresses"].([]interface{})[0].(string)
 	transferAmount = big.NewInt(int64(tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["value"].(float64)*100000000))
 
 	vintx := tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["txid"].(string)
-	vinvout := int(tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["vout"].(float64)) - 1
+	vinvout := int(tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["vout"].(float64))
 
 	cmd3 := btcjson.NewGetRawTransactionCmd(vintx, nil)
 
@@ -312,14 +310,13 @@ fmt.Printf("%v\n\n", retJSON2)
 	}
 
 	retJSON3, err := c.Send(string(marshalledJSON3))
-
 	if err != nil {
 		return
 	}
 
 	var rawTx2 interface{}
 	json.Unmarshal([]byte(retJSON3), &rawTx2)
-	rawTxStr2 := rawTx.(map[string]interface{})["result"].(string)
+	rawTxStr2 := rawTx2.(map[string]interface{})["result"].(string)
 
 	cmd4 := btcjson.NewDecodeRawTransactionCmd(rawTxStr2)
 
@@ -329,11 +326,14 @@ fmt.Printf("%v\n\n", retJSON2)
 	}
 
 	retJSON4, err := c.Send(string(marshalledJSON4))
+	if err != nil {
+		return
+	}
 
 	var tx2 interface{}
 	json.Unmarshal([]byte(retJSON4), &tx2)
 
-	fromAddress = tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[vinvout+1].(map[string]interface{})["scriptPubKey"].(map[string]interface{})["addresses"].([]interface{})[0].(string)
+	fromAddress = tx2.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[vinvout].(map[string]interface{})["scriptPubKey"].(map[string]interface{})["addresses"].([]interface{})[0].(string)
 
 	return
 }
