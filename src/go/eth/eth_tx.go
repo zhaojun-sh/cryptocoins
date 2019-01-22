@@ -16,7 +16,7 @@ import  (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/crypto/sha3"
+	"github.com/gaozhengxin/cryptocoins/src/go/eth/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/gaozhengxin/cryptocoins/src/go/config"

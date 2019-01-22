@@ -21,12 +21,12 @@ import  (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
 	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
 
+	"github.com/gaozhengxin/cryptocoins/src/go/eth/sha3"
 	"github.com/gaozhengxin/cryptocoins/src/go/erc20/token"
 )
 
@@ -271,6 +271,7 @@ func erc20_newUnsignedTransaction (client *ethclient.Client, dcrmAddress string,
 
 	fromAddress := common.HexToAddress(dcrmAddress)
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+//fmt.Printf("!!!!!!!!!!!!!! nonce is %v !!!!!!!!!!!!!\n", nonce)
 	if err != nil {
 		return nil, nil, err
 	}
