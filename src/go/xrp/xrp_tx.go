@@ -13,8 +13,8 @@ import (
 	"github.com/rubblelabs/ripple/crypto"
 	"github.com/rubblelabs/ripple/data"
 
-	"github.com/cryptocoins/src/go/config"
-	rpcutils "github.com/cryptocoins/src/go/rpcutils"
+	"github.com/gaozhengxin/cryptocoins/src/go/config"
+	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
 )
 
 const (

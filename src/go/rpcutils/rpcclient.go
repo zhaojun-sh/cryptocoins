@@ -15,7 +15,7 @@ import (
 	"net/http"
 	"time"
 	//"log"
-	"github.com/cryptocoins/src/go/config"
+	"github.com/gaozhengxin/cryptocoins/src/go/config"
 )
 
 // 钱包连接参数

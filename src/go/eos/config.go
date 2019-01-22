@@ -2,7 +2,7 @@ package eos
 import (
 	eos "github.com/eoscanada/eos-go"
 
-	"github.com/cryptocoins/src/go/config"
+	"github.com/gaozhengxin/cryptocoins/src/go/config"
 )
 
 var (

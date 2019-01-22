@@ -10,10 +10,10 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	tcrypto "github.com/cryptocoins/src/go/trx/crypto"
+	tcrypto "github.com/gaozhengxin/cryptocoins/src/go/trx/crypto"
 
-	rpcutils "github.com/cryptocoins/src/go/rpcutils"
-	"github.com/cryptocoins/src/go/config"
+	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
+	"github.com/gaozhengxin/cryptocoins/src/go/config"
 )
 
 const (

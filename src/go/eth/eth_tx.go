@@ -19,7 +19,7 @@ import  (
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/cryptocoins/src/go/config"
+	"github.com/gaozhengxin/cryptocoins/src/go/config"
 
 )
 

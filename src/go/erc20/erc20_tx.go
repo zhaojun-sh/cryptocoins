@@ -24,10 +24,10 @@ import  (
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/cryptocoins/src/go/config"
-	rpcutils "github.com/cryptocoins/src/go/rpcutils"
+	"github.com/gaozhengxin/cryptocoins/src/go/config"
+	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
 
-	"github.com/cryptocoins/src/go/erc20/token"
+	"github.com/gaozhengxin/cryptocoins/src/go/erc20/token"
 )
 
 var (

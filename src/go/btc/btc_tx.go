@@ -25,8 +25,8 @@ import (
 	"github.com/btcsuite/btcwallet/wallet/txrules"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	rpcutils "github.com/cryptocoins/src/go/rpcutils"
-	"github.com/cryptocoins/src/go/config"
+	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
+	"github.com/gaozhengxin/cryptocoins/src/go/config"
 )
 
 var ChainConfig = chaincfg.TestNet3Params

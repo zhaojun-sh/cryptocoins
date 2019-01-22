@@ -7,10 +7,10 @@ import (
 	"math/big"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/cryptocoins/src/go/eos"
-	"github.com/cryptocoins/src/go/xrp"
-	"github.com/cryptocoins/src/go/trx"
-	api "github.com/cryptocoins/src/go"
+	"github.com/gaozhengxin/cryptocoins/src/go/eos"
+	"github.com/gaozhengxin/cryptocoins/src/go/xrp"
+	"github.com/gaozhengxin/cryptocoins/src/go/trx"
+	api "github.com/gaozhengxin/cryptocoins/src/go"
 )
 
 func main() {

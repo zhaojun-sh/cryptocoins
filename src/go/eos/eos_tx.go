@@ -16,7 +16,7 @@ import (
 	"github.com/eoscanada/eos-go/token"
 	"github.com/rubblelabs/ripple/crypto"
 
-	rpcutils "github.com/cryptocoins/src/go/rpcutils"
+	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
 )
 
 type EOSTransactionHandler struct {
