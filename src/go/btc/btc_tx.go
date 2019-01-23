@@ -294,10 +294,13 @@ func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 		return
 	}
 	retJSON2, err := c.Send(string(marshalledJSON2))
+fmt.Printf("%v\n\n", retJSON2)
 	var tx interface{}
 	json.Unmarshal([]byte(retJSON2), &tx)
 	toAddress = tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["scriptPubKey"].(map[string]interface{})["addresses"].([]interface{})[0].(string)
-	transferAmount = big.NewInt(int64(tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["value"].(float64)*100000000))
+	flt := tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["value"].(float64)
+	amt, err := btcutil.NewAmount(flt)
+	transferAmount = big.NewInt(int64(amt.ToUnit(btcutil.AmountSatoshi)))
 
 	vintx := tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["txid"].(string)
 	vinvout := int(tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["vout"].(float64))
