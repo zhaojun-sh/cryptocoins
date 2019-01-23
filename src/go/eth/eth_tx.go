@@ -3,7 +3,7 @@ package eth
 import  (
 	"context"
 	"crypto/ecdsa"
-	"crypto/rand"
+	//"crypto/rand"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -69,14 +69,19 @@ func (h *ETHTransactionHandler) SignTransaction(hash []string, privateKey interf
 	if err != nil {
 		return
 	}
-	r, s, err := ecdsa.Sign(rand.Reader, privateKey.(*ecdsa.PrivateKey), hashBytes)
+	/*r, s, err := ecdsa.Sign(rand.Reader, privateKey.(*ecdsa.PrivateKey), hashBytes)
 	if err != nil {
 		return
 	}
 	fmt.Printf("r: %v\ns: %v\n\n", r, s)
 	rx := fmt.Sprintf("%X", r)
 	sx := fmt.Sprintf("%X", s)
-	rsv = append(rsv, rx + sx + "00")
+	rsv = append(rsv, rx + sx + "00")*/
+	rsvBytes, err := ethcrypto.Sign(hashBytes, privateKey.(*ecdsa.PrivateKey))
+	if err != nil {
+		return
+	}
+	rsv = append(rsv, hex.EncodeToString(rsvBytes))
 	return
 }
 
