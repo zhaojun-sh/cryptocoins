@@ -11,7 +11,7 @@ Research most crypto coins hash, address and signature algorithm.
 | 6 | EOS | https://eos.io/ | https://eospark.com/ | https://github.com/eosio | ECDSA/secp256k1 |  | SHA256 | EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV |  |  |  |  |  |
 | 7 | Litecoin | https://litecoin.org/ | https://live.blockcypher.com/ltc/ | https://github.com/litecoin-project | ECDSA/secp256k1 |  | SHA256 | LS3L3ThLEyuMWHkDts9BgXseu1byLgbpDw |  |  |  |  |  |
 | 8 | Cardano | https://www.cardano.org | https://cardanoexplorer.com/ | https://github.com/input-output-hk | ED25519/Curve25519 |  | Blake2b-224 | DdzFFzCqrhshvNLoWJi1uYoRoHYPDJrv1gzd4CGgKSYHWiqbK8RDiWwnSp9iTwpFENBeRbtJ5dLQURouHntANNKQLAfUsPBRWT3pWj5r | base58 |  |  |  |  |
-| 9 | Monero | https://getmonero.org/ | https://moneroblocks.info/ | https://github.com/monero-project |  |  |  | 49Jt4tzbvZ5PyEMub6tNDGKP4zxogN9t1VACVWgTEcMwhtCGjxrDyt5XCDHG6XpA2U1uWsnsyKYdrL25Vp6y2pou2bdboCZ |  |  |  |  |  |
+| 9 | Monero | https://getmonero.org/ | https://moneroblocks.info/ | https://github.com/monero-project | ED25519/Curve25519 |  |  | 49Jt4tzbvZ5PyEMub6tNDGKP4zxogN9t1VACVWgTEcMwhtCGjxrDyt5XCDHG6XpA2U1uWsnsyKYdrL25Vp6y2pou2bdboCZ |  |  |  |  | https://github.com/trezor/trezor-common/blob/master/defs/misc/misc.json |
 | 10 | Tether | https://tether.to/ | https://www.omniexplorer.info/ | https://github.com/OmniLayer/ | ECDSA/secp256k1 |  | SHA256 | 18KmBuZVAK9qMq38gm5DwFkZ7asvuhGyFT |  |  |  |  |  |
 | 11 | TRON | https://tron.network/ | https://tronscan.org | https://github.com/tronprotocol | ECDSA/secp256k1 |  | SHA3-keccak256 | TMYcx6eoRXnePKT1jVn25ZNeMNJ6828HWk |  |  |  |  | https://github.com/tronprotocol/Documentation/blob/master/English_Documentation/Procedures_of_transaction_signature_generation.md |
 | 12 | IOTA | https://www.iota.org/ | https://thetangle.org/live | https://github.com/iotaledger | Winternitz one-time |  | keccak384 | JJYINSNHNLDVI9P9HITKMSKJKMXTKDVIULWRCFCBNPEKMYBD9DLSKHMNIYZBSBQFLIYRBSC9ZXDJAESMCVTYQPQDRY |  |  |  |  | https://iota.readme.io/docs/seeds-private-keys-and-accounts |
@@ -19,15 +19,15 @@ Research most crypto coins hash, address and signature algorithm.
 | 14 | NEO | https://neo.org/ | http://antcha.in/ | https://github.com/neo-project | ECDSA/secp256r1 |  |  | AKCbHhCf3Sq9qeCm8n2nmhGdgMuTDrEhmK |  |  |  |  | https://github.com/neo-project/neo/blob/master/neo/Wallets/KeyPair.cs |
 | 15 | Ethereum Classic | https://ethereumclassic.org/ | https://etherhub.io/home | https://github.com/ethereumproject | ECDSA/secp256k1 |  | SHA3-keccak256 | 0x18489e2a517b22348f20343b7386b6a81d5261c4 |  |  |  |  |  |
 | 16 | NEM | https://nem.io/ | http://explorer.nemchina.com | https://github.com/NemProject | ED25519/Curve25519 |  |  | NDNBRZZ3VZGZ626NFVL357APEYACNL6NMTRKTF5W |  |  |  |  | https://nem.io/wp-content/themes/nem/files/NEM_techRef.pdf |
-| 17 | Tezos | https://tezos.com/ | https://tezos.id | https://gitlab.com/tezos/tezos |  |  |  | tz1bZ8vsMAXmaWEV7FRnyhcuUs2fYMaQ6Hkk |  |  |  |  |  |
+| 17 | Tezos | https://tezos.com/ | https://tezos.id | https://gitlab.com/tezos/tezos | ED25519/Curve25519 |  |  | tz1bZ8vsMAXmaWEV7FRnyhcuUs2fYMaQ6Hkk |  |  |  |  | https://github.com/trezor/trezor-common/blob/master/defs/misc/misc.json |
 | 18 | Zcash | https://z.cash/ | https://explorer.zcha.in/ | https://github.com/zcash/ | ECDSA/secp256k1 | ED25519/Curve25519 |  | t1aZ2DGuiokCxHVfb4cGQqXghxy9hUpE6xQ |  |  |  |  |  |
 | 19 | VeChain | https://www.vechain.org/ | https://explore.veforge.com/ | https://github.com/vechain/ | ECDSA/secp256k1 |  | SHA3-keccak256 | 0xdde1C7AD4Cca5672a5c6DB767B7ed79794bF7ca8 |  |  |  |  |  |
 | 20 | Bitcoin Gold |  |  |  |  |  |  |  |  |  |  |  |  |
 | 21 | Decred | https://www.decred.org/ | https://mainnet.decred.org | https://github.com/decred/dcrd | ECDSA/secp256k1 | ED25519/Curve25519 | BLAKE-256 | DsoPvDrJ6RajmUGwuqv2Xt1Pzb3VSbaGCCn |  |  | https://faucet.decred.org/ |  | https://github.com/decred/dcrd/tree/master/dcrec |
 | 22 | Dogecoin |  |  |  |  |  |  |  |  |  |  |  |  |
 | 23 | Qtum |  |  |  |  |  |  |  |  |  |  |  |  |
-| 24 | Ontology |  |  |  |  |  |  |  |  |  |  |  |  |
-| 25 | Lisk |  |  |  |  |  |  | 16116311465312421834L |  |  |  |  |  |
+| 24 | Ontology | https://ont.io |  | https://github.com/ontio/ontology | ECDSA/nist256p1 |  |  |  |  |  |  |  | https://github.com/trezor/trezor-common/blob/master/defs/misc/misc.json |
+| 25 | Lisk | https://lisk.io/ |  | https://github.com/LiskHQ/lisk | ED25519/Curve25519 |  |  | 16116311465312421834L |  |  |  |  | https://github.com/trezor/trezor-common/blob/master/defs/misc/misc.json |
 | 26 | Bitcoin Diamond |  |  |  |  |  |  |  |  |  |  |  |  |
 | 27 | ICON |  |  |  |  |  |  |  |  |  |  |  |  |
 | 28 | BitShares |  |  |  |  |  |  | binance-bts-1 |  |  |  |  |  |
