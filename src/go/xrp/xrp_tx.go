@@ -79,7 +79,9 @@ func (h *XRPTransactionHandler) SignTransaction(hash []string, privateKey interf
 		return
 	}
 	rx := fmt.Sprintf("%X", signature.R)
+	rx = make64(rx)
 	sx := fmt.Sprintf("%X", signature.S)
+	sx = make64(sx)
 	rsv = append(rsv, rx + sx + "00")
 	return
 }
@@ -180,6 +182,13 @@ type Account_info_Res struct {
 type Account struct {
 	Balance string
 	Sequence uint32
+}
+
+func make64 (str string) string {
+	for l := len(str); l < 64; l++ {
+		str = "0" + str
+	}
+	return str
 }
 
 func getAccount (address string) (Account) {
