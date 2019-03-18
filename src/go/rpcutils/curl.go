@@ -1,6 +1,5 @@
 package rpcutils
 import (
-"fmt"
 	"bytes"
 	"log"
 	"os/exec"
