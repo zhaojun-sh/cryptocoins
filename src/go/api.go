@@ -7,6 +7,7 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/eos"
 	"github.com/gaozhengxin/cryptocoins/src/go/eth"
 	"github.com/gaozhengxin/cryptocoins/src/go/erc20"
+	"github.com/gaozhengxin/cryptocoins/src/go/ltc"
 	"github.com/gaozhengxin/cryptocoins/src/go/xrp"
 	"github.com/gaozhengxin/cryptocoins/src/go/trx"
 )
@@ -55,6 +56,8 @@ func NewTransactionHandler(coinType string) (txHandler TransactionHandler) {
 		return &eth.ETHTransactionHandler{}
 	case "ERC20":
 		return &erc20.ERC20TransactionHandler{}
+	case "LTC":
+		return &ltc.LTCTransactionHandler{}
 	case "XRP":
 		return &xrp.XRPTransactionHandler{}
 	case "TRX":
