@@ -14,7 +14,8 @@ import (
 )
 
 func main() {
-	test_btc()
+	//test_btc()
+	test_ltc()
 	//test_eos()
 	//test_eth()
 	//test_erc20()
@@ -23,6 +24,7 @@ func main() {
 }
 
 func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, build_tx_args []interface{}, queryTxHash, queryAddress string, query_balance_args []interface{}) {
+
 	fmt.Printf("========== %s ==========\n\n", "test pubkey to address/account_name")
 	address, msg, err := h.PublicKeyToAddress(fromPubKeyHex)
 	if err != nil {
@@ -32,7 +34,7 @@ func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubK
 	if msg != "" {
 		fmt.Printf("msg is %s\n\n", msg)
 	}
-
+/*
 	fmt.Printf("========== %s ==========\n\n", "test build unsigned transfer transaction")
 	transaction, digest, err := h.BuildUnsignedTransaction(fromAddress, fromPubKeyHex, toAddress, big.NewInt(1), build_tx_args)
 	if err != nil {
@@ -60,14 +62,14 @@ func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubK
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("%s\n\n", ret)
-/*
+*/
 	fmt.Printf("========== %s ==========\n\n", "test get transaction info")
 	fromAddress2, toAddress2, amount, _, err := h.GetTransactionInfo(queryTxHash)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("from: %v\nto: %v\namount: %v\n\n", fromAddress2, toAddress2, amount)
-
+/*
 	fmt.Printf("========== %s ==========\n\n", "test get balance")
 	balance, err := h.GetAddressBalance(queryAddress, query_balance_args)
 	if err != nil {
@@ -86,9 +88,17 @@ func test_btc () {
 	toAddress := "mg1KnRaekxjZbvdUNDKxxJycd3hNbxMomA"
 	var build_tx_args []interface{}
 	build_tx_args = append(build_tx_args, float64(0), "")
-	queryTxHash := "1d77755a038f6a63f015ecedafdc7827a7f82cf2540f2e5e18054fdc8a523d2d"
+	queryTxHash := "6bf5a5077234908b44f69f5587f92c027a68374d88ccc36012663b4ebcdbc802"
 	queryAddress := "2MteNic4ttfvkYCJYEaYMuqrNcnc6xzwoBL"
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, nil)
+}
+
+func test_ltc () {
+	fmt.Printf("=========================\n           LTC           \n=========================\n\n")
+	h := api.NewTransactionHandler("LTC")
+	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
+	queryTxHash := "ae1359de01c84c1750faa71ac62ed8381e97fa1156b280861ebb01fc84f538aa"
+	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
 }
 
 func test_eos () {
@@ -100,9 +110,9 @@ func test_eos () {
 	fromAcctName := "gzx123454321"
 	toAcctName := "degtjwol11u3"
 	var build_tx_args []interface{}
-	memo := "hi there"
+	memo := "1234"
 	build_tx_args = append(build_tx_args, memo)
-	queryTxHash := "d8205bbb6e4c131c8a2bc3c6092f8416a291a453b597ddfbc8bae75060678331"
+	queryTxHash := "0cd1f75fff840bca344d1aa61c4bc5a0d97082b04a8bb8ee4e3a255a86f7cf19"
 	queryAcct := "degtjwol11u3"
 
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAcctName, toAcctName, build_tx_args, queryTxHash, queryAcct, nil)
@@ -112,16 +122,18 @@ func test_eth () {
 	fmt.Printf("=========================\n           ETH           \n=========================\n\n")
 	h := api.NewTransactionHandler("ETH")
 
-	fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
+	//fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
+	fromPrivateKey, _ := crypto.HexToECDSA("d55b502bd4867b2c1b505af9b7cefeeb910b6cfbb570e2e47680bc89ee123eab")
+//fromPrivateKey, _ := crypto.HexToECDSA("0ea7b1364bc2d1d58f35324b4c0deaa129cc9bd2728e0942e7592f2836cbb530")
 	pub := crypto.FromECDSAPub(&fromPrivateKey.PublicKey)
 	fromPubKeyHex := hex.EncodeToString(pub)
 
-	fromAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
+	fromAddress := "0x426B635fD6CdAf5E4e7Bf5B2A2Dd7bc6c7360FBd"
 
 	toAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
 
 	var build_tx_args []interface{}
-	build_tx_args = append(build_tx_args, big.NewInt(1), uint64(4000000))
+	build_tx_args = append(build_tx_args, big.NewInt(8000000000), uint64(50000))
 
 	queryTxHash := "0xf9e16303a1b5a59b12e18be82aaed2363621844d8b78961db57d1af7aa89419f"
 
@@ -135,16 +147,19 @@ func test_erc20 () {
 	fmt.Printf("=========================\n           ERC20           \n=========================\n\n")
 	h := api.NewTransactionHandler("ERC20")
 
-	fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
+	//fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
+//fromPrivateKey, _ := crypto.HexToECDSA("40d6e64ce085269869b178c23a786e499ff2d6a5334fe45964211d25bea973bf")
+fromPrivateKey, _ := crypto.HexToECDSA("0ea7b1364bc2d1d58f35324b4c0deaa129cc9bd2728e0942e7592f2836cbb530")
+
 	pub := crypto.FromECDSAPub(&fromPrivateKey.PublicKey)
 	fromPubKeyHex := hex.EncodeToString(pub)
 
 	fromAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
 
-	toAddress := "0xA8dC61209400C9A23bf1fe625c2919c3626Bc157"
+	toAddress := "0x426B635fD6CdAf5E4e7Bf5B2A2Dd7bc6c7360FBd"
 
 	var build_tx_args []interface{}
-	build_tx_args = append(build_tx_args, big.NewInt(1), uint64(4000000), "BNB")
+	build_tx_args = append(build_tx_args, big.NewInt(10000000000), uint64(100000), "BNB")
 
 	queryTxHash := "0xf9e16303a1b5a59b12e18be82aaed2363621844d8b78961db57d1af7aa89419f"
 
@@ -176,7 +191,7 @@ func test_xrp () {
 type Seed struct {}
 
 func (s *Seed) Read(p []byte) (n int, err error) {
-	n = 1
+	n = 5
 	return
 }
 
