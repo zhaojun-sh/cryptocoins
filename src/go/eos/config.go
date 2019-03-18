@@ -10,17 +10,20 @@ var (
 
 	opts = &eos.TxOptions{
 		ChainID: hexToChecksum256(config.EOS_CHAIN_ID),
-		MaxNetUsageWords: uint32(500),
+		MaxNetUsageWords: uint32(999),
 		//DelaySecs: uint32(120),
-		//MaxCPUUsageMS:
+		MaxCPUUsageMS: uint8(200),
 		Compress: eos.CompressionNone,
 	}
 )
+
+const OWNER_ACCOUNT = ""
 
 const EOS_ACCURACY = 10000
 
 const ALPHABET = "defghijklmnopqrstuvwxyz12345abcdefghijklmnopqrstuvwxyz12345abc"
 
+const BALANCE_SERVER = "http://127.0.0.1:1234/"
 
 
 
