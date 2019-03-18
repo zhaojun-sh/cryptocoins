@@ -208,7 +208,7 @@ func AddressHRToAddress(addressHR string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(b), err
+	return hex.EncodeToString(b), err
 }
 
 func AddressToAddressHR(address string) (string, error) {
