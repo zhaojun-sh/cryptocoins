@@ -1,12 +1,14 @@
 package eos
 import (
-	"crypto/rand"
+	//"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"io/ioutil"
 	"fmt"
 	"math/big"
+	"net/http"
 	"strconv"
-	"strings"
+	//"strings"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcutil"
@@ -22,8 +24,10 @@ import (
 type EOSTransactionHandler struct {
 }
 
+// 方案一：公钥hash+base58+截取12个字符当作账户名，用户用这个帐户名创建eos账户，用这个新账户给用户的公钥授权
+/*
 func (h *EOSTransactionHandler) PublicKeyToAddress(pubKeyHex string) (acctName string, msg string, err error) {
-	acctName = GenRandomAccountName(pubKeyHex)
+	acctName = GenAccountName(pubKeyHex)
 	msg = "this account name is not expected to be seen on chain, and the public key is not delegated by any existed account. it is possible to create an account with this name and delegate the public key."
 	pubKey, err := HexToPubKey(pubKeyHex)
 	if err != nil {
@@ -38,8 +42,17 @@ func (h *EOSTransactionHandler) PublicKeyToAddress(pubKeyHex string) (acctName s
 	}
 	return
 }
+*/
 
+// 方案二：用一个大账户存钱，用交易备注区分用户，交易备注是公钥hash+base58
+func (h *EOSTransactionHandler) PublicKeyToAddress(pubKeyHex string) (acctName string, msg string, err error) {
+	acctName = GenAccountName(pubKeyHex)
+	return
+}
+
+// 方案一中构造交易的方法
 // args[0] memo string
+/*
 func (h *EOSTransactionHandler) BuildUnsignedTransaction(fromAcctName, fromPublicKey, toAcctName string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
 	if fromAcctName == "" {
 		accounts, err1 := GetAccountNameByPubKey(fromPublicKey)
@@ -59,7 +72,15 @@ func (h *EOSTransactionHandler) BuildUnsignedTransaction(fromAcctName, fromPubli
 	}
 
 	digests = append(digests, digest)
+	return
+}
+*/
 
+// 方案二中构造交易的方法
+func (h *EOSTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAcctName string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
+	memo := fromAddress
+	digest, transaction, err := EOS_newUnsignedTransaction(OWNER_ACCOUNT, toAcctName, amount, memo)
+	digests = append(digests, digest)
 	return
 }
 
@@ -69,8 +90,11 @@ func (h *EOSTransactionHandler) SignTransaction(hash []string, privateKey interf
 		return
 	}
 	vrs := signature.Content
-	rsvBytes := append(vrs[1:], vrs[0])
+fmt.Printf("vrs is %v\n\n", hex.EncodeToString(vrs))
+v := vrs[0] - byte(31)
+	rsvBytes := append(vrs[1:], v)
 	rsv = append(rsv, hex.EncodeToString(rsvBytes))
+fmt.Printf("rsv is %v\n\n", rsv)
 	return
 }
 
@@ -85,6 +109,7 @@ func (h *EOSTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 
 func (h *EOSTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
 	ret = SubmitTransaction(signedTransaction.(*eos.SignedTransaction))
+fmt.Printf("\nstx is %+v\n\n\n", signedTransaction.(*eos.SignedTransaction))
 	return
 }
 
@@ -115,10 +140,15 @@ func (h *EOSTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 	return
 }
 
+// 方法一中查余额的方法
+/*
 func (h *EOSTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error) {
 	api := "v1/chain/get_account"
 	data := `{"account_name":"` + address + `"}`
+
 	ret := rpcutils.DoCurlRequest(nodeos, api, data)
+fmt.Printf("%+v\n\n", ret)
+
 	var retStruct map[string]interface{}
 	json.Unmarshal([]byte(ret), &retStruct)
 	if retStruct["core_liquid_balance"] == nil {
@@ -131,6 +161,36 @@ func (h *EOSTransactionHandler) GetAddressBalance(address string, args []interfa
 	balFloat, _ := strconv.ParseFloat(strings.Fields(balStr)[0], 64)
 	balInt := int64(balFloat * EOS_ACCURACY)
 	balance = big.NewInt(balInt)
+
+	return
+}
+*/
+
+// 方案二中使用的查余额的方法
+func (h *EOSTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error) {
+	req := BALANCE_SERVER + "get_balance?user_key" + address
+	resp, err := http.Get(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	var b interface{}
+	err = json.Unmarshal(body, &b)
+	if err != nil {
+		return
+	}
+	bal := b.(map[string]interface{})["balance"]
+	if bal == nil {
+		return
+	}
+	balance, ok := new(big.Int).SetString(bal.(string), 10)
+	if !ok {
+		err = fmt.Errorf("parse balance error, got: %+v", bal)
+	}
 	return
 }
 
@@ -228,6 +288,7 @@ func HexToPubKey(pubKeyHex string) (ecc.PublicKey, error) {
 func SignDigestWithPrivKey(hash, wif string) (ecc.Signature, error) {
 	digest := hexToChecksum256(hash)
 	privKey, err := ecc.NewPrivateKey(wif)
+fmt.Printf("private key is %+v\n\n", privKey)
 	checkErr(err)
 	return privKey.Sign(digest)
 }
@@ -250,12 +311,17 @@ func GetAccountNameByPubKey(pubKey string) ([]string, error) {
 	return accounts, nil
 }
 
+// dcrm签的rsv转传换成eos签名
 func RSVToSignature (rsvStr string) (ecc.Signature, error) {
+fmt.Printf("1111 rsvStr is %v\n\n", rsvStr)
 	rsv, _ := hex.DecodeString(rsvStr)
 	rsv[64] += byte(31)
+fmt.Printf("rsv is %v\n\n", rsv)
 	v := rsv[64]
+fmt.Printf("v is %v\n\n", v)
 	rs := rsv[:64]
 	vrs := append([]byte{v}, rs...)
+fmt.Printf("1111 vrs is %v\n\n", hex.EncodeToString(vrs))
 	data := append([]byte{0}, vrs...)
 	return ecc.NewSignatureFromData(data)
 }
@@ -266,22 +332,37 @@ func hexToChecksum256(data string) eos.Checksum256 {
 	return eos.Checksum256(bytes)
 }
 
-// 根据公钥生成随机的账户名
-func GenRandomAccountName(pubKeyHex string) string {
+// 根据公钥生成账户名（方案一）
+/*
+func GenAccountName(pubKeyHex string) string {
 	b, _ := hex.DecodeString(pubKeyHex)
 	fmt.Printf("!!! %v \n!!! %v\n\n", pubKeyHex, b)
 
-	r, _ := rand.Int(rand.Reader, big.NewInt(256))
-	b = append(b, byte(r.Uint64()))
+	//r, _ := rand.Int(rand.Reader, big.NewInt(256))
+	//b = append(b, byte(r.Uint64()))
 
 	b = btcutil.Hash160(b)
 
 	b = append([]byte{0}, b...)
 	return crypto.Base58Encode(b, ALPHABET)[:12]
 }
+*/
+
+// 根据公钥生成地址（方案二）
+func GenAccountName(pubKeyHex string) string {
+	b, _ := hex.DecodeString(pubKeyHex)
+	fmt.Printf("!!! %v \n!!! %v\n\n", pubKeyHex, b)
+
+	//r, _ := rand.Int(rand.Reader, big.NewInt(256))
+	//b = append(b, byte(r.Uint64()))
+
+	b = btcutil.Hash160(b)
+
+	b = append([]byte{0}, b...)
+	return crypto.Base58Encode(b, ALPHABET)
+}
 
 func EOS_newUnsignedTransaction(fromAcctName, toAcctName string, amount *big.Int, memo string) (string, *eos.SignedTransaction, error) {
-
 	from := eos.AccountName(fromAcctName)
 	to := eos.AccountName(toAcctName)
 	s := strconv.FormatFloat(float64(amount.Int64())/10000, 'f', 4, 64) + " EOS"
