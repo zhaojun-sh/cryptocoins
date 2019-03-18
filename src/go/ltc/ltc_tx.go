@@ -1,47 +1,75 @@
 package ltc
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/btcjson"
+	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil"
 	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
 	"github.com/gaozhengxin/cryptocoins/src/go/btc"
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
 )
 
-var allowHighFees = true
-
-type LTCTransactionHandler struct{
-	btchandler *btc.BTCTransactionHandler
+var ChainConfig = chaincfg.Params {
+	PubKeyHashAddrID: 0x30,
 }
 
+var btcHandler = new(btc.BTCTransactionHandler)
+
+var allowHighFees = true
+
+type LTCTransactionHandler struct {}
+
 func (h *LTCTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, msg string, err error){
-	return h.btchandler.PublicKeyToAddress(pubKeyHex)
+	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
+		pubKeyHex = pubKeyHex[2:]
+	}
+	bb, err := hex.DecodeString(pubKeyHex)
+	if err != nil {
+		return
+	}
+	pubKey, err := btcec.ParsePubKey(bb, btcec.S256())
+	if err != nil {
+		return
+	}
+	b := pubKey.SerializeCompressed()
+	pkHash := btcutil.Hash160(b)
+	addressPubKeyHash, err := btcutil.NewAddressPubKeyHash(pkHash, &ChainConfig)
+	if err != nil {
+		return
+	}
+	address = addressPubKeyHash.EncodeAddress()
+	msg = "this is a public-key-hash address"
+	return
 }
 
 // NOT completed, may or not work
 func (h *LTCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
-	return h.btchandler.BuildUnsignedHandler(fromAddress, fromPublicKey, toAddress, amount, args)
+	transaction, digests, err = btcHandler.BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress, amount, args)
+	return
 }
 
 // NOT completed, may or not work
 func (h *LTCTransactionHandler) SignTransaction(hash []string, wif interface{}) (rsv []string, err error){
-	return h.btchandler.SignTransaction(hash, wif)
+	return btcHandler.SignTransaction(hash, wif)
 }
 
 // NOT completed, may or not work
 func (h *LTCTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error){
-	return h.btchandler.MakeSignedTransaction(rsv, transaction)
+	return btcHandler.MakeSignedTransaction(rsv, transaction)
 }
 
 // NOT completed, may or not work
 func (h *LTCTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
-	btc.SendRawTransaction (signedTransaction.(*btc.AuthoredTx).Tx, allowHighFees)
+	ret, err= btc.SendRawTransaction (signedTransaction.(*btc.AuthoredTx).Tx, allowHighFees)
+	return
 }
 
-func (h *LTCTransaction) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+func (h *LTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
 	cmd := btcjson.NewGetRawTransactionCmd(txhash, nil)
 
 	marshalledJSON, err := btcjson.MarshalCmd(1, cmd)
@@ -49,15 +77,17 @@ func (h *LTCTransaction) GetTransactionInfo(txhash string) (fromAddress, toAddre
 		return
 	}
 
-	c, _ := rpcutils.NewClient(config.LTC_SERVER_HOST,config.LTC_SERVER_PORT,config.LTC_USER,config.config.LTC_PASSWD,config.LTC_USESSL)
+	c, _ := rpcutils.NewClient(config.LTC_SERVER_HOST,config.LTC_SERVER_PORT,config.LTC_USER,config.LTC_PASSWD,config.LTC_USESSL)
 	retJSON, err := c.Send(string(marshalledJSON))
 	if err != nil {
 		return
 	}
 
-	var rawTx interface{}
-	json.Unmarshal([]byte(retJSON), &rawTx)
-	rawTxStr := rawTx.(map[string]interface{})["result"].(string)
+	result, err := parseRPCReturn(retJSON)
+	if err != nil {
+		return
+	}
+	rawTxStr := result.(string)
 
 	cmd2 := btcjson.NewDecodeRawTransactionCmd(rawTxStr)
 
@@ -65,19 +95,36 @@ func (h *LTCTransaction) GetTransactionInfo(txhash string) (fromAddress, toAddre
 	if err != nil {
 		return
 	}
+
 	retJSON2, err := c.Send(string(marshalledJSON2))
-fmt.Printf("%v\n\n", retJSON2)
-	var tx interface{}
-	json.Unmarshal([]byte(retJSON2), &tx)
-	toAddress = tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["scriptPubKey"].(map[string]interface{})["addresses"].([]interface{})[0].(string)
-	flt := tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["value"].(float64)
+	if err != nil {
+		return
+	}
+
+	result, err = parseRPCReturn(retJSON2)
+	if err != nil {
+		return
+	}
+
+	toAddress = result.(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["scriptPubKey"].(map[string]interface{})["addresses"].([]interface{})[0].(string)
+	flt := result.(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["value"].(float64)
 	amt, err := btcutil.NewAmount(flt)
 	transferAmount = big.NewInt(int64(amt.ToUnit(btcutil.AmountSatoshi)))
 
-	vintx := tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["txid"].(string)
-	vinvout := int(tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["vout"].(float64))
+	// from where
+	vintx := result.(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["txid"]
+	if vintx == nil {
+		coinbase := result.(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["coinbase"]
+		if coinbase != nil {
+			fromAddress = coinbase.(string)
+			return
+		}
+	}
 
-	cmd3 := btcjson.NewGetRawTransactionCmd(vintx, nil)
+	// as which output in previous transaction
+	vinvout := int(result.(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["vout"].(float64))
+
+	cmd3 := btcjson.NewGetRawTransactionCmd(vintx.(string), nil)
 
 	marshalledJSON3, err := btcjson.MarshalCmd(1, cmd3)
 	if err != nil {
@@ -114,8 +161,23 @@ fmt.Printf("%v\n\n", retJSON2)
 }
 
 // TODO
-func (h *LTCTransaction) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error){
-	err := fmt.Errorf("function currently not available")
+func (h *LTCTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error){
+	err = fmt.Errorf("function currently not available")
 	return nil, err
+}
+
+func parseRPCReturn (retJSON string) (result interface{}, err error) {
+	var ret interface{}
+	json.Unmarshal([]byte(retJSON), &ret)
+	result = ret.(map[string]interface{})["result"]
+	if result == nil {
+		errStr := ret.(map[string]interface{})["error"]
+		if errStr == nil {
+			err = fmt.Errorf("unknown error")
+			return
+		}
+		err = fmt.Errorf(errStr.(string))
+	}
+	return
 }
 
