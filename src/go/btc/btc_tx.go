@@ -82,6 +82,7 @@ func (h *BTCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublic
 		changeAddress = args[1].(string)
 	}
 	unspentOutputs, err := listUnspent_blockchaininfo(fromAddress)
+//unspentOutputs, err := listUnspent(fromAddress)
 	if err != nil {
 		err = errContext(err, "failed to fetch unspent outputs")
 		return
@@ -194,6 +195,7 @@ func (h *BTCTransactionHandler) SignTransaction(hash []string, wif interface{}) 
 		}
 		rr := fmt.Sprintf("%X", signature.R)
 		ss := fmt.Sprintf("%X", signature.S)
+fmt.Printf("r, s: %v\n%v\n\n", rr, ss)
 		for len(rr) < 64 {
 			rr = "0" + rr
 		}
@@ -265,7 +267,7 @@ func (h *BTCTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 }
 
 func (h *BTCTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
-	ret, err = sendRawTransaction (signedTransaction.(*AuthoredTx).Tx, allowHighFees)
+	ret, err = SendRawTransaction (signedTransaction.(*AuthoredTx).Tx, allowHighFees)
 	return
 }
 
@@ -476,7 +478,7 @@ func newUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb btcutil.Amount,
 }
 
 // 发送交易
-func sendRawTransaction (tx *wire.MsgTx, allowHighFees bool) (string, error){
+func SendRawTransaction (tx *wire.MsgTx, allowHighFees bool) (string, error){
 	var txHex string
 	if tx != nil {
                 // Serialize the transaction and convert to hex string.
@@ -497,11 +499,7 @@ func sendRawTransaction (tx *wire.MsgTx, allowHighFees bool) (string, error){
 	c, _ := rpcutils.NewClient(config.BTC_SERVER_HOST,config.BTC_SERVER_PORT,config.BTC_USER,config.BTC_PASSWD,config.BTC_USESSL)
 	retJSON, err := c.Send(string(marshalledJSON))
 
-	if err != nil {
-		return "", err
-	}
-
-	return retJSON, nil
+	return retJSON, err
 
 }
 
@@ -656,6 +654,7 @@ func listUnspent(dcrmaddr string) ([]btcjson.ListUnspentResult, error) {
 
 	// addrs 接口查询到的交易信息中不包含上交易输出的锁定脚本
 	// 使用 txs 接口查询交易的详细信息，得到锁定脚本，用于交易签名
+fmt.Println("listUnspent lalala")
 	return makeListUnspentResult(addrApiResult, dcrmaddr)
 }
 
@@ -668,6 +667,11 @@ func getTxByTxHash (txhash string) (*TxApiResult, error) {
 func makeListUnspentResult (r *AddrApiResult, dcrmaddr string) ([]btcjson.ListUnspentResult, error) {
 	//cnt := 0
 	//var list []btcjson.ListUnspentResult
+
+fmt.Println("make list unspent result")
+fmt.Println(r.Txrefs)
+fmt.Printf("length is %v\n\n",len(r.Txrefs))
+
 	var list sortableLURSlice
 	for _, txref := range r.Txrefs {
 		// 判断 txref 是否是未花费的交易输出
@@ -687,6 +691,13 @@ func makeListUnspentResult (r *AddrApiResult, dcrmaddr string) ([]btcjson.ListUn
 			if err != nil {
 				continue
 			}
+if txRes == nil || len(txRes.Outputs) <= 0 {
+	continue
+}
+
+fmt.Printf("txref.Tx_output_n is %v\n\n", txref.Tx_output_n)
+fmt.Printf("txRes.Outputs is %v\n\n", txRes.Outputs)
+
 			res.ScriptPubKey = txRes.Outputs[txref.Tx_output_n].Script
 			list = append(list, res)
 		}
