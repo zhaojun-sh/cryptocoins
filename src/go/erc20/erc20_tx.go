@@ -34,6 +34,7 @@ var (
 	url = config.ETH_GATEWAY
 	err error
 	chainConfig = params.RinkebyChainConfig
+	//chainID = big.NewInt(40400)
 )
 
 var tokens map[string]string = map[string]string{
@@ -60,11 +61,14 @@ func (h *ERC20TransactionHandler) PublicKeyToAddress (pubKeyHex string) (address
 //args[1]: gasLimit	uint64
 //args[2]: tokenType	string
 func (h *ERC20TransactionHandler) BuildUnsignedTransaction (fromAddress, fromPublicKey, toAddress string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
+
+
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
 	}
 	transaction, hash, err := erc20_newUnsignedTransaction(client, fromAddress, toAddress, amount, args[0].(*big.Int), args[1].(uint64), args[2].(string))
+fmt.Printf("transaction is %+v\n\n", transaction)
 	hashStr := hash.Hex()
 	if hashStr[:2] == "0x" {
 		hashStr = hashStr[2:]
@@ -256,6 +260,7 @@ func DecodeTransferData(data []byte) (toAddress string, transferAmount *big.Int,
 func erc20_newUnsignedTransaction (client *ethclient.Client, dcrmAddress string, toAddressHex string, amount *big.Int, gasPrice *big.Int, gasLimit uint64, tokenType string) (*types.Transaction, *common.Hash, error) {
 
 	chainID, err := client.NetworkID(context.Background())
+
 	if err != nil {
 		return nil, nil, err
 	}
@@ -275,8 +280,8 @@ func erc20_newUnsignedTransaction (client *ethclient.Client, dcrmAddress string,
 	}
 
 	fromAddress := common.HexToAddress(dcrmAddress)
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
-//fmt.Printf("!!!!!!!!!!!!!! nonce is %v !!!!!!!!!!!!!\n", nonce)
+	//nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	nonce, err := client.NonceAt(context.Background(), fromAddress, nil)
 	if err != nil {
 		return nil, nil, err
 	}
