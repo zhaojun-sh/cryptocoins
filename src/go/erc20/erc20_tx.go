@@ -280,6 +280,9 @@ func erc20_newUnsignedTransaction (client *ethclient.Client, dcrmAddress string,
 	}
 
 	fromAddress := common.HexToAddress(dcrmAddress)
+/*
+	nonce or pending nonce
+*/
 	//nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	nonce, err := client.NonceAt(context.Background(), fromAddress, nil)
 	if err != nil {
