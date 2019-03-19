@@ -65,7 +65,8 @@ func (h *LTCTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 
 // NOT completed, may or not work
 func (h *LTCTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
-	ret, err= btc.SendRawTransaction (signedTransaction.(*btc.AuthoredTx).Tx, allowHighFees)
+	c, _ := rpcutils.NewClient(config.LTC_SERVER_HOST,config.LTC_SERVER_PORT,config.LTC_USER,config.LTC_PASSWD,config.LTC_USESSL)
+	ret, err= btc.SendRawTransaction (c, signedTransaction.(*btc.AuthoredTx).Tx, allowHighFees)
 	return
 }
 

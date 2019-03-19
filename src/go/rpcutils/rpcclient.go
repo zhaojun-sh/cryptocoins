@@ -19,7 +19,7 @@ import (
 )
 
 // 钱包连接参数
-type rpcClient struct {
+type RpcClient struct {
 	serverAddr string
 	user       string
 	passwd     string
@@ -41,7 +41,7 @@ type rpcResponse struct {
 }
 
 //连接配置
-func NewClient(host string, port int, user, passwd string, useSSL bool) (c *rpcClient, err error) {
+func NewClient(host string, port int, user, passwd string, useSSL bool) (c *RpcClient, err error) {
 	if len(host) == 0 {
 		err = errors.New("Bad call missing argument host")
 		return
@@ -58,12 +58,12 @@ func NewClient(host string, port int, user, passwd string, useSSL bool) (c *rpcC
 		serverAddr = "http://"
 		httpClient = &http.Client{}
 	}
-	c = &rpcClient{serverAddr: fmt.Sprintf("%s%s:%d", serverAddr, host, port), user: user, passwd: passwd, httpClient: httpClient}
+	c = &RpcClient{serverAddr: fmt.Sprintf("%s%s:%d", serverAddr, host, port), user: user, passwd: passwd, httpClient: httpClient}
 	return
 }
 
 // 超时处理
-func (c *rpcClient) doTimeoutRequest(timer *time.Timer, req *http.Request) (*http.Response, error) {
+func (c *RpcClient) doTimeoutRequest(timer *time.Timer, req *http.Request) (*http.Response, error) {
 	type result struct {
 		resp *http.Response
 		err  error
@@ -83,7 +83,7 @@ func (c *rpcClient) doTimeoutRequest(timer *time.Timer, req *http.Request) (*htt
 }
 
 //通信
-func (c *rpcClient) Send(reqJson string) (retJSON string, err error) {
+func (c *RpcClient) Send(reqJson string) (retJSON string, err error) {
 	connectTimer := time.NewTimer(config.RPCCLIENT_TIMEOUT * time.Second)
 	reqJsonByte := []byte(reqJson)
 	payloadBuffer := bytes.NewReader(reqJsonByte)

@@ -267,7 +267,8 @@ func (h *BTCTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 }
 
 func (h *BTCTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
-	ret, err = SendRawTransaction (signedTransaction.(*AuthoredTx).Tx, allowHighFees)
+	c, _ := rpcutils.NewClient(config.BTC_SERVER_HOST,config.BTC_SERVER_PORT,config.BTC_USER,config.BTC_PASSWD,config.BTC_USESSL)
+	ret, err = SendRawTransaction (c, signedTransaction.(*AuthoredTx).Tx, allowHighFees)
 	return
 }
 
@@ -478,7 +479,7 @@ func newUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb btcutil.Amount,
 }
 
 // 发送交易
-func SendRawTransaction (tx *wire.MsgTx, allowHighFees bool) (string, error){
+func SendRawTransaction (c *rpcutils.RpcClient, tx *wire.MsgTx, allowHighFees bool) (string, error){
 	var txHex string
 	if tx != nil {
                 // Serialize the transaction and convert to hex string.
@@ -496,7 +497,6 @@ func SendRawTransaction (tx *wire.MsgTx, allowHighFees bool) (string, error){
 		return "", err
 	}
 
-	c, _ := rpcutils.NewClient(config.BTC_SERVER_HOST,config.BTC_SERVER_PORT,config.BTC_USER,config.BTC_PASSWD,config.BTC_USESSL)
 	retJSON, err := c.Send(string(marshalledJSON))
 
 	return retJSON, err
