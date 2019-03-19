@@ -14,8 +14,9 @@ import (
 )
 
 func main() {
+	test_bch()
 	//test_btc()
-	test_ltc()
+	//test_ltc()
 	//test_eos()
 	//test_eth()
 	//test_erc20()
@@ -78,6 +79,15 @@ func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubK
 	fmt.Printf("balance: %v\n\n", balance)
 */
 }
+
+func test_bch () {
+	fmt.Printf("=========================\n           BCH           \n=========================\n\n")
+	h := api.NewTransactionHandler("BCH")
+	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
+	queryTxHash := "f6f24bd236252574c1ba7086ac1178b37abf5041653127bd6b400bae0f0a9b00"
+	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+}
+
 
 func test_btc () {
 	fmt.Printf("=========================\n           BTC           \n=========================\n\n")
