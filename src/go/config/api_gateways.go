@@ -46,3 +46,13 @@ const (
 	LTC_USESSL             = false
 	LTC_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
+
+// bitcash
+const (
+	BCH_SERVER_HOST        = "127.0.0.1"
+	BCH_SERVER_PORT        = 50607 
+	BCH_USER               = "xxmm"
+	BCH_PASSWD             = "123456"
+	BCH_USESSL             = false
+	BCH_WALLET_PASSPHRASE  = "WalletPassphrase"
+)

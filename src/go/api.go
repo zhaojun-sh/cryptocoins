@@ -3,6 +3,7 @@ package api
 import (
 	"math/big"
 
+	"github.com/gaozhengxin/cryptocoins/src/go/bch"
 	"github.com/gaozhengxin/cryptocoins/src/go/btc"
 	"github.com/gaozhengxin/cryptocoins/src/go/eos"
 	"github.com/gaozhengxin/cryptocoins/src/go/eth"
@@ -48,6 +49,8 @@ type TransactionHandler interface {
 
 func NewTransactionHandler(coinType string) (txHandler TransactionHandler) {
 	switch coinType {
+	case "BCH":
+		return &bch.BCHTransactionHandler{}
 	case "BTC":
 		return &btc.BTCTransactionHandler{}
 	case "EOS":
