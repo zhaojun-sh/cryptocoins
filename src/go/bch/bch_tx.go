@@ -66,7 +66,7 @@ func (h *BCHTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 
 // NOT completed, may or not work
 func (h *BCHTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
-	c, _ := rpcutils.NewClient(config.LTC_SERVER_HOST,config.LTC_SERVER_PORT,config.LTC_USER,config.LTC_PASSWD,config.LTC_USESSL)
+	c, _ := rpcutils.NewClient(config.BCH_SERVER_HOST,config.BCH_SERVER_PORT,config.BCH_USER,config.BCH_PASSWD,config.BCH_USESSL)
 	ret, err= btc.SendRawTransaction (c, signedTransaction.(*btc.AuthoredTx).Tx, allowHighFees)
 	return
 }
@@ -80,20 +80,16 @@ func (h *BCHTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 	}
 
 	c, _ := rpcutils.NewClient(config.BCH_SERVER_HOST,config.BCH_SERVER_PORT,config.BCH_USER,config.BCH_PASSWD,config.BCH_USESSL)
-fmt.Println(string(marshalledJSON))
 	retJSON, err := c.Send(string(marshalledJSON))
 	if err != nil {
-fmt.Println(111)
 		return
 	}
 
 	result, err := parseRPCReturn(retJSON)
 	if err != nil {
-fmt.Println(222)
 		return
 	}
 	rawTxStr := result.(string)
-fmt.Printf("66666666:\n%v\n\n",result)
 
 	cmd2 := btcjson.NewDecodeRawTransactionCmd(rawTxStr)
 
