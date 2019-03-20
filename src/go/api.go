@@ -9,8 +9,9 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/eth"
 	"github.com/gaozhengxin/cryptocoins/src/go/erc20"
 	"github.com/gaozhengxin/cryptocoins/src/go/ltc"
-	"github.com/gaozhengxin/cryptocoins/src/go/xrp"
 	"github.com/gaozhengxin/cryptocoins/src/go/trx"
+	"github.com/gaozhengxin/cryptocoins/src/go/tether"
+	"github.com/gaozhengxin/cryptocoins/src/go/xrp"
 )
 
 type TransactionHandler interface {
@@ -61,10 +62,12 @@ func NewTransactionHandler(coinType string) (txHandler TransactionHandler) {
 		return &erc20.ERC20TransactionHandler{}
 	case "LTC":
 		return &ltc.LTCTransactionHandler{}
-	case "XRP":
-		return &xrp.XRPTransactionHandler{}
 	case "TRX":
 		return &trx.TRXTransactionHandler{}
+	case "TETHER":
+		return &tether.TETHERTransactionHandler{}
+	case "XRP":
+		return &xrp.XRPTransactionHandler{}
 	}
 	return nil
 }

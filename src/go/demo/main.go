@@ -14,8 +14,9 @@ import (
 )
 
 func main() {
-	test_bch()
+	//test_bch()
 	//test_btc()
+	test_tether()
 	//test_ltc()
 	//test_eos()
 	//test_eth()
@@ -88,6 +89,13 @@ func test_bch () {
 	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
 }
 
+func test_tether () {
+	fmt.Printf("=========================\n           TETHER           \n=========================\n\n")
+	h := api.NewTransactionHandler("TETHER")
+	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
+	queryTxHash := "30fdcd207ba3cc3f9f5d69ab25e2290c71c1008564d7c27fdc3d96a797f65643"
+	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+}
 
 func test_btc () {
 	fmt.Printf("=========================\n           BTC           \n=========================\n\n")
