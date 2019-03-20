@@ -37,6 +37,16 @@ const (
 	BTC_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
 
+// tether
+const (
+	TETHER_SERVER_HOST        = "127.0.0.1"
+	TETHER_SERVER_PORT        = 50505 
+	TETHER_USER               = "xxmm"
+	TETHER_PASSWD             = "123456"
+	TETHER_USESSL             = false
+	TETHER_WALLET_PASSPHRASE  = "WalletPassphrase"
+)
+
 // litecoin
 const (
 	LTC_SERVER_HOST        = "127.0.0.1"
