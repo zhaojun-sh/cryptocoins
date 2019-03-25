@@ -60,7 +60,6 @@ func (h *BTCTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address st
 		return
 	}
 	address = addressPubKeyHash.EncodeAddress()
-	msg = "this is a public-key-hash address"
 	return
 }
 
