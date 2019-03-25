@@ -5,13 +5,17 @@ import (
 
 	"github.com/gaozhengxin/cryptocoins/src/go/bch"
 	"github.com/gaozhengxin/cryptocoins/src/go/btc"
+	"github.com/gaozhengxin/cryptocoins/src/go/dash"
 	"github.com/gaozhengxin/cryptocoins/src/go/eos"
 	"github.com/gaozhengxin/cryptocoins/src/go/eth"
+	"github.com/gaozhengxin/cryptocoins/src/go/etc"
 	"github.com/gaozhengxin/cryptocoins/src/go/erc20"
 	"github.com/gaozhengxin/cryptocoins/src/go/ltc"
 	"github.com/gaozhengxin/cryptocoins/src/go/trx"
 	"github.com/gaozhengxin/cryptocoins/src/go/tether"
+	"github.com/gaozhengxin/cryptocoins/src/go/vechain"
 	"github.com/gaozhengxin/cryptocoins/src/go/xrp"
+	"github.com/gaozhengxin/cryptocoins/src/go/zcash"
 )
 
 type TransactionHandler interface {
@@ -54,10 +58,14 @@ func NewTransactionHandler(coinType string) (txHandler TransactionHandler) {
 		return &bch.BCHTransactionHandler{}
 	case "BTC":
 		return &btc.BTCTransactionHandler{}
+	case "DASH":
+		return &dash.DASHTransactionHandler{}
 	case "EOS":
 		return &eos.EOSTransactionHandler{}
 	case "ETH":
 		return &eth.ETHTransactionHandler{}
+	case "ETC":
+		return &etc.ETCTransactionHandler{}
 	case "ERC20":
 		return &erc20.ERC20TransactionHandler{}
 	case "LTC":
@@ -66,8 +74,12 @@ func NewTransactionHandler(coinType string) (txHandler TransactionHandler) {
 		return &trx.TRXTransactionHandler{}
 	case "TETHER":
 		return &tether.TETHERTransactionHandler{}
+	case "VECHAIN":
+		return &vechain.VECHAINTransactionHandler{}
 	case "XRP":
 		return &xrp.XRPTransactionHandler{}
+	case "ZCASH":
+		return &zcash.ZCASHTransactionHandler{}
 	}
 	return nil
 }
