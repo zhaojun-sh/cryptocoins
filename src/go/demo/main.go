@@ -16,13 +16,17 @@ import (
 func main() {
 	//test_bch()
 	//test_btc()
-	test_tether()
+	//test_dash()
+	//test_tether()
 	//test_ltc()
 	//test_eos()
 	//test_eth()
+	test_etc()
+	//test_vechain()
 	//test_erc20()
 	//test_xrp()
 	//test_tron()
+	//test_zcash()
 }
 
 func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, build_tx_args []interface{}, queryTxHash, queryAddress string, query_balance_args []interface{}) {
@@ -89,6 +93,14 @@ func test_bch () {
 	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
 }
 
+func test_dash () {
+	fmt.Printf("=========================\n           DASH           \n=========================\n\n")
+	h := api.NewTransactionHandler("DASH")
+	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
+	queryTxHash := "60a8de0be75d153be34d39d31a4c2b0c6904be1354b462f9af8fe75fc1c2fc5e"
+	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+}
+
 func test_tether () {
 	fmt.Printf("=========================\n           TETHER           \n=========================\n\n")
 	h := api.NewTransactionHandler("TETHER")
@@ -116,6 +128,14 @@ func test_ltc () {
 	h := api.NewTransactionHandler("LTC")
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	queryTxHash := "ae1359de01c84c1750faa71ac62ed8381e97fa1156b280861ebb01fc84f538aa"
+	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+}
+
+func test_zcash () {
+	fmt.Printf("=========================\n           ZCASH           \n=========================\n\n")
+	h := api.NewTransactionHandler("ZCASH")
+	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
+	queryTxHash := "6a37436e56d4e4ac081c816b628404bc28a216afc0d0514ca0d490cc28fa5a28"
 	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
 }
 
@@ -159,6 +179,32 @@ func test_eth () {
 	queryAddress := fromAddress
 
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, nil)
+}
+
+func test_etc () {
+	fmt.Printf("=========================\n           ETC           \n=========================\n\n")
+	h := api.NewTransactionHandler("ETC")
+
+	fromPrivateKey, _ := crypto.HexToECDSA("d55b502bd4867b2c1b505af9b7cefeeb910b6cfbb570e2e47680bc89ee123eab")
+	pub := crypto.FromECDSAPub(&fromPrivateKey.PublicKey)
+	fromPubKeyHex := hex.EncodeToString(pub)
+
+	queryTxHash := "0xb3c033e2f22cd8f7e6f07d3da87bd92cfe8ca6128632d6b7d596f417bc440588"
+
+	test_common (h, fromPrivateKey, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+}
+
+func test_vechain () {
+	fmt.Printf("=========================\n           VECHAIN           \n=========================\n\n")
+	h := api.NewTransactionHandler("VECHAIN")
+
+	fromPrivateKey, _ := crypto.HexToECDSA("d55b502bd4867b2c1b505af9b7cefeeb910b6cfbb570e2e47680bc89ee123eab")
+	pub := crypto.FromECDSAPub(&fromPrivateKey.PublicKey)
+	fromPubKeyHex := hex.EncodeToString(pub)
+
+	queryTxHash := "0x1d4e7f364082341b719aa51cb86c907b37bb2335eca2b4243b6a5de39f87e87c"
+
+	test_common (h, fromPrivateKey, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
 }
 
 func test_erc20 () {
