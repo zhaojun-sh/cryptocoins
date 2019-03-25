@@ -12,12 +12,8 @@ import (
 	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
 	"github.com/gaozhengxin/cryptocoins/src/go/btc"
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
-	"github.com/schancel/cashaddr-converter/cashaddress"
+	addrconv "github.com/schancel/cashaddr-converter/address"
 )
-
-var ChainConfig = chaincfg.Params {
-	PubKeyHashAddrID: 0x78,
-}
 
 var btcHandler = new(btc.BTCTransactionHandler)
 
@@ -39,11 +35,16 @@ func (h *BCHTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address st
 	}
 	b := pubKey.SerializeCompressed()
 	pkHash := btcutil.Hash160(b)
-	var cashAddress = cashaddress.Address {
-		Prefix: "",
-		Version: 0,
-		Payload: pkHash,
+	addressPubKeyHash, err := btcutil.NewAddressPubKeyHash(pkHash, &chaincfg.MainNetParams)
+	if err != nil {
+		return
 	}
+	legaddr := addressPubKeyHash.EncodeAddress()  // legacy format
+	addr, err := addrconv.NewFromString(legaddr)
+	if err != nil {
+		return
+	}
+	cashAddress, _ := addr.CashAddress()  // bitcoin cash
 	address, err = cashAddress.Encode()
 	return
 }
