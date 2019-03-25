@@ -8,6 +8,16 @@ const (
 	//ETH_GATEWAY = "http://127.0.0.1:8111"
 )
 
+// etc
+const (
+	ETC_GATEWAY = "http://127.0.0.1:50505"
+)
+
+// vechain
+const (
+	VECHAIN_GATEWAY = "http://127.0.0.1:50505"
+)
+
 // eos kylincrypto testnet
 const (
 	//eos api nodes support get actions (filter-on=*)
@@ -57,7 +67,7 @@ const (
 	LTC_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
 
-// bitcash
+// bitcoin cash
 const (
 	BCH_SERVER_HOST        = "127.0.0.1"
 	BCH_SERVER_PORT        = 50607 
@@ -65,4 +75,24 @@ const (
 	BCH_PASSWD             = "123456"
 	BCH_USESSL             = false
 	BCH_WALLET_PASSPHRASE  = "WalletPassphrase"
+)
+
+// dash
+const (
+	DASH_SERVER_HOST        = "127.0.0.1"
+	DASH_SERVER_PORT        = 50505 
+	DASH_USER               = "xxmm"
+	DASH_PASSWD             = "123456"
+	DASH_USESSL             = false
+	DASH_WALLET_PASSPHRASE  = "WalletPassphrase"
+)
+
+// zcash
+const (
+	ZCASH_SERVER_HOST        = "127.0.0.1"
+	ZCASH_SERVER_PORT        = 50505 
+	ZCASH_USER               = "xxmm"
+	ZCASH_PASSWD             = "123456"
+	ZCASH_USESSL             = false
+	ZCASH_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
