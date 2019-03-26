@@ -14,7 +14,7 @@ import (
 	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
 	"github.com/gaozhengxin/cryptocoins/src/go/btc"
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
-	"github.com/gaozhengxin/cryptocoins/src/go/tetherjson"
+	"github.com/gaozhengxin/cryptocoins/src/go/tether/tetherjson"
 )
 
 var btcHandler = new(btc.BTCTransactionHandler)
