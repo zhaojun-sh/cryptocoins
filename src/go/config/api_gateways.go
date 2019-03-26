@@ -87,6 +87,16 @@ const (
 	BCH_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
 
+// bitgold
+const (
+	BITGOLD_SERVER_HOST        = "127.0.0.1"
+	BITGOLD_SERVER_PORT        = 50505
+	BITGOLD_USER               = "xxmm"
+	BITGOLD_PASSWD             = "123456"
+	BITGOLD_USESSL             = false
+	BITGOLD_WALLET_PASSPHRASE  = "WalletPassphrase"
+)
+
 // dash
 const (
 	DASH_SERVER_HOST        = "127.0.0.1"
