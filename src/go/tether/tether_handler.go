@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"runtime/debug"
 	"strings"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/btcjson"
@@ -68,6 +69,12 @@ func (h *TETHERTransactionHandler) SubmitTransaction(signedTransaction interface
 }
 
 func (h *TETHERTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+	defer func () {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
+			return
+		}
+	} ()
 	cmd := tetherjson.NewOmniGetTransactionCmd(txhash)
 	marshalledJSON, err := btcjson.MarshalCmd(1, cmd)
 	if err != nil {

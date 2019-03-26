@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"runtime/debug"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
@@ -73,6 +74,12 @@ func (h *BCHTransactionHandler) SubmitTransaction(signedTransaction interface{})
 }
 
 func (h *BCHTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+	defer func () {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
+			return
+		}
+	} ()
 	cmd := btcjson.NewGetRawTransactionCmd(txhash, nil)
 
 	marshalledJSON, err := btcjson.MarshalCmd(1, cmd)
