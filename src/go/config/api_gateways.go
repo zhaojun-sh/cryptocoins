@@ -28,7 +28,7 @@ const (
 
 // ripple testnet
 const (
-	XRP_GATEWAY = "https://s.altnet.rippletest.net:51234"  // Ripple test net
+	XRP_GATEWAY = "https://s.altnet.rippletest.net:51234"
 )
 
 // tron testnet
@@ -38,19 +38,29 @@ const (
 
 // bitcoin testnet
 const (
-	RPCCLIENT_TIMEOUT = 30
 	BTC_SERVER_HOST        = "47.107.50.83"
-	BTC_SERVER_PORT        = 8000 
+	BTC_SERVER_PORT        = 8000
 	BTC_USER               = "xxmm"
 	BTC_PASSWD             = "123456"
 	BTC_USESSL             = false
 	BTC_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
 
+// decred
+const (
+	RPCCLIENT_TIMEOUT = 30
+	DCR_SERVER_HOST        = "127.0.0.1"
+	DCR_SERVER_PORT        = 50505
+	DCR_USER               = "xxmm"
+	DCR_PASSWD             = "123456"
+	DCR_USESSL             = false
+	DCR_WALLET_PASSPHRASE  = "WalletPassphrase"
+)
+
 // tether
 const (
 	TETHER_SERVER_HOST        = "127.0.0.1"
-	TETHER_SERVER_PORT        = 50505 
+	TETHER_SERVER_PORT        = 50505
 	TETHER_USER               = "xxmm"
 	TETHER_PASSWD             = "123456"
 	TETHER_USESSL             = false
@@ -60,7 +70,7 @@ const (
 // litecoin
 const (
 	LTC_SERVER_HOST        = "127.0.0.1"
-	LTC_SERVER_PORT        = 50505 
+	LTC_SERVER_PORT        = 50505
 	LTC_USER               = "xxmm"
 	LTC_PASSWD             = "123456"
 	LTC_USESSL             = false
@@ -70,7 +80,7 @@ const (
 // bitcoin cash
 const (
 	BCH_SERVER_HOST        = "127.0.0.1"
-	BCH_SERVER_PORT        = 50607 
+	BCH_SERVER_PORT        = 50607
 	BCH_USER               = "xxmm"
 	BCH_PASSWD             = "123456"
 	BCH_USESSL             = false
@@ -80,7 +90,7 @@ const (
 // dash
 const (
 	DASH_SERVER_HOST        = "127.0.0.1"
-	DASH_SERVER_PORT        = 50505 
+	DASH_SERVER_PORT        = 50505
 	DASH_USER               = "xxmm"
 	DASH_PASSWD             = "123456"
 	DASH_USESSL             = false
@@ -90,7 +100,7 @@ const (
 // zcash
 const (
 	ZCASH_SERVER_HOST        = "127.0.0.1"
-	ZCASH_SERVER_PORT        = 50505 
+	ZCASH_SERVER_PORT        = 50505
 	ZCASH_USER               = "xxmm"
 	ZCASH_PASSWD             = "123456"
 	ZCASH_USESSL             = false

@@ -6,6 +6,7 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/bch"
 	"github.com/gaozhengxin/cryptocoins/src/go/btc"
 	"github.com/gaozhengxin/cryptocoins/src/go/dash"
+	"github.com/gaozhengxin/cryptocoins/src/go/dcr"
 	"github.com/gaozhengxin/cryptocoins/src/go/eos"
 	"github.com/gaozhengxin/cryptocoins/src/go/eth"
 	"github.com/gaozhengxin/cryptocoins/src/go/etc"
@@ -60,6 +61,8 @@ func NewTransactionHandler(coinType string) (txHandler TransactionHandler) {
 		return &btc.BTCTransactionHandler{}
 	case "DASH":
 		return &dash.DASHTransactionHandler{}
+	case "DCR":
+		return &dcr.DCRTransactionHandler{}
 	case "EOS":
 		return &eos.EOSTransactionHandler{}
 	case "ETH":

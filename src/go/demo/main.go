@@ -17,11 +17,12 @@ func main() {
 	//test_bch()
 	//test_btc()
 	//test_dash()
+	test_dcr()
 	//test_tether()
 	//test_ltc()
 	//test_eos()
 	//test_eth()
-	test_etc()
+	//test_etc()
 	//test_vechain()
 	//test_erc20()
 	//test_xrp()
@@ -98,6 +99,14 @@ func test_dash () {
 	h := api.NewTransactionHandler("DASH")
 	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "60a8de0be75d153be34d39d31a4c2b0c6904be1354b462f9af8fe75fc1c2fc5e"
+	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+}
+
+func test_dcr () {
+	fmt.Printf("=========================\n           DCR           \n=========================\n\n")
+	h := api.NewTransactionHandler("DCR")
+	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
+	queryTxHash := "561541db309e70c7399c6028a8249a09c1da0cee517162de34dca660023c9c6c"
 	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
 }
 
