@@ -214,11 +214,11 @@ const (
 )
 
 // Secp256k1 is the secp256k1 curve and ECDSA system used in Bitcoin.
-var Secp256k1 = newSecp256k1DSA()
+//var Secp256k1 = newSecp256k1DSA()
 
 // Edwards is the Ed25519 ECDSA signature system.
-var Edwards = newEdwardsDSA()
+//var Edwards = newEdwardsDSA()
 
 // SecSchnorr is a Schnorr signature scheme about the secp256k1 curve
 // implemented in libsecp256k1.
-var SecSchnorr = newSecSchnorrDSA()
+//var SecSchnorr = newSecSchnorrDSA()

@@ -15,9 +15,9 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/dcr/chaincfg"
 	"github.com/gaozhengxin/cryptocoins/src/go/dcr/chaincfg/chainec"
 	"github.com/gaozhengxin/cryptocoins/src/go/dcr/dcrec"
-	"github.com/gaozhengxin/cryptocoins/src/go/dcr/dcrec/edwards"
-	"github.com/gaozhengxin/cryptocoins/src/go/dcr/dcrec/secp256k1"
-	"github.com/gaozhengxin/cryptocoins/src/go/dcr/dcrec/secp256k1/schnorr"
+	//"github.com/decred/dcrd/dcrec/edwards"
+	"github.com/decred/dcrd/dcrec/secp256k1"
+	//"github.com/decred/dcrd/dcrec/secp256k1/schnorr"
 )
 
 var (
@@ -91,12 +91,12 @@ func NewAddressPubKey(decoded []byte, net *chaincfg.Params) (Address, error) {
 			return NewAddressSecpPubKey(
 				append([]byte{toAppend}, decoded[1:]...),
 				net)
-		case dcrec.STEd25519:
+		/*case dcrec.STEd25519:
 			return NewAddressEdwardsPubKey(decoded, net)
 		case dcrec.STSchnorrSecp256k1:
 			return NewAddressSecSchnorrPubKey(
 				append([]byte{toAppend}, decoded[1:]...),
-				net)
+				net)*/
 		}
 		return nil, ErrUnknownAddressType
 	}
@@ -394,17 +394,17 @@ func (a *AddressSecpPubKey) DSA(net *chaincfg.Params) dcrec.SignatureType {
 func (a *AddressSecpPubKey) Net() *chaincfg.Params {
 	return a.net
 }
-
+/*
 func NewAddressSecpPubKeyCompressed(pubkey chainec.PublicKey, params *chaincfg.Params) (*AddressSecpPubKey, error) {
 	return NewAddressSecpPubKey(pubkey.SerializeCompressed(), params)
 }
-
+*/
 type AddressEdwardsPubKey struct {
 	net          *chaincfg.Params
 	pubKey       chainec.PublicKey
 	pubKeyHashID [2]byte
 }
-
+/*
 func NewAddressEdwardsPubKey(serializedPubKey []byte,
 	net *chaincfg.Params) (*AddressEdwardsPubKey, error) {
 	pubKey, err := edwards.ParsePubKey(edwards.Edwards(), serializedPubKey)
@@ -418,7 +418,7 @@ func NewAddressEdwardsPubKey(serializedPubKey []byte,
 		pubKeyHashID: net.PKHEdwardsAddrID,
 	}, nil
 }
-
+*/
 func (a *AddressEdwardsPubKey) serialize() []byte {
 	return a.pubKey.Serialize()
 }
@@ -471,7 +471,7 @@ type AddressSecSchnorrPubKey struct {
 	pubKey       chainec.PublicKey
 	pubKeyHashID [2]byte
 }
-
+/*
 func NewAddressSecSchnorrPubKey(serializedPubKey []byte,
 	net *chaincfg.Params) (*AddressSecSchnorrPubKey, error) {
 	pubKey, err := schnorr.ParsePubKey(secp256k1.S256(), serializedPubKey)
@@ -485,7 +485,7 @@ func NewAddressSecSchnorrPubKey(serializedPubKey []byte,
 		pubKeyHashID: net.PKHSchnorrAddrID,
 	}, nil
 }
-
+*/
 func (a *AddressSecSchnorrPubKey) serialize() []byte {
 	return a.pubKey.Serialize()
 }

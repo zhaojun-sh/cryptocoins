@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/gaozhengxin/cryptocoins/src/go/dcr/chaincfg/chainhash"
-	"github.com/gaozhengxin/cryptocoins/src/go/dcr/wire"
+	//"github.com/gaozhengxin/cryptocoins/src/go/dcr/wire"
 )
 
 // These variables are the chain proof-of-work limit parameters for each default
@@ -222,7 +222,7 @@ type Params struct {
 	Name string
 
 	// Net defines the magic bytes used to identify the network.
-	Net wire.CurrencyNet
+	//Net wire.CurrencyNet
 
 	// DefaultPort defines the default peer-to-peer port for the network.
 	DefaultPort string
@@ -232,7 +232,7 @@ type Params struct {
 	DNSSeeds []DNSSeed
 
 	// GenesisBlock defines the first block of the chain.
-	GenesisBlock *wire.MsgBlock
+	//GenesisBlock *wire.MsgBlock
 
 	// GenesisHash is the starting block hash.
 	GenesisHash *chainhash.Hash
@@ -488,7 +488,7 @@ func (p *Params) XPrivKeyID() [4]byte {
 }
 
 // XPubKeyID returns the hierarchical deterministic extended public key magic
-// version bytes for the network the parameters define.
+// version bytes for the network the paramwireeters define.
 func (p *Params) XPubKeyID() [4]byte {
 	return p.HDPublicKeyID
 }
@@ -515,7 +515,7 @@ var (
 )
 
 var (
-	registeredNets    = make(map[wire.CurrencyNet]struct{})
+	//registeredNets    = make(map[wire.CurrencyNet]struct{})
 	pubKeyAddrIDs     = make(map[[2]byte]struct{})
 	pubKeyHashAddrIDs = make(map[[2]byte]struct{})
 	pkhEdwardsAddrIDs = make(map[[2]byte]struct{})
@@ -540,13 +540,13 @@ func (d DNSSeed) String() string {
 // parameters based on inputs and work regardless of the network being standard
 // or not.
 func Register(params *Params) error {
-	if _, ok := registeredNets[params.Net]; ok {
-		return ErrDuplicateNet
-	}
-	if _, ok := netPrefixToParams[params.NetworkAddressPrefix]; ok {
-		return ErrDuplicateNetAddrPrefix
-	}
-	registeredNets[params.Net] = struct{}{}
+	//if _, ok := registeredNets[params.Net]; ok {
+	//	return ErrDuplicateNet
+	//}
+	//if _, ok := netPrefixToParams[params.NetworkAddressPrefix]; ok {
+	//	return ErrDuplicateNetAddrPrefix
+	//}
+	//registeredNets[params.Net] = struct{}{}
 	pubKeyAddrIDs[params.PubKeyAddrID] = struct{}{}
 	pubKeyHashAddrIDs[params.PubKeyHashAddrID] = struct{}{}
 	scriptHashAddrIDs[params.ScriptHashAddrID] = struct{}{}
