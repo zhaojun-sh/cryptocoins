@@ -78,7 +78,7 @@ func (h *EOSTransactionHandler) BuildUnsignedTransaction(fromAcctName, fromPubli
 
 // 方案二中构造交易的方法
 func (h *EOSTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAcctName string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
-	memo := fromAddress
+	memo := GenAccountName(fromPublicKey)
 	digest, transaction, err := EOS_newUnsignedTransaction(OWNER_ACCOUNT, toAcctName, amount, memo)
 	digests = append(digests, digest)
 	return
@@ -168,7 +168,7 @@ fmt.Printf("%+v\n\n", ret)
 
 // 方案二中使用的查余额的方法
 func (h *EOSTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error) {
-	req := BALANCE_SERVER + "get_balance?user_key" + address
+	req := BALANCE_SERVER + "get_balance?user_key=" + address
 	resp, err := http.Get(req)
 	if err != nil {
 		return

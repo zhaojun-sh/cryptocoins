@@ -17,7 +17,7 @@ var (
 	}
 )
 
-const OWNER_ACCOUNT = ""
+const OWNER_ACCOUNT = "gzx123454321"
 
 const EOS_ACCURACY = 10000
 

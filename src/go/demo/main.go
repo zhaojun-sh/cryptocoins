@@ -18,10 +18,10 @@ func main() {
 	//test_bitgold()
 	//test_btc()
 	//test_dash()
-	test_dcr()
+	//test_dcr()
 	//test_tether()
 	//test_ltc()
-	//test_eos()
+	test_eos()
 	//test_eth()
 	//test_etc()
 	//test_vechain()
@@ -32,7 +32,7 @@ func main() {
 }
 
 func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, build_tx_args []interface{}, queryTxHash, queryAddress string, query_balance_args []interface{}) {
-
+/*
 	fmt.Printf("========== %s ==========\n\n", "test pubkey to address/account_name")
 	address, msg, err := h.PublicKeyToAddress(fromPubKeyHex)
 	if err != nil {
@@ -42,7 +42,7 @@ func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubK
 	if msg != "" {
 		fmt.Printf("msg is %s\n\n", msg)
 	}
-/*
+
 	fmt.Printf("========== %s ==========\n\n", "test build unsigned transfer transaction")
 	transaction, digest, err := h.BuildUnsignedTransaction(fromAddress, fromPubKeyHex, toAddress, big.NewInt(1), build_tx_args)
 	if err != nil {
@@ -70,21 +70,21 @@ func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubK
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("%s\n\n", ret)
-*/
+
 	fmt.Printf("========== %s ==========\n\n", "test get transaction info")
 	fromAddress2, toAddress2, amount, _, err := h.GetTransactionInfo(queryTxHash)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("from: %v\nto: %v\namount: %v\n\n", fromAddress2, toAddress2, amount)
-/*
+*/
 	fmt.Printf("========== %s ==========\n\n", "test get balance")
 	balance, err := h.GetAddressBalance(queryAddress, query_balance_args)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("balance: %v\n\n", balance)
-*/
+
 }
 
 func test_bitgold () {
@@ -168,8 +168,8 @@ func test_eos () {
 	var build_tx_args []interface{}
 	memo := "1234"
 	build_tx_args = append(build_tx_args, memo)
-	queryTxHash := "0cd1f75fff840bca344d1aa61c4bc5a0d97082b04a8bb8ee4e3a255a86f7cf19"
-	queryAcct := "degtjwol11u3"
+	queryTxHash := "a7a8fee54901cffeeb580774a867323cde87dac848d4068ca57fc4a0b4443c58"
+	queryAcct := "dt4j25eyljrkjpg3sh4e3mhrywbjvvkigq"
 
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAcctName, toAcctName, build_tx_args, queryTxHash, queryAcct, nil)
 }
