@@ -15,6 +15,7 @@ import (
 
 func main() {
 	//test_bch()
+	//test_bitgold()
 	//test_btc()
 	//test_dash()
 	test_dcr()
@@ -84,6 +85,14 @@ func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubK
 	}
 	fmt.Printf("balance: %v\n\n", balance)
 */
+}
+
+func test_bitgold () {
+	fmt.Printf("=========================\n           BITGOLD           \n=========================\n\n")
+	h := api.NewTransactionHandler("BITGOLD")
+	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
+	queryTxHash := "6e4765956be5b6fe4c4b43f156a07a9662ca591b2a88b09e89d32b51681eb00b"
+	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
 }
 
 func test_bch () {
