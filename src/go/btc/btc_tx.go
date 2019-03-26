@@ -311,7 +311,13 @@ fmt.Printf("%v\n\n", retJSON2)
 	amt, err := btcutil.NewAmount(flt)
 	transferAmount = big.NewInt(int64(amt.ToUnit(btcutil.AmountSatoshi)))
 
-	vintx := tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["txid"].(string)
+	vintx0 := tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["txid"]
+	coinbase := tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["coinbase"]
+	if vintx0 == nil {
+		fromAddress = coinbase.(string)
+		return
+	}
+	vintx := vintx0.(string)
 	vinvout := int(tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["vout"].(float64))
 
 	cmd3 := btcjson.NewGetRawTransactionCmd(vintx, nil)
