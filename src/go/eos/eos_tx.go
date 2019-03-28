@@ -19,65 +19,24 @@ import (
 	"github.com/rubblelabs/ripple/crypto"
 
 	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
+	"github.com/gaozhengxin/cryptocoins/src/go/types"
 )
 
 type EOSTransactionHandler struct {
 }
 
-// 方案一：公钥hash+base58+截取12个字符当作账户名，用户用这个帐户名创建eos账户，用这个新账户给用户的公钥授权
-/*
-func (h *EOSTransactionHandler) PublicKeyToAddress(pubKeyHex string) (acctName string, msg string, err error) {
-	acctName = GenAccountName(pubKeyHex)
-	msg = "this account name is not expected to be seen on chain, and the public key is not delegated by any existed account. it is possible to create an account with this name and delegate the public key."
-	pubKey, err := HexToPubKey(pubKeyHex)
-	if err != nil {
-		return
-	}
-	accounts, err := GetAccountNameByPubKey(pubKey.String())
-	if len(accounts) != 0 {
-		msg = "this public key is delegated by accounts: "
-		for _, acct := range accounts {
-			msg = msg + "/" + acct
-		}
-	}
-	return
+func NewEOSTransactionHandler () *EOSTransactionHandler {
+	return &EOSTransactionHandler{}
 }
-*/
 
-// 方案二：用一个大账户存钱，用交易备注区分用户，交易备注是公钥hash+base58
-func (h *EOSTransactionHandler) PublicKeyToAddress(pubKeyHex string) (acctName string, msg string, err error) {
+// 用一个大账户存钱，用交易备注区分用户，交易备注是公钥hash+base58
+func (h *EOSTransactionHandler) PublicKeyToAddress(pubKeyHex string) (acctName string, err error) {
 	acctName = GenAccountName(pubKeyHex)
 	return
 }
 
-// 方案一中构造交易的方法
-// args[0] memo string
-/*
-func (h *EOSTransactionHandler) BuildUnsignedTransaction(fromAcctName, fromPublicKey, toAcctName string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
-	if fromAcctName == "" {
-		accounts, err1 := GetAccountNameByPubKey(fromPublicKey)
-		if err1 != nil {
-			err = err1
-			return
-		}
-		if len(accounts) > 1 {
-			err = fmt.Errorf("public key is delegated by multiple accounts, need to specify account name")
-		}
-		fromAcctName = accounts[0]
-	}
-	memo := args[0].(string)
-	digest, transaction, err := EOS_newUnsignedTransaction(fromAcctName, toAcctName, amount, memo)
-	if err != nil {
-		return
-	}
-
-	digests = append(digests, digest)
-	return
-}
-*/
-
-// 方案二中构造交易的方法
-func (h *EOSTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAcctName string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
+// 构造交易
+func (h *EOSTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 	memo := GenAccountName(fromPublicKey)
 	digest, transaction, err := EOS_newUnsignedTransaction(OWNER_ACCOUNT, toAcctName, amount, memo)
 	digests = append(digests, digest)
@@ -90,11 +49,9 @@ func (h *EOSTransactionHandler) SignTransaction(hash []string, privateKey interf
 		return
 	}
 	vrs := signature.Content
-fmt.Printf("vrs is %v\n\n", hex.EncodeToString(vrs))
-v := vrs[0] - byte(31)
+	v := vrs[0] - byte(31)
 	rsvBytes := append(vrs[1:], v)
 	rsv = append(rsv, hex.EncodeToString(rsvBytes))
-fmt.Printf("rsv is %v\n\n", rsv)
 	return
 }
 
@@ -107,13 +64,12 @@ func (h *EOSTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 	return
 }
 
-func (h *EOSTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
-	ret = SubmitTransaction(signedTransaction.(*eos.SignedTransaction))
-fmt.Printf("\nstx is %+v\n\n\n", signedTransaction.(*eos.SignedTransaction))
+func (h *EOSTransactionHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
+	txhash = SubmitTransaction(signedTransaction.(*eos.SignedTransaction))
 	return
 }
 
-func (h *EOSTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+func (h *EOSTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	api := "v1/history/get_transaction"
 	data := `{"id":"` + txhash + `","block_num_hint":"0"}`
 	ret := rpcutils.DoCurlRequest(nodeos, api, data)
@@ -135,39 +91,17 @@ func (h *EOSTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 	}
 	tfData := retStruct["trx"].(map[string]interface{})["actions"].([]interface{})[0].(map[string]interface{})["data"].(map[string]interface{})
 	fromAddress = tfData["from"].(string)
-	toAddress = tfData["receiver"].(string)
-	transferAmount = big.NewInt(int64(tfData["transfer"].(float64)))
-	return
-}
-
-// 方法一中查余额的方法
-/*
-func (h *EOSTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error) {
-	api := "v1/chain/get_account"
-	data := `{"account_name":"` + address + `"}`
-
-	ret := rpcutils.DoCurlRequest(nodeos, api, data)
-fmt.Printf("%+v\n\n", ret)
-
-	var retStruct map[string]interface{}
-	json.Unmarshal([]byte(ret), &retStruct)
-	if retStruct["core_liquid_balance"] == nil {
-		err = fmt.Errorf("%v", ret)
-		return
+	toAddress := tfData["receiver"].(string)
+	transferAmount := big.NewInt(int64(tfData["transfer"].(float64)))
+	txOutput = types.TxOutput{
+		ToAddress: toAddress,
+		Amount: transferAmount
 	}
-	balStr := retStruct["core_liquid_balance"].(string)
-	fmt.Printf("%s\n\n", balStr)
-	fmt.Printf("%s\n\n", strings.Fields(balStr)[0])
-	balFloat, _ := strconv.ParseFloat(strings.Fields(balStr)[0], 64)
-	balInt := int64(balFloat * EOS_ACCURACY)
-	balance = big.NewInt(balInt)
-
+	txOutputs = append(txOutputs, txOutput)
 	return
 }
-*/
 
-// 方案二中使用的查余额的方法
-func (h *EOSTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error) {
+func (h *EOSTransactionHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	req := BALANCE_SERVER + "get_balance?user_key=" + address
 	resp, err := http.Get(req)
 	if err != nil {
