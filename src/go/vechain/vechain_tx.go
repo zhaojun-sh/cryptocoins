@@ -8,13 +8,14 @@ import  (
 	"errors"
 	"fmt"
 	"math/big"
+	"runtime/debug"
 
 
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
 	"github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
-
+	"github.com/gaozhengxin/cryptocoins/src/go/types"
 )
 
 var (
@@ -24,7 +25,11 @@ var (
 type VECHAINTransactionHandler struct {
 }
 
-func (h *VECHAINTransactionHandler) PublicKeyToAddress (pubKeyHex string) (address string, msg string, err error) {
+func NewVECHAINTransactionHandler () *VECHAINTransactionHandler {
+	return &VECHAINTransactionHandler{}
+}
+
+func (h *VECHAINTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	data := hexEncPubkey(pubKeyHex[2:])
 
 	pub, err := decodePubkey(data)
@@ -34,7 +39,7 @@ func (h *VECHAINTransactionHandler) PublicKeyToAddress (pubKeyHex string) (addre
 	return
 }
 
-func (h *VECHAINTransactionHandler) BuildUnsignedTransaction (fromAddress, fromPublicKey, toAddress string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
+func (h *VECHAINTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 	return
 }
 
@@ -46,25 +51,34 @@ func (h *VECHAINTransactionHandler) MakeSignedTransaction(rsv []string, transact
 	return
 }
 
-func (h *VECHAINTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
+func (h *VECHAINTransactionHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
 	return
 }
 
-func (h *VECHAINTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
-	params := make(map[string][]string)
-	params["111"] = append(params["111"], "aaa")
-	params["222"] = append(params["222"], "bbb")
+func (h *VECHAINTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
+	defer func () {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
+			return
+		}
+	} ()
 	b, err := rpcutils.HttpGet(config.VECHAIN_GATEWAY, "transactions/"+txhash+"/receipt", nil)
 	if err != nil {
 		return
 	}
 	var body interface{}
 	json.Unmarshal(b, &body)
-	transfers0 := body.(map[string]interface{})["outputs"].([]interface{})[0].(map[string]interface{})["transfers"].([]interface{})[0].(map[string]interface{})
-	fromAddress = transfers0["sender"].(string)
-	toAddress = transfers0["recipient"].(string)
-	amt := transfers0["amount"].(string)
-	transferAmount, ok := new(big.Int).SetString(amt, 0)
+	transfers := body.(map[string]interface{})["outputs"].([]interface{})[0].(map[string]interface{})["transfers"].([]interface{})
+	for _, transfer := range transfers {
+		fromAddress = transfer.(map[string]interface{})["sender"].(string)
+		toAddress = transfer.(map[string]interface{})["recipient"].(string)
+		amt := transfer.(map[string]interface{})["amount"].(string)
+		transferAmount, ok := new(big.Int).SetString(amt, 0)
+		txOutPuts = append(txOutPuts, types.TxOutput{
+			ToAddress: toAddress,
+			Amount: transferAmount
+		})
+	}
 	if !ok {
 		err = fmt.Errorf("parse amount value error")
 		return
