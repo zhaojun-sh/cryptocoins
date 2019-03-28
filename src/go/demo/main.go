@@ -31,7 +31,7 @@ func main() {
 	//test_zcash()
 }
 
-func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, build_tx_args []interface{}, queryTxHash, queryAddress string, query_balance_args []interface{}) {
+func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, build_tx_args string, queryTxHash, queryAddress string, query_balance_args string) {
 /*
 	fmt.Printf("========== %s ==========\n\n", "test pubkey to address/account_name")
 	address, msg, err := h.PublicKeyToAddress(fromPubKeyHex)
@@ -92,7 +92,7 @@ func test_bitgold () {
 	h := api.NewTransactionHandler("BITGOLD")
 	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "6e4765956be5b6fe4c4b43f156a07a9662ca591b2a88b09e89d32b51681eb00b"
-	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
 }
 
 func test_bch () {
@@ -100,7 +100,7 @@ func test_bch () {
 	h := api.NewTransactionHandler("BCH")
 	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "f6f24bd236252574c1ba7086ac1178b37abf5041653127bd6b400bae0f0a9b00"
-	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
 }
 
 func test_dash () {
@@ -108,7 +108,7 @@ func test_dash () {
 	h := api.NewTransactionHandler("DASH")
 	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "60a8de0be75d153be34d39d31a4c2b0c6904be1354b462f9af8fe75fc1c2fc5e"
-	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
 }
 
 func test_dcr () {
@@ -116,7 +116,7 @@ func test_dcr () {
 	h := api.NewTransactionHandler("DCR")
 	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "561541db309e70c7399c6028a8249a09c1da0cee517162de34dca660023c9c6c"
-	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
 }
 
 func test_tether () {
@@ -124,7 +124,7 @@ func test_tether () {
 	h := api.NewTransactionHandler("TETHER")
 	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "30fdcd207ba3cc3f9f5d69ab25e2290c71c1008564d7c27fdc3d96a797f65643"
-	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
 }
 
 func test_btc () {
@@ -134,11 +134,10 @@ func test_btc () {
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
 	toAddress := "mg1KnRaekxjZbvdUNDKxxJycd3hNbxMomA"
-	var build_tx_args []interface{}
-	build_tx_args = append(build_tx_args, float64(0), "")
+	build_tx_args := `"feeRate":0.0001`
 	queryTxHash := "6bf5a5077234908b44f69f5587f92c027a68374d88ccc36012663b4ebcdbc802"
 	queryAddress := "2MteNic4ttfvkYCJYEaYMuqrNcnc6xzwoBL"
-	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, nil)
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, "")
 }
 
 func test_ltc () {
@@ -146,7 +145,7 @@ func test_ltc () {
 	h := api.NewTransactionHandler("LTC")
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	queryTxHash := "ae1359de01c84c1750faa71ac62ed8381e97fa1156b280861ebb01fc84f538aa"
-	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
 }
 
 func test_zcash () {
@@ -154,7 +153,7 @@ func test_zcash () {
 	h := api.NewTransactionHandler("ZCASH")
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	queryTxHash := "6a37436e56d4e4ac081c816b628404bc28a216afc0d0514ca0d490cc28fa5a28"
-	test_common (h, nil, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
 }
 
 func test_eos () {
@@ -165,13 +164,10 @@ func test_eos () {
 	fromPubKeyHex, _ := eos.PubKeyToHex(fromPubKey)
 	fromAcctName := "gzx123454321"
 	toAcctName := "degtjwol11u3"
-	var build_tx_args []interface{}
-	memo := "1234"
-	build_tx_args = append(build_tx_args, memo)
 	queryTxHash := "a7a8fee54901cffeeb580774a867323cde87dac848d4068ca57fc4a0b4443c58"
 	queryAcct := "dt4j25eyljrkjpg3sh4e3mhrywbjvvkigq"
 
-	test_common (h, fromPrivateKey, fromPubKeyHex, fromAcctName, toAcctName, build_tx_args, queryTxHash, queryAcct, nil)
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAcctName, toAcctName, "", queryTxHash, queryAcct, "")
 }
 
 func test_eth () {
@@ -188,15 +184,14 @@ func test_eth () {
 
 	toAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
 
-	var build_tx_args []interface{}
-	build_tx_args = append(build_tx_args, big.NewInt(8000000000), uint64(50000))
+	build_tx_args := `{"gasPrice":8000000000,"gasLimit":50000}`
 
 	queryTxHash := "0xf9e16303a1b5a59b12e18be82aaed2363621844d8b78961db57d1af7aa89419f"
 
 //	queryAddress := "0xEc430068f392e5FBcE92016758C5111375d16f7D"
 	queryAddress := fromAddress
 
-	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, nil)
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, "")
 }
 
 func test_etc () {
@@ -209,7 +204,7 @@ func test_etc () {
 
 	queryTxHash := "0xb3c033e2f22cd8f7e6f07d3da87bd92cfe8ca6128632d6b7d596f417bc440588"
 
-	test_common (h, fromPrivateKey, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+	test_common (h, fromPrivateKey, fromPubKeyHex, "", "", "", queryTxHash, "", "")
 }
 
 func test_vechain () {
@@ -222,7 +217,7 @@ func test_vechain () {
 
 	queryTxHash := "0x1d4e7f364082341b719aa51cb86c907b37bb2335eca2b4243b6a5de39f87e87c"
 
-	test_common (h, fromPrivateKey, fromPubKeyHex, "", "", nil, queryTxHash, "", nil)
+	test_common (h, fromPrivateKey, fromPubKeyHex, "", "", "", queryTxHash, "", "")
 }
 
 func test_erc20 () {
@@ -240,14 +235,13 @@ fromPrivateKey, _ := crypto.HexToECDSA("0ea7b1364bc2d1d58f35324b4c0deaa129cc9bd2
 
 	toAddress := "0x426B635fD6CdAf5E4e7Bf5B2A2Dd7bc6c7360FBd"
 
-	var build_tx_args []interface{}
-	build_tx_args = append(build_tx_args, big.NewInt(10000000000), uint64(100000), "BNB")
+	build_tx_args := `"gasPrice":10000000000,"gasLimit":100000,"tokenType":"BNB"`
 
 	queryTxHash := "0xf9e16303a1b5a59b12e18be82aaed2363621844d8b78961db57d1af7aa89419f"
 
 	queryAddress := "0xEc430068f392e5FBcE92016758C5111375d16f7D"
-	var query_balance_args []interface{}
-	query_balance_args = append(query_balance_args, "GUSD")
+
+	query_balance_args := `"tokenType":"GUSD"`
 
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, query_balance_args)
 }
@@ -260,14 +254,12 @@ func test_xrp () {
 	fromPubKeyHex := hex.EncodeToString(fromKey.Public(&keyseq))
 	fromAddress := "rwLc28nRV7WZiBv6vsHnpxUGAVcj8qpAtE"
 	toAddress := "raF1e6TSKtB34MZ9USrKphQAW5hYbARFWK"
-	var build_tx_args []interface{}
-	fee := int64(10)
-	build_tx_args = append(build_tx_args, &fee)
+	build_tx_args := `{"fee":10}`
 	fromPrivateKey := "ssfL5tmpTTqCw5sHjnRHQ4yyUCQKf/0"
 	queryTxHash := "738F84EE3BDCA016680916021EF613A2DA3B1302F8D6448E33D1976A55796C54"
 	queryAddress := "raF1e6TSKtB34MZ9USrKphQAW5hYbARFWK"
 
-	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, nil)
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, "")
 }
 
 type Seed struct {}
@@ -287,5 +279,5 @@ func test_tron() {
 	queryTxHash := "4ec77591400e30c729f10a11d6b33ef75ea565d46b6314f2fa8d170a4b8f74e1"
 	queryAddress := fromAddress
 
-	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, nil, queryTxHash, queryAddress, nil)
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, "", queryTxHash, queryAddress, "")
 }
