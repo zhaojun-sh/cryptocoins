@@ -8,6 +8,7 @@ import  (
 	"errors"
 	"fmt"
 	"math/big"
+	"runtime/debug"
 
 	"github.com/ethereum/go-ethereum/params"
 
@@ -20,16 +21,23 @@ import  (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
+	"github.com/gaozhengxin/cryptocoins/src/go/types"
 
 )
 
 var (
+	gasPrice = big.NewInt(8000000000)
+	gasLimit uint64 = 50000
 	url = config.ETH_GATEWAY
 	err error
 	chainConfig = params.RinkebyChainConfig
 )
 
 type ETHTransactionHandler struct {
+}
+
+func NewETHTransactionHandler () *ETHTransactionHandler {
+	return &ETHTransactionHandler{}
 }
 
 func (h *ETHTransactionHandler) PublicKeyToAddress (pubKeyHex string) (address string, msg string, err error) {
@@ -41,15 +49,29 @@ func (h *ETHTransactionHandler) PublicKeyToAddress (pubKeyHex string) (address s
 	return
 }
 
-//args[0]: gasPrice	*big.Int
-//args[1]: gasLimit	uint64
-//args[2]: tokenType	string
-func (h *ETHTransactionHandler) BuildUnsignedTransaction (fromAddress, fromPublicKey, toAddress string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
+// jsonstring '{"gasPrice":8000000000,"gasLimit":50000}'
+func (h *ETHTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+	defer func () {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
+			return
+		}
+	} ()
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
 	}
-	transaction, hash, err := eth_newUnsignedTransaction(client, fromAddress, toAddress, amount, args[0].(*big.Int), args[1].(uint64))
+	var args interface{}
+	json.Unmarshal(jsonstring, &args)
+	userGasPrice = args.(map[string]interface{})["gasPrice"]
+	userGasLimit = args.(map[string]interface{})["gasLimit"]
+	if userGasPrice != nil {
+		gasPrice = big.NewInt(int64(userGasPrice.(float64)))
+	}
+	if userGasLimit != nil {
+		gasLimit = uint64(userGasLimit.(float64))
+	}
+	transaction, hash, err := eth_newUnsignedTransaction(client, fromAddress, toAddress, amount, gasPrice, gasLimit)
 	hashStr := hash.Hex()
 	if hashStr[:2] == "0x" {
 		hashStr = hashStr[2:]
@@ -57,12 +79,6 @@ func (h *ETHTransactionHandler) BuildUnsignedTransaction (fromAddress, fromPubli
 	digests = append(digests, hashStr)
 	return
 }
-
-/*
-func SignTransaction(hash string, address string) (rsv string, err error) {
-	return
-}
-*/
 
 func (h *ETHTransactionHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
 	hashBytes, err := hex.DecodeString(hash[0])
@@ -93,7 +109,7 @@ func (h *ETHTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 	return makeSignedTransaction(client, transaction.(*types.Transaction), rsv[0])
 }
 
-func (h *ETHTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
+func (h *ETHTransactionHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
@@ -101,7 +117,7 @@ func (h *ETHTransactionHandler) SubmitTransaction(signedTransaction interface{})
 	return eth_sendTx(client, signedTransaction.(*types.Transaction))
 }
 
-func (h *ETHTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+func (h *ETHTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
@@ -112,8 +128,8 @@ func (h *ETHTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 		msg, err2 := tx.AsMessage(types.MakeSigner(chainConfig, GetLastBlock()))
 		err = err2
 		fromAddress = msg.From().Hex()
-		toAddress = msg.To().Hex()
-		transferAmount = msg.Value()
+		toAddress := msg.To().Hex()
+		transferAmount := msg.Value()
 	} else if err1 != nil {
 		err = err1
 	} else if isPending {
@@ -121,11 +137,15 @@ func (h *ETHTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 	} else {
 		err = fmt.Errorf("Unknown error")
 	}
+	txOutput = types.TxOutput{
+		ToAddress: toAddress,
+		Amount: transferAmount
+	}
+	txOutputs = append(txOutputs, txOutput)
 	return
 }
 
-// args[0] coinType string
-func (h *ETHTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error) {
+func (h *ETHTransactionHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	// TODO
 	client, err := ethclient.Dial(url)
 	if err != nil {

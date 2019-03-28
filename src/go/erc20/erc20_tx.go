@@ -28,9 +28,12 @@ import  (
 
 	"github.com/gaozhengxin/cryptocoins/src/go/eth/sha3"
 	"github.com/gaozhengxin/cryptocoins/src/go/erc20/token"
+	"github.com/gaozhengxin/cryptocoins/src/go/types"
 )
 
 var (
+	gasPrice = big.NewInt(8000000000)
+	gasLimit uint64 = 50000
 	url = config.ETH_GATEWAY
 	err error
 	chainConfig = params.RinkebyChainConfig
@@ -48,7 +51,7 @@ var tokens map[string]string = map[string]string{
 type ERC20TransactionHandler struct {
 }
 
-func (h *ERC20TransactionHandler) PublicKeyToAddress (pubKeyHex string) (address string, msg string, err error) {
+func (h *ERC20TransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	data := hexEncPubkey(pubKeyHex[2:])
 
 	pub, err := decodePubkey(data)
@@ -57,18 +60,34 @@ func (h *ERC20TransactionHandler) PublicKeyToAddress (pubKeyHex string) (address
 	return
 }
 
-//args[0]: gasPrice	*big.Int
-//args[1]: gasLimit	uint64
-//args[2]: tokenType	string
-func (h *ERC20TransactionHandler) BuildUnsignedTransaction (fromAddress, fromPublicKey, toAddress string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
-
-
+// jsonstring '{"gasPrice":8000000000,"gasLimit":50000,"tokenType":"BNB"}'
+func (h *ERC20TransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+	defer func () {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
+			return
+		}
+	} ()
+	var args interface{}
+	json.Unmarshal(jsonstring, &args)
+	userGasPrice := args.(map[string]interface{})["gasPrice"]
+	userGasLimit := args.(map[string]interface{})["gasLimit"]
+	coinType := args.(map[string]interface{})["tokenType"]
+	if coinType == nil {
+		err := fmt.Errorf("erc20 token type not specified")
+		return
+	}
+	if userGasPrice != nil {
+		gasPrice = big.NewInt(int64(userGasPrice.(float64)))
+	}
+	if userGasLimit != nil {
+		gasLimit = uint64(userGasLimit.(float64))
+	}
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
 	}
-	transaction, hash, err := erc20_newUnsignedTransaction(client, fromAddress, toAddress, amount, args[0].(*big.Int), args[1].(uint64), args[2].(string))
-fmt.Printf("transaction is %+v\n\n", transaction)
+	transaction, hash, err := erc20_newUnsignedTransaction(client, fromAddress, toAddress, amount, gasPrice, gasLimit, coinType.(string))
 	hashStr := hash.Hex()
 	if hashStr[:2] == "0x" {
 		hashStr = hashStr[2:]
@@ -120,7 +139,7 @@ func (h *ERC20TransactionHandler) SubmitTransaction(signedTransaction interface{
 	return erc20_sendTx(client, signedTransaction.(*types.Transaction))
 }
 
-func (h *ERC20TransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+func (h *ERC20TransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
@@ -133,7 +152,7 @@ func (h *ERC20TransactionHandler) GetTransactionInfo(txhash string) (fromAddress
 		fromAddress = msg.From().Hex()
 		data := msg.Data()
 
-		toAddress, transferAmount, err = DecodeTransferData(data)
+		toAddress, transferAmount, err := DecodeTransferData(data)
 
 	} else if err1 != nil {
 		err = err1
@@ -142,17 +161,30 @@ func (h *ERC20TransactionHandler) GetTransactionInfo(txhash string) (fromAddress
 	} else {
 		err = fmt.Errorf("Unknown error")
 	}
+	txOutput = types.TxOutput{
+		ToAddress: toAddress,
+		Amount: transferAmount
+	}
+	txOutputs = append(txOutputs, txOutput)
 	return
 }
 
-// args[0] coinType string
-func (h *ERC20TransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error) {
-	if args[0] == nil {
-		err = fmt.Errorf("Unspecified coin type")
-		return
+// jsonstring:'{"tokenType":"BNB"}'
+func (h *ERC20TransactionHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
+	defer func () {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
+			return
+		}
+	} ()
+	var args interface{}
+	jsonUnmarshal(jsonstring &args)
+	tokenType := args.(map[string]interface{})["tokenType"]
+	if tokenType != nil {
+		err = fmt.Errorf("token type not specified")
 	}
 
-	tokenAddr := tokens[args[0].(string)]
+	tokenAddr := tokens[tokenType.(string)]
 	if tokenAddr == "" {
 		err = fmt.Errorf("Token not supported")
 		return
