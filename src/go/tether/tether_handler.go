@@ -15,15 +15,24 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/btc"
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
 	"github.com/gaozhengxin/cryptocoins/src/go/tether/tetherjson"
+	"github.com/gaozhengxin/cryptocoins/src/go/types"
 )
 
 var btcHandler = new(btc.BTCTransactionHandler)
 
 var allowHighFees = true
 
-type TETHERTransactionHandler struct {}
+type TETHERTransactionHandler struct {
+	btcHandler *btc.BTCTransactionHandler
+}
 
-func (h *TETHERTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, msg string, err error){
+func NewTETHERTransactionHandler () *TETHERTransactionHandler {
+	return *TETHERTransactionHandler{
+		btcHandler = btc.NewBTCHandlerWithConfig(config.TETHER_SERVER_HOST,config.TETHER_SERVER_PORT,config.TETHER_USER,config.TETHER_PASSWD,config.TETHER_USESSL)
+	}
+}
+
+func (h *TETHERTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
 		pubKeyHex = pubKeyHex[2:]
 	}
@@ -46,7 +55,7 @@ func (h *TETHERTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address
 }
 
 // NOT completed, may or not work
-func (h *TETHERTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
+func (h *TETHERTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 	transaction, digests, err = btcHandler.BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress, amount, args)
 	return
 }
@@ -68,7 +77,7 @@ func (h *TETHERTransactionHandler) SubmitTransaction(signedTransaction interface
 	return
 }
 
-func (h *TETHERTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+func (h *TETHERTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	defer func () {
 		if e := recover(); e != nil {
 			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
@@ -111,12 +120,16 @@ func (h *TETHERTransactionHandler) GetTransactionInfo(txhash string) (fromAddres
 			err = fmt.Errorf("wrong property id: %v", propertyid.(float64))
 		}
 	}
-
+	txOutput = types.TxOutput{
+		ToAddress:toAddress,
+		Amount:transferAmount
+	}
+	txOutputs = append(txOutputs, txOutput)
 	return
 }
 
 // TODO
-func (h *TETHERTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error){
+func (h *TETHERTransactionHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	err = fmt.Errorf("function currently not available")
 	return nil, err
 }

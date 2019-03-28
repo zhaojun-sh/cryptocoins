@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
+	"github.com/gaozhengxin/cryptocoins/src/go/types"
 )
 
 var ChainConfig = chaincfg.TestNet3Params
@@ -40,9 +41,34 @@ var feeRate, _ = btcutil.NewAmount(0.0001)
 
 var hashType = txscript.SigHashAll
 
-type BTCTransactionHandler struct{}
+type BTCTransactionHandler struct{
+	serverHost string
+	serverPort int
+	rpcuser string
+	passwd string
+	usessl bool
+}
 
-func (h *BTCTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, msg string, err error){
+func NewBTCTransactionHandler () *BTCTransactionHandler {
+	return *BTCTransactionHandler{
+		serverHost = config.BTC_SERVER_HOST
+		serverPort = config.BTC_SERVER_PORT
+		rpcuser = config.BTC_USER
+		passwd = config.BTC_PASSWD
+		usessl = config.BTC_USESSL
+	}
+}
+
+func (h *BTCTransactionHandler) NewBTCHandlerWithConfig (serverHost string, serverPort int, rpcuser, passwd string, usessl bool) *BTCTransactionHandler {
+		h.serverHost = serverHost
+		h.serverPort = serverPort
+		h.rpcuser = rpcuser
+		h.passwd = passwd
+		h.usessl = usessl
+		return h
+}
+
+func (h *BTCTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error){
 	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
 		pubKeyHex = pubKeyHex[2:]
 	}
@@ -64,22 +90,27 @@ func (h *BTCTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address st
 	return
 }
 
-// args[0] feeRate float64
-// args[1] changAddress string
-func (h *BTCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, args []interface{}) (transaction interface{}, digests []string, err error) {
-	feeRate, err := btcutil.NewAmount(0.0001)
-	if err != nil {
-		return
-	}
-	if args[0] != float64(0) {
-		feeRate, err = btcutil.NewAmount(args[0].(float64))
+// jsonstring: '{"feeRate":0.0001,"changAddress":"mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"}'
+func (h *BTCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+	defer func () {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
+			return
+		}
+	} ()
+	var args interface{}
+	json.Unmarshal(jsonstring, &args)
+	userFeeRate := args.(map[string]interface{})["feeRate"]
+	userChangeAddress := args.(map[string]interface{})["changeAddress"]
+	if userFeeRate != nil {
+		feeRate, err = btcutil.NewAmount(userFeeRate.(float64))
 		if err != nil {
 			return
 		}
 	}
 	changeAddress := fromAddress
-	if args[1] != "" {
-		changeAddress = args[1].(string)
+	if userChangeAddress != nil {
+		changeAddress = userChangeAddress.(string)
 	}
 	unspentOutputs, err := listUnspent_blockchaininfo(fromAddress)
 //unspentOutputs, err := listUnspent(fromAddress)
@@ -267,12 +298,12 @@ func (h *BTCTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 }
 
 func (h *BTCTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
-	c, _ := rpcutils.NewClient(config.BTC_SERVER_HOST,config.BTC_SERVER_PORT,config.BTC_USER,config.BTC_PASSWD,config.BTC_USESSL)
+	c, _ := rpcutils.NewClient(serverHost,serverPort,rpcuser,passwd,usessl)
 	ret, err = SendRawTransaction (c, signedTransaction.(*AuthoredTx).Tx, allowHighFees)
 	return
 }
 
-func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	defer func () {
 		if e := recover(); e != nil {
 			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
@@ -286,7 +317,7 @@ func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 		return
 	}
 
-	c, _ := rpcutils.NewClient(config.BTC_SERVER_HOST,config.BTC_SERVER_PORT,config.BTC_USER,config.BTC_PASSWD,config.BTC_USESSL)
+	c, _ := rpcutils.NewClient(serverHost,serverPort,rpcuser,passwd,usessl)
 	retJSON, err := c.Send(string(marshalledJSON))
 	if err != nil {
 		return
@@ -303,19 +334,31 @@ func (h *BTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, 
 		return
 	}
 	retJSON2, err := c.Send(string(marshalledJSON2))
-fmt.Printf("%v\n\n", retJSON2)
 	var tx interface{}
 	json.Unmarshal([]byte(retJSON2), &tx)
-	toAddress = tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["scriptPubKey"].(map[string]interface{})["addresses"].([]interface{})[0].(string)
-	flt := tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})[0].(map[string]interface{})["value"].(float64)
-	amt, err := btcutil.NewAmount(flt)
-	transferAmount = big.NewInt(int64(amt.ToUnit(btcutil.AmountSatoshi)))
+	vouts := tx.(map[string]interface{})["result"].(map[string]interface{})["vout"].([]interface{})
+	for _, vout := range vouts {
+		toAddress = vout.(map[string]interface{})["scriptPubKey"].(map[string]interface{})["addresses"].([]interface{})[0].(string)
+		flt := vout.(map[string]interface{})["value"].(float64)
+		amt, _ := btcutil.NewAmount(flt)
+		transferAmount = big.NewInt(int64(amt.ToUnit(btcutil.AmountSatoshi)))
+		txOutputs = txOutputs.append(txOutputs, types.TxOutput{ToAddress:toAddress, Amount:transferAmount})
+	}
 
-	vintx0 := tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["txid"]
+	vins := tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})
+	var vintx interface{}
+	for _, vin := vins {
+		vintx = vin.(map[string]interface{})["txid"]
+		if vintx != nil {
+			break
+		}
+	}
+	if vintx == nil {
 	coinbase := tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["coinbase"]
-	if vintx0 == nil {
-		fromAddress = coinbase.(string)
-		return
+		if vintx0 == nil {
+			fromAddress = coinbase.(string)
+			return
+		}
 	}
 	vintx := vintx0.(string)
 	vinvout := int(tx.(map[string]interface{})["result"].(map[string]interface{})["vin"].([]interface{})[0].(map[string]interface{})["vout"].(float64))
@@ -356,7 +399,7 @@ fmt.Printf("%v\n\n", retJSON2)
 	return
 }
 
-func (h *BTCTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error){
+func (h *BTCTransactionHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error)
 	addrsUrl := "https://api.blockcypher.com/v1/btc/test3/addrs/" + address
 	resstr := loginPre1("GET",addrsUrl)
 	if resstr == "" {
