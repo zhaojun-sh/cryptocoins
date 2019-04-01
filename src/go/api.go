@@ -81,5 +81,8 @@ func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
 	case "ZCASH":
 		return zcash.NewZCASHHandler()
 	}
+	default:
+		return erc20.NewERC20TokenHandler(coinType)
+	}
 	return nil
 }

@@ -50,10 +50,17 @@ var tokens map[string]string = map[string]string{
 }
 
 type ERC20Handler struct {
+	TokenType string
 }
 
 func NewERC20Handler () *ERC20Handler {
 	return &ERC20Handler{}
+}
+
+func NewERC20TokenHandler (tokenType string) *ERC20Handler {
+	return &ERC20Handler{
+		TokenType: tokenType,
+	}
 }
 
 func (h *ERC20Handler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
@@ -77,10 +84,18 @@ func (h *ERC20Handler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAd
 	json.Unmarshal([]byte(jsonstring), &args)
 	userGasPrice := args.(map[string]interface{})["gasPrice"]
 	userGasLimit := args.(map[string]interface{})["gasLimit"]
-	coinType := args.(map[string]interface{})["tokenType"]
-	if coinType == nil {
-		err = fmt.Errorf("erc20 token type not specified")
-		return
+	userTokenType := args.(map[string]interface{})["tokenType"]
+	var tokenType string
+	if userTokenType == nil {
+		tokenType = h.TokenType
+		if tokenType == nil || tokenType == "" {
+			err = fmt.Errorf("token type not specified.")
+			return
+		}
+		if tokens[tokenType] == nil {
+			err = fmt.Errorf("token not supported")
+			return
+		}
 	}
 	if userGasPrice != nil {
 		gasPrice = big.NewInt(int64(userGasPrice.(float64)))
