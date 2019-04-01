@@ -25,9 +25,13 @@ const (
 	TRANSFER_CONTRACT = "TransferContract"
 )
 
-type TRXTransactionHandler struct {}
+type TRXHandler struct {}
 
-func (h *TRXTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
+func NewTRXHandler() *TRXHandler {
+	return &TRXHandler{}
+}
+
+func (h *TRXHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	pk, err := HexToPublicKey(pubKeyHex)
 	if err != nil {
 		return
@@ -36,7 +40,7 @@ func (h *TRXTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address st
 	return
 }
 
-func (h *TRXTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+func (h *TRXHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 	if len(fromAddress) != 42 {
 		b, err1 := tcrypto.Base58Decode(fromAddress, ALPHABET)
 		if err1 != nil {
@@ -76,7 +80,7 @@ func (h *TRXTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublic
 	return
 }
 
-func (h *TRXTransactionHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
+func (h *TRXHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
 	hashBytes, err := hex.DecodeString(hash[0])
 	if err != nil {
 		return
@@ -101,15 +105,15 @@ func (h *TRXTransactionHandler) SignTransaction(hash []string, privateKey interf
 	return
 }
 
-func (h *TRXTransactionHandler) MakeSignedTransaction (rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
+func (h *TRXHandler) MakeSignedTransaction (rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
 	signedTransaction = transaction
 	signedTransaction.(*Transaction).Signature = rsv[0]
 	return
 }
 
-func (h *TRXTransactionHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
+func (h *TRXHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
 	req, err := signedTransaction.(*Transaction).MarshalJson()
-	ret = rpcutils.DoCurlRequest(URL, "wallet/broadcasttransaction", req)
+	ret := rpcutils.DoCurlRequest(URL, "wallet/broadcasttransaction", req)
 	var result interface{}
 	err = json.Unmarshal([]byte(ret), &result)
 	if err != nil {
@@ -121,7 +125,7 @@ func (h *TRXTransactionHandler) SubmitTransaction(signedTransaction interface{})
 	return
 }
 
-func (h *TRXTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
+func (h *TRXHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	data, err := json.Marshal(struct{
 		Value string `json:"value"`
 	}{
@@ -142,15 +146,15 @@ func (h *TRXTransactionHandler) GetTransactionInfo(txhash string) (fromAddress s
 	fromAddress = tf["owner_address"].(string)
 	toAddress := tf["to_address"].(string)
 	transferAmount := big.NewInt(int64(tf["amount"].(float64)))
-	txOutput = types.TxOutput{
+	txOutput := types.TxOutput{
 		ToAddress: toAddress,
-		Amount: transferAmount
+		Amount: transferAmount,
 	}
 	txOutputs = append(txOutputs, txOutput)
 	return
 }
 
-func (h *TRXTransactionHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
+func (h *TRXHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	reqData := `{"address":"` + address + `"}`
 	ret := rpcutils.DoPostRequest(URL, "walletsolidity/getaccount", reqData)
 	var retStruct map[string]interface{}

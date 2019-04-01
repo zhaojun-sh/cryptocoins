@@ -22,7 +22,7 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/zcash"
 )
 
-type TransactionHandler interface {
+type CryptocoinHandler interface {
 
 	// 公钥to dcrm地址
 	PublicKeyToAddress(pubKeyHex string) (address string, err error)
@@ -48,38 +48,38 @@ type TransactionHandler interface {
 	GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error)
 }
 
-func NewTransactionHandler(coinType string) (txHandler TransactionHandler) {
+func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
 	switch coinType {
 	case "BITGOLD":
-		return bitgold.NewBTCTransactionHandler{}
+		return bitgold.NewBITGOLDHandler()
 	case "BCH":
-		return bch.NewBCHTransactionHandler{}
+		return bch.NewBCHHandler()
 	case "BTC":
-		return btc.NewBTCTransactionHandler{}
+		return btc.NewBTCHandler()
 	case "DASH":
-		return dash.NewDASHTransactionHandler{}
+		return dash.NewDASHHandler()
 	case "DCR":
-		return dcr.NewDCRTransactionHandler{}
+		return dcr.NewDCRHandler()
 	case "EOS":
-		return eos.NewEOSTransactionHandler{}
+		return eos.NewEOSHandler()
 	case "ETH":
-		return eth.NewETHTransactionHandler{}
+		return eth.NewETHHandler()
 	case "ETC":
-		return etc.NewETCTransactionHandler{}
+		return etc.NewETCHandler()
 	case "ERC20":
-		return erc20.NewERC20TransactionHandler{}
+		return erc20.NewERC20Handler()
 	case "LTC":
-		return ltc.NewLTCTransactionHandler{}
+		return ltc.NewLTCHandler()
 	case "TRX":
-		return trx.NewTRXTransactionHandler{}
+		return trx.NewTRXHandler()
 	case "TETHER":
-		return tether.NewTETHERTransactionHandler{}
+		return tether.NewTETHERHandler()
 	case "VECHAIN":
-		return vechain.NewVECHAINTransactionHandler{}
+		return vechain.NewVECHAINHandler()
 	case "XRP":
-		return xrp.NewXRPTransactionHandler{}
+		return xrp.NewXRPHandler()
 	case "ZCASH":
-		return zcash.NewZCASHTransactionHandler{}
+		return zcash.NewZCASHHandler()
 	}
 	return nil
 }

@@ -22,14 +22,14 @@ var (
 	err error
 )
 
-type VECHAINTransactionHandler struct {
+type VECHAINHandler struct {
 }
 
-func NewVECHAINTransactionHandler () *VECHAINTransactionHandler {
-	return &VECHAINTransactionHandler{}
+func NewVECHAINHandler () *VECHAINHandler {
+	return &VECHAINHandler{}
 }
 
-func (h *VECHAINTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
+func (h *VECHAINHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	data := hexEncPubkey(pubKeyHex[2:])
 
 	pub, err := decodePubkey(data)
@@ -39,23 +39,23 @@ func (h *VECHAINTransactionHandler) PublicKeyToAddress(pubKeyHex string) (addres
 	return
 }
 
-func (h *VECHAINTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+func (h *VECHAINHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 	return
 }
 
-func (h *VECHAINTransactionHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
+func (h *VECHAINHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
 	return
 }
 
-func (h *VECHAINTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
+func (h *VECHAINHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
 	return
 }
 
-func (h *VECHAINTransactionHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
+func (h *VECHAINHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
 	return
 }
 
-func (h *VECHAINTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
+func (h *VECHAINHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	defer func () {
 		if e := recover(); e != nil {
 			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
@@ -71,22 +71,22 @@ func (h *VECHAINTransactionHandler) GetTransactionInfo(txhash string) (fromAddre
 	transfers := body.(map[string]interface{})["outputs"].([]interface{})[0].(map[string]interface{})["transfers"].([]interface{})
 	for _, transfer := range transfers {
 		fromAddress = transfer.(map[string]interface{})["sender"].(string)
-		toAddress = transfer.(map[string]interface{})["recipient"].(string)
+		toAddress := transfer.(map[string]interface{})["recipient"].(string)
 		amt := transfer.(map[string]interface{})["amount"].(string)
 		transferAmount, ok := new(big.Int).SetString(amt, 0)
-		txOutPuts = append(txOutPuts, types.TxOutput{
+		txOutputs = append(txOutputs, types.TxOutput{
 			ToAddress: toAddress,
-			Amount: transferAmount
+			Amount: transferAmount,
 		})
-	}
-	if !ok {
-		err = fmt.Errorf("parse amount value error")
-		return
+		if !ok {
+			err = fmt.Errorf("parse amount value error")
+			return
+		}
 	}
 	return
 }
 
-func (h *VECHAINTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error) {
+func (h *VECHAINHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	return
 }
 

@@ -2,15 +2,11 @@ package bitgold
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"math/big"
-	"runtime/debug"
 	"github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil"
-	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
 	"github.com/gaozhengxin/cryptocoins/src/go/btc"
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
 	"github.com/gaozhengxin/cryptocoins/src/go/types"
@@ -22,17 +18,17 @@ var ChainConfig = chaincfg.Params {
 
 var allowHighFees = true
 
-type BITGOLDTransactionHandler struct {
-	btcHandler *btc.BTCTransactionHandler
+type BITGOLDHandler struct {
+	btcHandler *btc.BTCHandler
 }
 
-func NewBITGOLDTransactionHandler () *BITGOLDTransactionHandler {
-	return *BITGOLDTransactionHandler{
-		btcHandler = btc.NewBTCHandlerWithConfig(config.BITGOLD_SERVER_HOST,config.BITGOLD_SERVER_PORT,config.BITGOLD_USER,config.BITGOLD_PASSWD,config.BITGOLD_USESSL)
+func NewBITGOLDHandler () *BITGOLDHandler {
+	return &BITGOLDHandler{
+		btcHandler: btc.NewBTCHandlerWithConfig(config.BITGOLD_SERVER_HOST,config.BITGOLD_SERVER_PORT,config.BITGOLD_USER,config.BITGOLD_PASSWD,config.BITGOLD_USESSL),
 	}
 }
 
-func (h *BITGOLDTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error){
+func (h *BITGOLDHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error){
 	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
 		pubKeyHex = pubKeyHex[2:]
 	}
@@ -55,31 +51,31 @@ func (h *BITGOLDTransactionHandler) PublicKeyToAddress(pubKeyHex string) (addres
 }
 
 // NOT completed, may or not work
-func (h *BITGOLDTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
-	return h.btcHandler.BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress, amount, args)
+func (h *BITGOLDHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+	return h.btcHandler.BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress, amount, jsonstring)
 }
 
 // NOT completed, may or not work
-func (h *BITGOLDTransactionHandler) SignTransaction(hash []string, wif interface{}) (rsv []string, err error){
+func (h *BITGOLDHandler) SignTransaction(hash []string, wif interface{}) (rsv []string, err error){
 	return h.btcHandler.SignTransaction(hash, wif)
 }
 
 // NOT completed, may or not work
-func (h *BITGOLDTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error){
+func (h *BITGOLDHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error){
 	return h.btcHandler.MakeSignedTransaction(rsv, transaction)
 }
 
 // NOT completed, may or not work
-func (h *BITGOLDTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
+func (h *BITGOLDHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
 	return h.btcHandler.SubmitTransaction(signedTransaction)
 }
 
-func (h *BITGOLDTransactionHandler) GetTransactionInfo(txhash string) (fromAddress, toAddress string, transferAmount *big.Int, _ []interface{}, err error) {
+func (h *BITGOLDHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	return h.btcHandler.GetTransactionInfo(txhash)
 }
 
 // TODO
-func (h *BITGOLDTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error){
+func (h *BITGOLDHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error){
 	err = fmt.Errorf("function currently not available")
 	return nil, err
 }

@@ -19,7 +19,7 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/types"
 )
 
-const (
+var (
 	fee int64 = 1
 	url = config.XRP_GATEWAY
 )
@@ -31,20 +31,20 @@ func checkErr(err error) {
 	}
 }
 
-type XRPTransactionHandler struct {}
+type XRPHandler struct {}
 
-func NewXRPTransactionHandler () *XRPTransactionHandler {
-	return &XRPTransactionHandler{}
+func NewXRPHandler () *XRPHandler {
+	return &XRPHandler{}
 }
 
-func (h *XRPTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
+func (h *XRPHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	pub, err := hex.DecodeString(pubKeyHex)
 	address = XRP_publicKeyToAddress(pub)
 	return
 }
 
 // jsonstring:'{"fee":1}'
-func (h *XRPTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+func (h *XRPHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 	defer func () {
 		if e := recover(); e != nil {
 			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
@@ -52,13 +52,13 @@ func (h *XRPTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublic
 		}
 	} ()
 	var args interface{}
-	json.Unmarshal(jsonstring, &args)
+	json.Unmarshal([]byte(jsonstring), &args)
 	userFee := args.(map[string]interface{})["fee"]
 	if userFee != nil {
 		fee = int64(userFee.(float64))
 	}
 	if fromAddress == "" {
-		fromAddress, _, err = h.PublicKeyToAddress(fromPublicKey)
+		fromAddress, err = h.PublicKeyToAddress(fromPublicKey)
 		if err != nil {
 			return
 		}
@@ -72,7 +72,7 @@ func (h *XRPTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublic
 	return
 }
 
-func (h *XRPTransactionHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
+func (h *XRPHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
 	seed := strings.Split(privateKey.(string), "/")[0]
 	keySeqStr := strings.Split(privateKey.(string), "/")[1]
 	key := XRP_importKeyFromSeed(seed, "ecdsa")
@@ -105,13 +105,13 @@ func (h *XRPTransactionHandler) SignTransaction(hash []string, privateKey interf
 	return
 }
 
-func (h *XRPTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
+func (h *XRPHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
 	sig := rsvToSig(rsv[0])
 	signedTransaction = XRP_makeSignedTx(transaction.(data.Transaction), sig)
 	return
 }
 
-func (h *XRPTransactionHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
+func (h *XRPHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
 	ret := XRP_submitTx(signedTransaction.(data.Transaction))
 
 	var retStruct interface{}
@@ -129,7 +129,7 @@ func (h *XRPTransactionHandler) SubmitTransaction(signedTransaction interface{})
 	return
 }
 
-func (h *XRPTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
+func (h *XRPHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	data := "{\"method\":\"tx\", \"params\":[{\"transaction\":\"" + txhash + "\", \"binary\":false}]}"
 	ret := rpcutils.DoPostRequest(url, "", data)
 
@@ -148,12 +148,12 @@ func (h *XRPTransactionHandler) GetTransactionInfo(txhash string) (fromAddress s
 	transferAmount, _ := new(big.Int).SetString(amt, 10)
 	txOutputs = append(txOutputs, types.TxOutput{
 		ToAddress: toAddress,
-		Amount: transferAmount
+		Amount: transferAmount,
 	})
 	return
 }
 
-func (h *XRPTransactionHandler) GetAddressBalance(address string, args []interface{}) (balance *big.Int, err error) {
+func (h *XRPHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	account := getAccount(address)
 	balance, _ = new(big.Int).SetString(account.Balance, 10)
 	return

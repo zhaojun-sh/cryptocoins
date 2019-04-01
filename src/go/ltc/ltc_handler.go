@@ -2,12 +2,9 @@ package ltc
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"math/big"
-	"runtime/debug"
 	"github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil"
 	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
@@ -22,17 +19,17 @@ var ChainConfig = chaincfg.Params {
 
 var allowHighFees = true
 
-type LTCTransactionHandler struct {
-	btcHandler *btc.BTCTransactionHandler
+type LTCHandler struct {
+	btcHandler *btc.BTCHandler
 }
 
-func NewLTCTransactionHandler () *LTCTransactionHandler {
-	return *LTCTransactionHandler{
-		btcHandler = btc.NewBTCHandlerWithConfig(config.LTC_SERVER_HOST,config.LTC_SERVER_PORT,config.LTC_USER,config.LTC_PASSWD,config.LTC_USESSL)
+func NewLTCHandler () *LTCHandler {
+	return &LTCHandler{
+		btcHandler: btc.NewBTCHandlerWithConfig(config.LTC_SERVER_HOST,config.LTC_SERVER_PORT,config.LTC_USER,config.LTC_PASSWD,config.LTC_USESSL),
 	}
 }
 
-func (h *LTCTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
+func (h *LTCHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
 		pubKeyHex = pubKeyHex[2:]
 	}
@@ -55,33 +52,33 @@ func (h *LTCTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address st
 }
 
 // NOT completed, may or not work
-func (h *LTCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
-	return h.btcHandler.BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress, amount, args)
+func (h *LTCHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+	return h.btcHandler.BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress, amount, jsonstring)
 }
 
 // NOT completed, may or not work
-func (h *LTCTransactionHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
+func (h *LTCHandler) SignTransaction(hash []string, wif interface{}) (rsv []string, err error) {
 	return h.btcHandler.SignTransaction(hash, wif)
 }
 
 // NOT completed, may or not work
-func (h *LTCTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
+func (h *LTCHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
 	return h.btcHandler.MakeSignedTransaction(rsv, transaction)
 }
 
 // NOT completed, may or not work
-func (h *LTCTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
+func (h *LTCHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
 	c, _ := rpcutils.NewClient(config.LTC_SERVER_HOST,config.LTC_SERVER_PORT,config.LTC_USER,config.LTC_PASSWD,config.LTC_USESSL)
 	ret, err= btc.SendRawTransaction (c, signedTransaction.(*btc.AuthoredTx).Tx, allowHighFees)
 	return h.SubmitTransaction(signedTransaction)
 }
 
-func (h *LTCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
+func (h *LTCHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	return h.GetTransactionInfo(txhash)
 }
 
 // TODO
-func (h *LTCTransactionHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
+func (h *LTCHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	err = fmt.Errorf("function currently not available")
 	return nil, err
 }

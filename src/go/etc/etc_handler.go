@@ -5,9 +5,11 @@ import  (
 	"crypto/ecdsa"
 	//"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
+	"runtime/debug"
 
 
 	"github.com/ethereum/go-ethereum"
@@ -19,7 +21,7 @@ import  (
 	"github.com/ethereum/go-ethereum/params"
 
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
-	"github.com/gaozhengxin/cryptocoins/src/go/types"
+	ctypes "github.com/gaozhengxin/cryptocoins/src/go/types"
 
 )
 
@@ -31,14 +33,14 @@ var (
 	chainConfig = params.MainnetChainConfig
 )
 
-type ETCTransactionHandler struct {
+type ETCHandler struct {
 }
 
-func NewETCTransactionHandler () *ETCTransactionHandler {
-	return &ETCTransactionHandler{}
+func NewETCHandler () *ETCHandler {
+	return &ETCHandler{}
 }
 
-func (h *ETCTransactionHandler) PublicKeyToAddress (pubKeyHex string) (address string, msg string, err error) {
+func (h *ETCHandler) PublicKeyToAddress (pubKeyHex string) (address string, err error) {
 	data := hexEncPubkey(pubKeyHex[2:])
 
 	pub, err := decodePubkey(data)
@@ -48,7 +50,7 @@ func (h *ETCTransactionHandler) PublicKeyToAddress (pubKeyHex string) (address s
 }
 
 // jsonstring '{"gasPrice":8000000000,"gasLimit":50000}'
-func (h *ETCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+func (h *ETCHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 	defer func () {
 		if e := recover(); e != nil {
 			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
@@ -59,9 +61,9 @@ func (h *ETCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublic
 		return
 	}
 	var args interface{}
-	json.Unmarshal(jsonstring, &args)
-	userGasPrice = args.(map[string]interface{})["gasPrice"]
-	userGasLimit = args.(map[string]interface{})["gasLimit"]
+	json.Unmarshal([]byte(jsonstring), &args)
+	userGasPrice := args.(map[string]interface{})["gasPrice"]
+	userGasLimit := args.(map[string]interface{})["gasLimit"]
 	if userGasPrice != nil {
 		gasPrice = big.NewInt(int64(userGasPrice.(float64)))
 	}
@@ -81,13 +83,7 @@ func (h *ETCTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublic
 	return
 }
 
-/*
-func SignTransaction(hash string, address string) (rsv string, err error) {
-	return
-}
-*/
-
-func (h *ETCTransactionHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
+func (h *ETCHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
 	hashBytes, err := hex.DecodeString(hash[0])
 	if err != nil {
 		return
@@ -108,7 +104,7 @@ func (h *ETCTransactionHandler) SignTransaction(hash []string, privateKey interf
 	return
 }
 
-func (h *ETCTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
+func (h *ETCHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
@@ -116,7 +112,7 @@ func (h *ETCTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 	return makeSignedTransaction(client, transaction.(*types.Transaction), rsv[0])
 }
 
-func (h *ETCTransactionHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
+func (h *ETCHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
@@ -124,7 +120,7 @@ func (h *ETCTransactionHandler) SubmitTransaction(signedTransaction interface{})
 	return eth_sendTx(client, signedTransaction.(*types.Transaction))
 }
 
-func (h *ETCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
+func (h *ETCHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []ctypes.TxOutput, jsonstring string, err error) {
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
@@ -137,6 +133,11 @@ func (h *ETCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress s
 		fromAddress = msg.From().Hex()
 		toAddress := msg.To().Hex()
 		transferAmount := msg.Value()
+		txOutput := ctypes.TxOutput{
+			ToAddress: toAddress,
+			Amount: transferAmount,
+		}
+		txOutputs = append(txOutputs, txOutput)
 	} else if err1 != nil {
 		err = err1
 	} else if isPending {
@@ -144,16 +145,11 @@ func (h *ETCTransactionHandler) GetTransactionInfo(txhash string) (fromAddress s
 	} else {
 		err = fmt.Errorf("Unknown error")
 	}
-	txOutput = types.TxOutput{
-		ToAddress: toAddress,
-		Amount: transferAmount
-	}
-	txOutputs = append(txOutputs, txOutput)
 	return
 }
 
 // args[0] coinType string
-func (h *ETCTransactionHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
+func (h *ETCHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	// TODO
 	client, err := ethclient.Dial(url)
 	if err != nil {

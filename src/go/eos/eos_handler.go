@@ -22,28 +22,28 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/types"
 )
 
-type EOSTransactionHandler struct {
+type EOSHandler struct {
 }
 
-func NewEOSTransactionHandler () *EOSTransactionHandler {
-	return &EOSTransactionHandler{}
+func NewEOSHandler () *EOSHandler {
+	return &EOSHandler{}
 }
 
 // 用一个大账户存钱，用交易备注区分用户，交易备注是公钥hash+base58
-func (h *EOSTransactionHandler) PublicKeyToAddress(pubKeyHex string) (acctName string, err error) {
+func (h *EOSHandler) PublicKeyToAddress(pubKeyHex string) (acctName string, err error) {
 	acctName = GenAccountName(pubKeyHex)
 	return
 }
 
 // 构造交易
-func (h *EOSTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+func (h *EOSHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAcctName string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 	memo := GenAccountName(fromPublicKey)
 	digest, transaction, err := EOS_newUnsignedTransaction(OWNER_ACCOUNT, toAcctName, amount, memo)
 	digests = append(digests, digest)
 	return
 }
 
-func (h *EOSTransactionHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
+func (h *EOSHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
 	signature, err := SignDigestWithPrivKey(hash[0], privateKey.(string))
 	if err != nil {
 		return
@@ -55,7 +55,7 @@ func (h *EOSTransactionHandler) SignTransaction(hash []string, privateKey interf
 	return
 }
 
-func (h *EOSTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
+func (h *EOSHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
 	signature, err := RSVToSignature(rsv[0])
 	if err != nil {
 		return
@@ -64,12 +64,12 @@ func (h *EOSTransactionHandler) MakeSignedTransaction(rsv []string, transaction 
 	return
 }
 
-func (h *EOSTransactionHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
+func (h *EOSHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
 	txhash = SubmitTransaction(signedTransaction.(*eos.SignedTransaction))
 	return
 }
 
-func (h *EOSTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
+func (h *EOSHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	api := "v1/history/get_transaction"
 	data := `{"id":"` + txhash + `","block_num_hint":"0"}`
 	ret := rpcutils.DoCurlRequest(nodeos, api, data)
@@ -93,15 +93,15 @@ func (h *EOSTransactionHandler) GetTransactionInfo(txhash string) (fromAddress s
 	fromAddress = tfData["from"].(string)
 	toAddress := tfData["receiver"].(string)
 	transferAmount := big.NewInt(int64(tfData["transfer"].(float64)))
-	txOutput = types.TxOutput{
+	txOutput := types.TxOutput{
 		ToAddress: toAddress,
-		Amount: transferAmount
+		Amount: transferAmount,
 	}
 	txOutputs = append(txOutputs, txOutput)
 	return
 }
 
-func (h *EOSTransactionHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
+func (h *EOSHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	req := BALANCE_SERVER + "get_balance?user_key=" + address
 	resp, err := http.Get(req)
 	if err != nil {

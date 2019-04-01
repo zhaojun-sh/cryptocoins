@@ -4,7 +4,6 @@ import (
 	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
-	"math/big"
 	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/gaozhengxin/cryptocoins/src/go/eos"
@@ -31,7 +30,7 @@ func main() {
 	//test_zcash()
 }
 
-func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, build_tx_args string, queryTxHash, queryAddress string, query_balance_args string) {
+func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, build_tx_args string, queryTxHash, queryAddress string, query_balance_args string) {
 /*
 	fmt.Printf("========== %s ==========\n\n", "test pubkey to address/account_name")
 	address, msg, err := h.PublicKeyToAddress(fromPubKeyHex)
@@ -89,7 +88,7 @@ func test_common (h api.TransactionHandler, fromPrivateKey interface{}, fromPubK
 
 func test_bitgold () {
 	fmt.Printf("=========================\n           BITGOLD           \n=========================\n\n")
-	h := api.NewTransactionHandler("BITGOLD")
+	h := api.NewCryptocoinHandler("BITGOLD")
 	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "6e4765956be5b6fe4c4b43f156a07a9662ca591b2a88b09e89d32b51681eb00b"
 	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
@@ -97,7 +96,7 @@ func test_bitgold () {
 
 func test_bch () {
 	fmt.Printf("=========================\n           BCH           \n=========================\n\n")
-	h := api.NewTransactionHandler("BCH")
+	h := api.NewCryptocoinHandler("BCH")
 	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "f6f24bd236252574c1ba7086ac1178b37abf5041653127bd6b400bae0f0a9b00"
 	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
@@ -105,7 +104,7 @@ func test_bch () {
 
 func test_dash () {
 	fmt.Printf("=========================\n           DASH           \n=========================\n\n")
-	h := api.NewTransactionHandler("DASH")
+	h := api.NewCryptocoinHandler("DASH")
 	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "60a8de0be75d153be34d39d31a4c2b0c6904be1354b462f9af8fe75fc1c2fc5e"
 	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
@@ -113,7 +112,7 @@ func test_dash () {
 
 func test_dcr () {
 	fmt.Printf("=========================\n           DCR           \n=========================\n\n")
-	h := api.NewTransactionHandler("DCR")
+	h := api.NewCryptocoinHandler("DCR")
 	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "561541db309e70c7399c6028a8249a09c1da0cee517162de34dca660023c9c6c"
 	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
@@ -121,7 +120,7 @@ func test_dcr () {
 
 func test_tether () {
 	fmt.Printf("=========================\n           TETHER           \n=========================\n\n")
-	h := api.NewTransactionHandler("TETHER")
+	h := api.NewCryptocoinHandler("TETHER")
 	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "30fdcd207ba3cc3f9f5d69ab25e2290c71c1008564d7c27fdc3d96a797f65643"
 	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
@@ -129,7 +128,7 @@ func test_tether () {
 
 func test_btc () {
 	fmt.Printf("=========================\n           BTC           \n=========================\n\n")
-	h := api.NewTransactionHandler("BTC")
+	h := api.NewCryptocoinHandler("BTC")
 	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
@@ -142,7 +141,7 @@ func test_btc () {
 
 func test_ltc () {
 	fmt.Printf("=========================\n           LTC           \n=========================\n\n")
-	h := api.NewTransactionHandler("LTC")
+	h := api.NewCryptocoinHandler("LTC")
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	queryTxHash := "ae1359de01c84c1750faa71ac62ed8381e97fa1156b280861ebb01fc84f538aa"
 	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
@@ -150,7 +149,7 @@ func test_ltc () {
 
 func test_zcash () {
 	fmt.Printf("=========================\n           ZCASH           \n=========================\n\n")
-	h := api.NewTransactionHandler("ZCASH")
+	h := api.NewCryptocoinHandler("ZCASH")
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	queryTxHash := "6a37436e56d4e4ac081c816b628404bc28a216afc0d0514ca0d490cc28fa5a28"
 	test_common (h, nil, fromPubKeyHex, "", "", "", queryTxHash, "", "")
@@ -158,7 +157,7 @@ func test_zcash () {
 
 func test_eos () {
 	fmt.Printf("=========================\n           EOS           \n=========================\n\n")
-	h := api.NewTransactionHandler("EOS")
+	h := api.NewCryptocoinHandler("EOS")
 	fromPrivateKey := "5JqBVZS4shWHBhcht6bn3ecWDoZXPk3TRSVpsLriQz5J3BKZtqH"
 	fromPubKey := "EOS7EXiYEgNaxgc8ABX5YTATs4fC9nEuCa9fna61X2nZ8Z8KDEMLg"
 	fromPubKeyHex, _ := eos.PubKeyToHex(fromPubKey)
@@ -172,7 +171,7 @@ func test_eos () {
 
 func test_eth () {
 	fmt.Printf("=========================\n           ETH           \n=========================\n\n")
-	h := api.NewTransactionHandler("ETH")
+	h := api.NewCryptocoinHandler("ETH")
 
 	//fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
 	fromPrivateKey, _ := crypto.HexToECDSA("d55b502bd4867b2c1b505af9b7cefeeb910b6cfbb570e2e47680bc89ee123eab")
@@ -196,7 +195,7 @@ func test_eth () {
 
 func test_etc () {
 	fmt.Printf("=========================\n           ETC           \n=========================\n\n")
-	h := api.NewTransactionHandler("ETC")
+	h := api.NewCryptocoinHandler("ETC")
 
 	fromPrivateKey, _ := crypto.HexToECDSA("d55b502bd4867b2c1b505af9b7cefeeb910b6cfbb570e2e47680bc89ee123eab")
 	pub := crypto.FromECDSAPub(&fromPrivateKey.PublicKey)
@@ -209,7 +208,7 @@ func test_etc () {
 
 func test_vechain () {
 	fmt.Printf("=========================\n           VECHAIN           \n=========================\n\n")
-	h := api.NewTransactionHandler("VECHAIN")
+	h := api.NewCryptocoinHandler("VECHAIN")
 
 	fromPrivateKey, _ := crypto.HexToECDSA("d55b502bd4867b2c1b505af9b7cefeeb910b6cfbb570e2e47680bc89ee123eab")
 	pub := crypto.FromECDSAPub(&fromPrivateKey.PublicKey)
@@ -222,7 +221,7 @@ func test_vechain () {
 
 func test_erc20 () {
 	fmt.Printf("=========================\n           ERC20           \n=========================\n\n")
-	h := api.NewTransactionHandler("ERC20")
+	h := api.NewCryptocoinHandler("ERC20")
 
 	//fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
 //fromPrivateKey, _ := crypto.HexToECDSA("40d6e64ce085269869b178c23a786e499ff2d6a5334fe45964211d25bea973bf")
@@ -248,7 +247,7 @@ fromPrivateKey, _ := crypto.HexToECDSA("0ea7b1364bc2d1d58f35324b4c0deaa129cc9bd2
 
 func test_xrp () {
 	fmt.Printf("=========================\n           XRP           \n=========================\n\n")
-	h := api.NewTransactionHandler("XRP")
+	h := api.NewCryptocoinHandler("XRP")
 	fromKey := xrp.XRP_importKeyFromSeed("ssfL5tmpTTqCw5sHjnRHQ4yyUCQKf", "ecdsa")
 	keyseq := uint32(0)
 	fromPubKeyHex := hex.EncodeToString(fromKey.Public(&keyseq))
@@ -271,7 +270,7 @@ func (s *Seed) Read(p []byte) (n int, err error) {
 
 func test_tron() {
 	fmt.Printf("=========================\n           TRX           \n=========================\n\n")
-	h := api.NewTransactionHandler("TRX")
+	h := api.NewCryptocoinHandler("TRX")
 	fromPrivateKey, _ := ecdsa.GenerateKey(crypto.S256(), &Seed{})
 	fromPubKeyHex := trx.PublicKeyToHex(&trx.PublicKey{&fromPrivateKey.PublicKey})
 	fromAddress := "417e5f4552091a69125d5dfcb7b8c2659029395bdf"

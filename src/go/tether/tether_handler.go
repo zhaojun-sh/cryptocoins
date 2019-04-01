@@ -18,21 +18,19 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/types"
 )
 
-var btcHandler = new(btc.BTCTransactionHandler)
-
 var allowHighFees = true
 
-type TETHERTransactionHandler struct {
-	btcHandler *btc.BTCTransactionHandler
+type TETHERHandler struct {
+	btcHandler *btc.BTCHandler
 }
 
-func NewTETHERTransactionHandler () *TETHERTransactionHandler {
-	return *TETHERTransactionHandler{
-		btcHandler = btc.NewBTCHandlerWithConfig(config.TETHER_SERVER_HOST,config.TETHER_SERVER_PORT,config.TETHER_USER,config.TETHER_PASSWD,config.TETHER_USESSL)
+func NewTETHERHandler () *TETHERHandler {
+	return &TETHERHandler{
+		btcHandler: btc.NewBTCHandlerWithConfig(config.TETHER_SERVER_HOST,config.TETHER_SERVER_PORT,config.TETHER_USER,config.TETHER_PASSWD,config.TETHER_USESSL),
 	}
 }
 
-func (h *TETHERTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
+func (h *TETHERHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
 		pubKeyHex = pubKeyHex[2:]
 	}
@@ -55,29 +53,29 @@ func (h *TETHERTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address
 }
 
 // NOT completed, may or not work
-func (h *TETHERTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
-	transaction, digests, err = btcHandler.BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress, amount, args)
+func (h *TETHERHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+	transaction, digests, err = h.btcHandler.BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress, amount, jsonstring)
 	return
 }
 
 // NOT completed, may or not work
-func (h *TETHERTransactionHandler) SignTransaction(hash []string, wif interface{}) (rsv []string, err error){
-	return btcHandler.SignTransaction(hash, wif)
+func (h *TETHERHandler) SignTransaction(hash []string, wif interface{}) (rsv []string, err error){
+	return h.btcHandler.SignTransaction(hash, wif)
 }
 
 // NOT completed, may or not work
-func (h *TETHERTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error){
-	return btcHandler.MakeSignedTransaction(rsv, transaction)
+func (h *TETHERHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error){
+	return h.btcHandler.MakeSignedTransaction(rsv, transaction)
 }
 
 // NOT completed, may or not work
-func (h *TETHERTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
+func (h *TETHERHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
 	c, _ := rpcutils.NewClient(config.TETHER_SERVER_HOST,config.TETHER_SERVER_PORT,config.TETHER_USER,config.TETHER_PASSWD,config.TETHER_USESSL)
 	ret, err= btc.SendRawTransaction (c, signedTransaction.(*btc.AuthoredTx).Tx, allowHighFees)
 	return
 }
 
-func (h *TETHERTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
+func (h *TETHERHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	defer func () {
 		if e := recover(); e != nil {
 			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
@@ -104,7 +102,8 @@ func (h *TETHERTransactionHandler) GetTransactionInfo(txhash string) (fromAddres
 	recipientStr := result.(map[string]interface{})["referenceaddress"]
 	amountStr := result.(map[string]interface{})["amount"]
 	propertyid := result.(map[string]interface{})["propertyid"]
-
+	var toAddress string
+	var transferAmount *big.Int
 	if senderStr != nil {
 		fromAddress = senderStr.(string)
 	}
@@ -120,16 +119,16 @@ func (h *TETHERTransactionHandler) GetTransactionInfo(txhash string) (fromAddres
 			err = fmt.Errorf("wrong property id: %v", propertyid.(float64))
 		}
 	}
-	txOutput = types.TxOutput{
+	txOutput := types.TxOutput{
 		ToAddress:toAddress,
-		Amount:transferAmount
+		Amount:transferAmount,
 	}
 	txOutputs = append(txOutputs, txOutput)
 	return
 }
 
 // TODO
-func (h *TETHERTransactionHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
+func (h *TETHERHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	err = fmt.Errorf("function currently not available")
 	return nil, err
 }

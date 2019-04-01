@@ -2,15 +2,11 @@ package dash
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"math/big"
-	"runtime/debug"
 	"github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil"
-	rpcutils "github.com/gaozhengxin/cryptocoins/src/go/rpcutils"
 	"github.com/gaozhengxin/cryptocoins/src/go/btc"
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
 	"github.com/gaozhengxin/cryptocoins/src/go/types"
@@ -22,17 +18,17 @@ var ChainConfig = chaincfg.Params {
 
 var allowHighFees = true
 
-type DASHTransactionHandler struct {
-	btcHandler *btc.BTCTransactionHandler
+type DASHHandler struct {
+	btcHandler *btc.BTCHandler
 }
 
-func NewDASHTransactionHandler () *DASHTransactionHandler {
-	return *DASHTransactionHandler{
-		btcHandler = btc.NewBTCHandlerWithConfig(config.DASH_SERVER_HOST,config.DASH_SERVER_PORT,config.DASH_USER,config.DASH_PASSWD,config.DASH_USESSL)
+func NewDASHHandler () *DASHHandler {
+	return &DASHHandler{
+		btcHandler: btc.NewBTCHandlerWithConfig(config.DASH_SERVER_HOST,config.DASH_SERVER_PORT,config.DASH_USER,config.DASH_PASSWD,config.DASH_USESSL),
 	}
 }
 
-func (h *DASHTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error){
+func (h *DASHHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error){
 	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
 		pubKeyHex = pubKeyHex[2:]
 	}
@@ -55,31 +51,31 @@ func (h *DASHTransactionHandler) PublicKeyToAddress(pubKeyHex string) (address s
 }
 
 // NOT completed, may or not work
-func (h *DASHTransactionHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
-	return h.btcHandler.BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress, amount, args)
+func (h *DASHHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+	return h.btcHandler.BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress, amount, jsonstring)
 }
 
 // NOT completed, may or not work
-func (h *DASHTransactionHandler) SignTransaction(hash []string, wif interface{}) (rsv []string, err error){
+func (h *DASHHandler) SignTransaction(hash []string, wif interface{}) (rsv []string, err error){
 	return h.btcHandler.SignTransaction(hash, wif)
 }
 
 // NOT completed, may or not work
-func (h *DASHTransactionHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error){
+func (h *DASHHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error){
 	return h.btcHandler.MakeSignedTransaction(rsv, transaction)
 }
 
 // NOT completed, may or not work
-func (h *DASHTransactionHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
+func (h *DASHHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
 	return h.btcHandler.SubmitTransaction(signedTransaction)
 }
 
-func (h *DASHTransactionHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
+func (h *DASHHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	return h.btcHandler.GetTransactionInfo(txhash)
 }
 
 // TODO
-func (h *DASHTransactionHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
+func (h *DASHHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	err = fmt.Errorf("function currently not available")
 	return nil, err
 }
