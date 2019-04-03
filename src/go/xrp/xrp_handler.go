@@ -112,6 +112,12 @@ func (h *XRPHandler) MakeSignedTransaction(rsv []string, transaction interface{}
 }
 
 func (h *XRPHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
+	defer func () {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
+			return
+		}
+	} ()
 	ret := XRP_submitTx(signedTransaction.(data.Transaction))
 
 	var retStruct interface{}
@@ -122,8 +128,11 @@ func (h *XRPHandler) SubmitTransaction(signedTransaction interface{}) (txhash st
 		err = fmt.Errorf("%v, %v Error message: %v", result["error"], result["error_exception"], result["error_message"])
 		return
 	}
+fmt.Printf("%+v\n\n",result)
 	if result["engine_result_message"].(string) == "The transaction was applied. Only final in a validated ledger." {
 		txhash = "success/" + result["tx_json"].(map[string]interface{})["hash"].(string)
+	} else if res := result["engine_result_message"].(string); res != "" {
+		err = fmt.Errorf(res)
 	}
 
 	return
