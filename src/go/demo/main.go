@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
+	"math/big"
 	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/gaozhengxin/cryptocoins/src/go/eos"
@@ -15,12 +16,12 @@ import (
 func main() {
 	//test_bch()
 	//test_bitgold()
-	//test_btc()
+	test_btc()
 	//test_dash()
 	//test_dcr()
 	//test_tether()
 	//test_ltc()
-	test_eos()
+	//test_eos()
 	//test_eth()
 	//test_etc()
 	//test_vechain()
@@ -41,7 +42,7 @@ func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKe
 	if msg != "" {
 		fmt.Printf("msg is %s\n\n", msg)
 	}
-
+*/
 	fmt.Printf("========== %s ==========\n\n", "test build unsigned transfer transaction")
 	transaction, digest, err := h.BuildUnsignedTransaction(fromAddress, fromPubKeyHex, toAddress, big.NewInt(1), build_tx_args)
 	if err != nil {
@@ -69,21 +70,21 @@ func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKe
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("%s\n\n", ret)
-
+/*
 	fmt.Printf("========== %s ==========\n\n", "test get transaction info")
 	fromAddress2, toAddress2, amount, _, err := h.GetTransactionInfo(queryTxHash)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("from: %v\nto: %v\namount: %v\n\n", fromAddress2, toAddress2, amount)
-*/
+
 	fmt.Printf("========== %s ==========\n\n", "test get balance")
 	balance, err := h.GetAddressBalance(queryAddress, query_balance_args)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("balance: %v\n\n", balance)
-
+*/
 }
 
 func test_bitgold () {
@@ -132,8 +133,9 @@ func test_btc () {
 	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
-	toAddress := "mg1KnRaekxjZbvdUNDKxxJycd3hNbxMomA"
-	build_tx_args := `"feeRate":0.0001`
+	//toAddress := "mg1KnRaekxjZbvdUNDKxxJycd3hNbxMomA"
+toAddress := "mjXckKAkeQccPSPkgdAdFaresvgxbAZSMe"
+	build_tx_args := `{"feeRate":0.0001}`
 	queryTxHash := "6bf5a5077234908b44f69f5587f92c027a68374d88ccc36012663b4ebcdbc802"
 	queryAddress := "2MteNic4ttfvkYCJYEaYMuqrNcnc6xzwoBL"
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, build_tx_args, queryTxHash, queryAddress, "")
@@ -181,7 +183,8 @@ func test_eth () {
 
 	fromAddress := "0x426B635fD6CdAf5E4e7Bf5B2A2Dd7bc6c7360FBd"
 
-	toAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
+	//toAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
+toAddress := "0x65997a98CEfcFc0A17Bf4EE952129265D71AFf0F"
 
 	build_tx_args := `{"gasPrice":8000000000,"gasLimit":50000}`
 
