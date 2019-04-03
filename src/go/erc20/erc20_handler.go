@@ -41,7 +41,7 @@ var (
 	//chainID = big.NewInt(40400)
 )
 
-var tokens map[string]string = map[string]string{
+var Tokens map[string]string = map[string]string{
 	"GUSD":"0x28a79f9b0fe54a39a0ff4c10feeefa832eeceb78",
 	"BNB":"0x7f30B414A814a6326d38535CA8eb7b9A62Bceae2",
 	"MKR":"0x2c111ede2538400F39368f3A3F22A9ac90A496c7",
@@ -88,11 +88,11 @@ func (h *ERC20Handler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAd
 	var tokenType string
 	if userTokenType == nil {
 		tokenType = h.TokenType
-		if tokenType == nil || tokenType == "" {
+		if tokenType == "" {
 			err = fmt.Errorf("token type not specified.")
 			return
 		}
-		if tokens[tokenType] == nil {
+		if Tokens[tokenType] == "" {
 			err = fmt.Errorf("token not supported")
 			return
 		}
@@ -107,7 +107,7 @@ func (h *ERC20Handler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAd
 	if err != nil {
 		return
 	}
-	transaction, hash, err := erc20_newUnsignedTransaction(client, fromAddress, toAddress, amount, gasPrice, gasLimit, coinType.(string))
+	transaction, hash, err := erc20_newUnsignedTransaction(client, fromAddress, toAddress, amount, gasPrice, gasLimit, tokenType)
 	hashStr := hash.Hex()
 	if hashStr[:2] == "0x" {
 		hashStr = hashStr[2:]
@@ -207,7 +207,7 @@ func (h *ERC20Handler) GetAddressBalance(address string, jsonstring string) (bal
 		err = fmt.Errorf("token type not specified")
 	}
 
-	tokenAddr := tokens[tokenType.(string)]
+	tokenAddr := Tokens[tokenType.(string)]
 	if tokenAddr == "" {
 		err = fmt.Errorf("Token not supported")
 		return
@@ -320,7 +320,7 @@ func erc20_newUnsignedTransaction (client *ethclient.Client, dcrmAddress string,
 		return nil, nil, err
 	}
 
-	tokenAddressHex, ok := tokens[tokenType]
+	tokenAddressHex, ok := Tokens[tokenType]
 	if ok {
 	} else {
 		err = errors.New("token not supported")

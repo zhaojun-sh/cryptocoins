@@ -31,7 +31,7 @@ type CryptocoinHandler interface {
 	BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error)
 
 	// 签名函数 txhash 输出 rsv 测试用
-	//SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error)
+	SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error)
 
 	// 构造签名交易
 	MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error)
@@ -80,9 +80,10 @@ func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
 		return xrp.NewXRPHandler()
 	case "ZCASH":
 		return zcash.NewZCASHHandler()
-	}
 	default:
-		return erc20.NewERC20TokenHandler(coinType)
+		if erc20.Tokens[coinType] != "" {
+			return erc20.NewERC20TokenHandler(coinType)
+		}
+		return nil
 	}
-	return nil
 }
