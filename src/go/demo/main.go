@@ -16,7 +16,7 @@ import (
 func main() {
 	//test_bch()
 	//test_bitgold()
-	//test_btc()
+	test_btc()
 	//test_dash()
 	//test_dcr()
 	//test_tether()
@@ -26,7 +26,7 @@ func main() {
 	//test_etc()
 	//test_vechain()
 	//test_erc20()
-	test_xrp()
+	//test_xrp()
 	//test_tron()
 	//test_zcash()
 }
@@ -134,7 +134,7 @@ func test_btc () {
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
 	//toAddress := "mg1KnRaekxjZbvdUNDKxxJycd3hNbxMomA"
-toAddress := "mveYrWPkRMrTvR2c6w4RZ7NVzFydXQzBuG"
+toAddress := "muPcobaeJcv6H6BsC9kMXWLVH8Vxvw4kr5"
 	build_tx_args := `{"feeRate":0.0001}`
 	queryTxHash := "6bf5a5077234908b44f69f5587f92c027a68374d88ccc36012663b4ebcdbc802"
 	queryAddress := "2MteNic4ttfvkYCJYEaYMuqrNcnc6xzwoBL"
@@ -184,7 +184,7 @@ func test_eth () {
 	fromAddress := "0x426B635fD6CdAf5E4e7Bf5B2A2Dd7bc6c7360FBd"
 
 	//toAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
-toAddress := "0x4B739D12914ff10e8a0Dcb17BC27b28D25b28E38"
+toAddress := "0x1D1A73c323DE9e2B85bcaA7008b3e533228602B2"
 
 	build_tx_args := `{"gasPrice":8000000000,"gasLimit":50000}`
 
