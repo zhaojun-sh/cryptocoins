@@ -2,6 +2,7 @@ package api
 
 import (
 	"math/big"
+	"strings"
 
 	"github.com/gaozhengxin/cryptocoins/src/go/types"
 
@@ -49,6 +50,7 @@ type CryptocoinHandler interface {
 }
 
 func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
+	coinType = strings.ToUpper(coinType)
 	switch coinType {
 	case "BITGOLD":
 		return bitgold.NewBITGOLDHandler()
