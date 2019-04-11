@@ -43,7 +43,6 @@ const (
 	BTC_USER               = "xxmm"
 	BTC_PASSWD             = "123456"
 	BTC_USESSL             = false
-	BTC_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
 
 // decred
@@ -54,7 +53,6 @@ const (
 	DCR_USER               = "xxmm"
 	DCR_PASSWD             = "123456"
 	DCR_USESSL             = false
-	DCR_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
 
 // tether
@@ -64,7 +62,6 @@ const (
 	TETHER_USER               = "xxmm"
 	TETHER_PASSWD             = "123456"
 	TETHER_USESSL             = false
-	TETHER_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
 
 // litecoin
@@ -74,7 +71,6 @@ const (
 	LTC_USER               = "xxmm"
 	LTC_PASSWD             = "123456"
 	LTC_USESSL             = false
-	LTC_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
 
 // bitcoin cash
@@ -84,7 +80,6 @@ const (
 	BCH_USER               = "xxmm"
 	BCH_PASSWD             = "123456"
 	BCH_USESSL             = false
-	BCH_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
 
 // bitgold
@@ -94,7 +89,6 @@ const (
 	BITGOLD_USER               = "xxmm"
 	BITGOLD_PASSWD             = "123456"
 	BITGOLD_USESSL             = false
-	BITGOLD_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
 
 // dash
@@ -104,7 +98,6 @@ const (
 	DASH_USER               = "xxmm"
 	DASH_PASSWD             = "123456"
 	DASH_USESSL             = false
-	DASH_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
 
 // zcash
@@ -114,5 +107,4 @@ const (
 	ZCASH_USER               = "xxmm"
 	ZCASH_PASSWD             = "123456"
 	ZCASH_USESSL             = false
-	ZCASH_WALLET_PASSPHRASE  = "WalletPassphrase"
 )
