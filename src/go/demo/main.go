@@ -16,7 +16,7 @@ import (
 func main() {
 	//test_bch()
 	//test_bitgold()
-	test_btc()
+	//test_btc()
 	//test_dash()
 	//test_dcr()
 	//test_tether()
@@ -26,7 +26,7 @@ func main() {
 	//test_etc()
 	//test_vechain()
 	//test_erc20()
-	//test_xrp()
+	test_xrp()
 	//test_tron()
 	//test_zcash()
 }
@@ -70,13 +70,13 @@ func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKe
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("%s\n\n", ret)
-/*
+
 	fmt.Printf("========== %s ==========\n\n", "test get transaction info")
-	fromAddress2, toAddress2, amount, _, err := h.GetTransactionInfo(queryTxHash)
+	fromAddress2, txOutputs, jsonstring, err := h.GetTransactionInfo(queryTxHash)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
-	fmt.Printf("from: %v\nto: %v\namount: %v\n\n", fromAddress2, toAddress2, amount)
+	fmt.Printf("from: %v\ntxOutputs: %v\njsonstring: %v\n", fromAddress2, txOutputs, jsonstring)
 
 	fmt.Printf("========== %s ==========\n\n", "test get balance")
 	balance, err := h.GetAddressBalance(queryAddress, query_balance_args)
@@ -84,7 +84,6 @@ func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKe
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("balance: %v\n\n", balance)
-*/
 }
 
 func test_bitgold () {
@@ -134,7 +133,7 @@ func test_btc () {
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
 	//toAddress := "mg1KnRaekxjZbvdUNDKxxJycd3hNbxMomA"
-toAddress := "muPcobaeJcv6H6BsC9kMXWLVH8Vxvw4kr5"
+toAddress := "muVHjzE6Lz1J7M8bGBjBVpavwnJMKyK17t"
 	build_tx_args := `{"feeRate":0.0001}`
 	queryTxHash := "6bf5a5077234908b44f69f5587f92c027a68374d88ccc36012663b4ebcdbc802"
 	queryAddress := "2MteNic4ttfvkYCJYEaYMuqrNcnc6xzwoBL"
@@ -182,18 +181,18 @@ func test_eth () {
 	fromPubKeyHex := hex.EncodeToString(pub)
 
 	fromAddress := "0x426B635fD6CdAf5E4e7Bf5B2A2Dd7bc6c7360FBd"
-
 	//toAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
-toAddress := "0x1D1A73c323DE9e2B85bcaA7008b3e533228602B2"
+toAddress := "0x3CAFde3f9bFd8A53975b446DcD851f919a256b1A"
 
 	build_tx_args := `{"gasPrice":8000000000,"gasLimit":50000}`
 
 	queryTxHash := "0xf9e16303a1b5a59b12e18be82aaed2363621844d8b78961db57d1af7aa89419f"
 
 //	queryAddress := "0xEc430068f392e5FBcE92016758C5111375d16f7D"
-	queryAddress := fromAddress
+queryAddress := "0x3CAFde3f9bFd8A53975b446DcD851f919a256b1A"
+	//queryAddress := fromAddress
 
-	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 1, build_tx_args, queryTxHash, queryAddress, "")
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 20000000000000000, build_tx_args, queryTxHash, queryAddress, "")
 }
 
 func test_etc () {
@@ -248,24 +247,29 @@ fromPrivateKey, _ := crypto.HexToECDSA("0ea7b1364bc2d1d58f35324b4c0deaa129cc9bd2
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 1, build_tx_args, queryTxHash, queryAddress, query_balance_args)
 }
 
-// transfer at least 100000000 drop to fund a new ripple account
+// transfer at least 100000000 drops to fund a new ripple account
+// 9979999990
+// 79999990
 func test_xrp () {
 	fmt.Printf("=========================\n           XRP           \n=========================\n\n")
 	h := api.NewCryptocoinHandler("XRP")
-	//fromKey := xrp.XRP_importKeyFromSeed("ssfL5tmpTTqCw5sHjnRHQ4yyUCQKf", "ecdsa")
-fromKey := xrp.XRP_importKeyFromSeed("sh755CRfKNhBjL1CzwMKvvbm4gPUn", "ecdsa")
+	fromKey := xrp.XRP_importKeyFromSeed("ssfL5tmpTTqCw5sHjnRHQ4yyUCQKf", "ecdsa")
+//fromKey := xrp.XRP_importKeyFromSeed("snVn7ZZnuQ5YjAGPZMD8xikMfE58z", "ecdsa")
 	keyseq := uint32(0)
 	fromPubKeyHex := hex.EncodeToString(fromKey.Public(&keyseq))
-	//fromAddress := "rwLc28nRV7WZiBv6vsHnpxUGAVcj8qpAtE"
-fromAddress := "rKREzxRWYMnFpK2eAPaH2JBQjzVKfLVMor"
-	//toAddress := "raF1e6TSKtB34MZ9USrKphQAW5hYbARFWK"
+fmt.Printf("++++++++++++\nfromPubKeyHex is %v\n++++++++++++\n", fromPubKeyHex)
+	fromAddress := "rwLc28nRV7WZiBv6vsHnpxUGAVcj8qpAtE"
+//fromAddress := "rJZaFWA5F4xq1rXKX8nBDL2kvZk4JazKuz"
+	toAddress := "rPsuTYS2WbXV7s9BMzranSfUYXJqs6ZCkn"
 //toAddress := "ran6MwG2XT4N7d5d35YUhPLZK8WVoe9tnV"
-toAddress := "rfW3FRynYN5FVQ7tAJfondGavRGppAvg2k"
+//toAddress := "rwLc28nRV7WZiBv6vsHnpxUGAVcj8qpAtE"
 	build_tx_args := `{"fee":10}`
-	//fromPrivateKey := "ssfL5tmpTTqCw5sHjnRHQ4yyUCQKf/0"
-fromPrivateKey := "sh755CRfKNhBjL1CzwMKvvbm4gPUn/0"
-	queryTxHash := "738F84EE3BDCA016680916021EF613A2DA3B1302F8D6448E33D1976A55796C54"
-	queryAddress := "raF1e6TSKtB34MZ9USrKphQAW5hYbARFWK"
+	fromPrivateKey := "ssfL5tmpTTqCw5sHjnRHQ4yyUCQKf/0"
+//fromPrivateKey := "snVn7ZZnuQ5YjAGPZMD8xikMfE58z/0"
+	queryTxHash := "48ED82C7B3DAD0B86533B18CB5CE2BEDCE8CD841AD8930C79F428AB053FBB41C"
+//queryTxHash := "50D0DA51DEB64590011D0BEDB852A811A96E5C9D3E8F162321777F31BBB30246" // lockin 100 drops
+	//queryAddress := "raF1e6TSKtB34MZ9USrKphQAW5hYbARFWK"
+	queryAddress := "rPsuTYS2WbXV7s9BMzranSfUYXJqs6ZCkn"
 
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 100000000, build_tx_args, queryTxHash, queryAddress, "")
 }
