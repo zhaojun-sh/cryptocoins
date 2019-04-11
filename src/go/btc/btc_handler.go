@@ -99,19 +99,21 @@ func (h *BTCHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddr
 			return
 		}
 	} ()
+	changeAddress := fromAddress
 	var args interface{}
 	json.Unmarshal([]byte(jsonstring), &args)
-	userFeeRate := args.(map[string]interface{})["feeRate"]
-	userChangeAddress := args.(map[string]interface{})["changeAddress"]
-	if userFeeRate != nil {
-		feeRate, err = btcutil.NewAmount(userFeeRate.(float64))
-		if err != nil {
-			return
+	if args != nil {
+		userFeeRate := args.(map[string]interface{})["feeRate"]
+		userChangeAddress := args.(map[string]interface{})["changeAddress"]
+		if userFeeRate != nil {
+			feeRate, err = btcutil.NewAmount(userFeeRate.(float64))
+			if err != nil {
+				return
+			}
 		}
-	}
-	changeAddress := fromAddress
-	if userChangeAddress != nil {
-		changeAddress = userChangeAddress.(string)
+		if userChangeAddress != nil {
+			changeAddress = userChangeAddress.(string)
+		}
 	}
 	unspentOutputs, err := listUnspent_blockchaininfo(fromAddress)
 //unspentOutputs, err := listUnspent(fromAddress)
@@ -532,7 +534,13 @@ func newUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb btcutil.Amount,
 }
 
 // 发送交易
-func SendRawTransaction (c *rpcutils.RpcClient, tx *wire.MsgTx, allowHighFees bool) (string, error){
+func SendRawTransaction (c *rpcutils.RpcClient, tx *wire.MsgTx, allowHighFees bool) (ret string, err error){
+	defer func () {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
+			return
+		}
+	} ()
 	var txHex string
 	if tx != nil {
                 // Serialize the transaction and convert to hex string.
@@ -551,8 +559,14 @@ func SendRawTransaction (c *rpcutils.RpcClient, tx *wire.MsgTx, allowHighFees bo
 	}
 
 	retJSON, err := c.Send(string(marshalledJSON))
+	var res interface{}
+	json.Unmarshal([]byte(retJSON),&res)
+	txhash := res.(map[string]interface{})["result"]
+	if txhash == nil {
+		return "", fmt.Errorf("retJSON")
+	}
 
-	return retJSON, err
+	return txhash.(string), err
 
 }
 
