@@ -404,5 +404,5 @@ func erc20_sendTx (client *ethclient.Client, signedTx *types.Transaction) (strin
 	if err != nil {
 		return "", err
 	}
-	return "success/" + signedTx.Hash().Hex(), nil
+	return signedTx.Hash().Hex(), nil
 }

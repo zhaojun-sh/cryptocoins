@@ -64,13 +64,15 @@ func (h *ETHHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddr
 	}
 	var args interface{}
 	json.Unmarshal([]byte(jsonstring), &args)
-	userGasPrice := args.(map[string]interface{})["gasPrice"]
-	userGasLimit := args.(map[string]interface{})["gasLimit"]
-	if userGasPrice != nil {
-		gasPrice = big.NewInt(int64(userGasPrice.(float64)))
-	}
-	if userGasLimit != nil {
-		gasLimit = uint64(userGasLimit.(float64))
+	if args != nil {
+		userGasPrice := args.(map[string]interface{})["gasPrice"]
+		userGasLimit := args.(map[string]interface{})["gasLimit"]
+		if userGasPrice != nil {
+			gasPrice = big.NewInt(int64(userGasPrice.(float64)))
+		}
+		if userGasLimit != nil {
+			gasLimit = uint64(userGasLimit.(float64))
+		}
 	}
 	transaction, hash, err := eth_newUnsignedTransaction(client, fromAddress, toAddress, amount, gasPrice, gasLimit)
 	hashStr := hash.Hex()
@@ -259,5 +261,5 @@ func eth_sendTx (client *ethclient.Client, signedTx *types.Transaction) (string,
 	if err != nil {
 		return "", err
 	}
-	return "success/" + signedTx.Hash().Hex(), nil
+	return signedTx.Hash().Hex(), nil
 }
