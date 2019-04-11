@@ -1,4 +1,4 @@
-package api
+package cryptocoins
 
 import (
 	"math/big"
