@@ -37,6 +37,12 @@ func NewXRPHandler () *XRPHandler {
 	return &XRPHandler{}
 }
 
+var XRP_DEFAULT_FEE, _ = new(big.Int).SetString("1",10)
+
+func (h *XRPHandler) GetDefaultFee() *big.Int {
+	return XRP_DEFAULT_FEE
+}
+
 func (h *XRPHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	pub, err := hex.DecodeString(pubKeyHex)
 	address = XRP_publicKeyToAddress(pub)

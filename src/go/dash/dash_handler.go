@@ -28,6 +28,12 @@ func NewDASHHandler () *DASHHandler {
 	}
 }
 
+var DASH_DEFAULT_FEE, _ = new(big.Int).SetString("50000",10)
+
+func (h *DASHHandler) GetDefaultFee() *big.Int {
+	return DASH_DEFAULT_FEE
+}
+
 func (h *DASHHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error){
 	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
 		pubKeyHex = pubKeyHex[2:]

@@ -29,6 +29,12 @@ func NewEOSHandler () *EOSHandler {
 	return &EOSHandler{}
 }
 
+var EOS_DEFAULT_FEE, _ = new(big.Int).SetString("1",10)
+
+func (h *EOSHandler) GetDefaultFee() *big.Int {
+	return EOS_DEFAULT_FEE
+}
+
 // 用一个大账户存钱，用交易备注区分用户，交易备注是公钥hash+base58
 func (h *EOSHandler) PublicKeyToAddress(pubKeyHex string) (acctName string, err error) {
 	acctName = GenAccountName(pubKeyHex)

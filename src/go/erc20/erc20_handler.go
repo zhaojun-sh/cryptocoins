@@ -63,6 +63,12 @@ func NewERC20TokenHandler (tokenType string) *ERC20Handler {
 	}
 }
 
+var ERC20_DEFAULT_FEE, _ = new(big.Int).SetString("10000000000000000",10)
+
+func (h *ERC20Handler) GetDefaultFee() *big.Int {
+	return ERC20_DEFAULT_FEE
+}
+
 func (h *ERC20Handler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	data := hexEncPubkey(pubKeyHex[2:])
 

@@ -1,4 +1,4 @@
-package zcash
+package zec
 
 import (
 	"encoding/hex"
@@ -18,17 +18,23 @@ var ChainConfig = chaincfg.Params {
 
 var allowHighFees = true
 
-type ZCASHHandler struct {
+type ZECHandler struct {
 	btcHandler *btc.BTCHandler
 }
 
-func NewZCASHHandler () *ZCASHHandler {
-	return &ZCASHHandler{
+func NewZECHandler () *ZECHandler {
+	return &ZECHandler{
 		btcHandler: btc.NewBTCHandlerWithConfig(config.ZCASH_SERVER_HOST,config.ZCASH_SERVER_PORT,config.ZCASH_USER,config.ZCASH_PASSWD,config.ZCASH_USESSL),
 	}
 }
 
-func (h *ZCASHHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
+var ZEC_DEFAULT_FEE, _ = new(big.Int).SetString("50000",10)
+
+func (h *ZECHandler) GetDefaultFee() *big.Int {
+	return ZEC_DEFAULT_FEE
+}
+
+func (h *ZECHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
 		pubKeyHex = pubKeyHex[2:]
 	}
@@ -52,32 +58,32 @@ func (h *ZCASHHandler) PublicKeyToAddress(pubKeyHex string) (address string, err
 }
 
 // NOT completed, may or not work
-func (h *ZCASHHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+func (h *ZECHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 	transaction, digests, err = h.btcHandler.BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress, amount, jsonstring)
 	return
 }
 
 // NOT completed, may or not work
-func (h *ZCASHHandler) SignTransaction(hash []string, wif interface{}) (rsv []string, err error){
+func (h *ZECHandler) SignTransaction(hash []string, wif interface{}) (rsv []string, err error){
 	return h.btcHandler.SignTransaction(hash, wif)
 }
 
 // NOT completed, may or not work
-func (h *ZCASHHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error){
+func (h *ZECHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error){
 	return h.btcHandler.MakeSignedTransaction(rsv, transaction)
 }
 
 // NOT completed, may or not work
-func (h *ZCASHHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
+func (h *ZECHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
 	return h.SubmitTransaction(signedTransaction)
 }
 
-func (h *ZCASHHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
+func (h *ZECHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	return h.GetTransactionInfo(txhash)
 }
 
 // TODO
-func (h *ZCASHHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
+func (h *ZECHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	err = fmt.Errorf("function currently not available")
 	return nil, err
 }

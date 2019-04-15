@@ -36,6 +36,12 @@ func NewDCRHandler () *DCRHandler {
 	}
 }
 
+var DCR_DEFAULT_FEE, _ = new(big.Int).SetString("50000",10)
+
+func (h *DCRHandler) GetDefaultFee() *big.Int {
+	return DCR_DEFAULT_FEE
+}
+
 func (h *DCRHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
 		pubKeyHex = pubKeyHex[2:]

@@ -40,6 +40,12 @@ func NewETCHandler () *ETCHandler {
 	return &ETCHandler{}
 }
 
+var ETC_DEFAULT_FEE, _ = new(big.Int).SetString("10000000000",10)
+
+func (h *ETCHandler) GetDefaultFee() *big.Int {
+	return ETC_DEFAULT_FEE
+}
+
 func (h *ETCHandler) PublicKeyToAddress (pubKeyHex string) (address string, err error) {
 	data := hexEncPubkey(pubKeyHex[2:])
 

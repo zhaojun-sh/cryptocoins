@@ -41,6 +41,12 @@ func NewETHHandler () *ETHHandler {
 	return &ETHHandler{}
 }
 
+var ETH_DEFAULT_FEE, _ = new(big.Int).SetString("10000000000",10)
+
+func (h *ETHHandler) GetDefaultFee() *big.Int {
+	return ETH_DEFAULT_FEE
+}
+
 func (h *ETHHandler) PublicKeyToAddress (pubKeyHex string) (address string, err error) {
 	data := hexEncPubkey(pubKeyHex[2:])
 

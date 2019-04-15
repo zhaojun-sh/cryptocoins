@@ -18,9 +18,9 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/ltc"
 	"github.com/gaozhengxin/cryptocoins/src/go/trx"
 	"github.com/gaozhengxin/cryptocoins/src/go/tether"
-	"github.com/gaozhengxin/cryptocoins/src/go/vechain"
+	"github.com/gaozhengxin/cryptocoins/src/go/ven"
 	"github.com/gaozhengxin/cryptocoins/src/go/xrp"
-	"github.com/gaozhengxin/cryptocoins/src/go/zcash"
+	"github.com/gaozhengxin/cryptocoins/src/go/zec"
 )
 
 type CryptocoinHandler interface {
@@ -47,6 +47,9 @@ type CryptocoinHandler interface {
 
 	// 账户查账户余额
 	GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error)
+
+	// 默认交易费用
+	GetDefaultFee() *big.Int
 }
 
 func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
@@ -76,12 +79,12 @@ func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
 		return trx.NewTRXHandler()
 	case "TETHER":
 		return tether.NewTETHERHandler()
-	case "VECHAIN":
-		return vechain.NewVECHAINHandler()
+	case "VEN":
+		return ven.NewVENHandler()
 	case "XRP":
 		return xrp.NewXRPHandler()
 	case "ZCASH":
-		return zcash.NewZCASHHandler()
+		return zec.NewZECHandler()
 	default:
 		if erc20.Tokens[coinType] != "" {
 			return erc20.NewERC20TokenHandler(coinType)

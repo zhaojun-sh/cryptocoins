@@ -30,6 +30,12 @@ func NewTETHERHandler () *TETHERHandler {
 	}
 }
 
+var TETHER_DEFAULT_FEE, _ = new(big.Int).SetString("10",10)
+
+func (h *TETHERHandler) GetDefaultFee() *big.Int {
+	return TETHER_DEFAULT_FEE
+}
+
 func (h *TETHERHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	if pubKeyHex[:2] == "0x" || pubKeyHex[:2] == "0X" {
 		pubKeyHex = pubKeyHex[2:]

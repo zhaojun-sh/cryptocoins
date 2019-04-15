@@ -1,4 +1,4 @@
-package vechain
+package ven
 
 import  (
 	"crypto/ecdsa"
@@ -22,14 +22,20 @@ var (
 	err error
 )
 
-type VECHAINHandler struct {
+type VENHandler struct {
 }
 
-func NewVECHAINHandler () *VECHAINHandler {
-	return &VECHAINHandler{}
+func NewVENHandler () *VENHandler {
+	return &VENHandler{}
 }
 
-func (h *VECHAINHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
+var VEN_DEFAULT_FEE, _ = new(big.Int).SetString("50000",10)
+
+func (h *VENHandler) GetDefaultFee() *big.Int {
+	return VEN_DEFAULT_FEE
+}
+
+func (h *VENHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	data := hexEncPubkey(pubKeyHex[2:])
 
 	pub, err := decodePubkey(data)
@@ -39,23 +45,23 @@ func (h *VECHAINHandler) PublicKeyToAddress(pubKeyHex string) (address string, e
 	return
 }
 
-func (h *VECHAINHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+func (h *VENHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 	return
 }
 
-func (h *VECHAINHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
+func (h *VENHandler) SignTransaction(hash []string, privateKey interface{}) (rsv []string, err error) {
 	return
 }
 
-func (h *VECHAINHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
+func (h *VENHandler) MakeSignedTransaction(rsv []string, transaction interface{}) (signedTransaction interface{}, err error) {
 	return
 }
 
-func (h *VECHAINHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
+func (h *VENHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
 	return
 }
 
-func (h *VECHAINHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
+func (h *VENHandler) GetTransactionInfo(txhash string) (fromAddress string, txOutputs []types.TxOutput, jsonstring string, err error) {
 	defer func () {
 		if e := recover(); e != nil {
 			err = fmt.Errorf("Runtime error: %v\n%v", e, string(debug.Stack()))
@@ -86,7 +92,7 @@ func (h *VECHAINHandler) GetTransactionInfo(txhash string) (fromAddress string, 
 	return
 }
 
-func (h *VECHAINHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
+func (h *VENHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error) {
 	return
 }
 

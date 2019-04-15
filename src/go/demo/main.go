@@ -39,6 +39,7 @@ func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKe
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("address from pubKeyHex is %v\n\n", address)
+
 /*
 	fmt.Printf("========== %s ==========\n\n", "test build unsigned transfer transaction")
 	transaction, digest, err := h.BuildUnsignedTransaction(fromAddress, fromPubKeyHex, toAddress, big.NewInt(value), build_tx_args)
@@ -80,7 +81,8 @@ func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKe
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
-	fmt.Printf("balance: %v\n\n", balance)*/
+	fmt.Printf("balance: %v\n\n", balance)
+*/
 }
 
 func test_bitgold () {

@@ -31,6 +31,12 @@ func NewTRXHandler() *TRXHandler {
 	return &TRXHandler{}
 }
 
+var TRX_DEFAULT_FEE, _ = new(big.Int).SetString("50000",10)
+
+func (h *TRXHandler) GetDefaultFee() *big.Int {
+	return TRX_DEFAULT_FEE
+}
+
 func (h *TRXHandler) PublicKeyToAddress(pubKeyHex string) (address string, err error) {
 	pk, err := HexToPublicKey(pubKeyHex)
 	if err != nil {
