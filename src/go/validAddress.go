@@ -8,7 +8,7 @@ var RegExpmap map[string]string = map[string]string {
 	"BTC":"^(1|3|m|n)[a-zA-Z\\d]{24,33}$",
 	"ETH":"^(0x)?[0-9a-fA-F]{40}$",
 	"XRP":"^r[1-9a-km-zA-HJ-NP-Z]{33}$",
-	"EOS":"^d[a-z\\d]{34}$",
+	"EOS":"^d[a-z\\d]{33}$",
 }
 
 type AddressValidator struct {
