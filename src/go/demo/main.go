@@ -4,7 +4,7 @@ import (
 	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
-	"math/big"
+	//"math/big"
 	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/gaozhengxin/cryptocoins/src/go/eos"
@@ -21,28 +21,25 @@ func main() {
 	//test_dcr()
 	//test_tether()
 	//test_ltc()
-	//test_eos()
+	test_eos()
 	//test_eth()
 	//test_etc()
 	//test_vechain()
 	//test_erc20()
-	test_xrp()
+	//test_xrp()
 	//test_tron()
 	//test_zcash()
 }
 
 func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, value int64, build_tx_args string, queryTxHash, queryAddress string, query_balance_args string) {
-/*
+
 	fmt.Printf("========== %s ==========\n\n", "test pubkey to address/account_name")
-	address, msg, err := h.PublicKeyToAddress(fromPubKeyHex)
+	address, err := h.PublicKeyToAddress(fromPubKeyHex)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("address from pubKeyHex is %v\n\n", address)
-	if msg != "" {
-		fmt.Printf("msg is %s\n\n", msg)
-	}
-*/
+/*
 	fmt.Printf("========== %s ==========\n\n", "test build unsigned transfer transaction")
 	transaction, digest, err := h.BuildUnsignedTransaction(fromAddress, fromPubKeyHex, toAddress, big.NewInt(value), build_tx_args)
 	if err != nil {
@@ -83,7 +80,7 @@ func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKe
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
-	fmt.Printf("balance: %v\n\n", balance)
+	fmt.Printf("balance: %v\n\n", balance)*/
 }
 
 func test_bitgold () {
@@ -133,11 +130,11 @@ func test_btc () {
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
 	//toAddress := "mg1KnRaekxjZbvdUNDKxxJycd3hNbxMomA"
-toAddress := "muVHjzE6Lz1J7M8bGBjBVpavwnJMKyK17t"
+toAddress := "n1hdLfSVJpYmusgAQs8KgmSr3tv3qKyGyd"
 	build_tx_args := `{"feeRate":0.0001}`
 	queryTxHash := "6bf5a5077234908b44f69f5587f92c027a68374d88ccc36012663b4ebcdbc802"
-	queryAddress := "2MteNic4ttfvkYCJYEaYMuqrNcnc6xzwoBL"
-	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 1, build_tx_args, queryTxHash, queryAddress, "")
+	queryAddress := "n1hdLfSVJpYmusgAQs8KgmSr3tv3qKyGyd"
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 10000, build_tx_args, queryTxHash, queryAddress, "")
 }
 
 func test_ltc () {
@@ -182,14 +179,14 @@ func test_eth () {
 
 	fromAddress := "0x426B635fD6CdAf5E4e7Bf5B2A2Dd7bc6c7360FBd"
 	//toAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
-toAddress := "0x3CAFde3f9bFd8A53975b446DcD851f919a256b1A"
+toAddress := "0x7A84bBb0F8237c4547Bf8E3DaAF9ae90537e672e"
 
 	build_tx_args := `{"gasPrice":8000000000,"gasLimit":50000}`
 
-	queryTxHash := "0xf9e16303a1b5a59b12e18be82aaed2363621844d8b78961db57d1af7aa89419f"
+	queryTxHash := "85813592d147d0e9773fcde154622ee216e16d5274f72fd8a23347300cbb667d"
 
 //	queryAddress := "0xEc430068f392e5FBcE92016758C5111375d16f7D"
-queryAddress := "0x3CAFde3f9bFd8A53975b446DcD851f919a256b1A"
+queryAddress := "0x7A84bBb0F8237c4547Bf8E3DaAF9ae90537e672e"
 	//queryAddress := fromAddress
 
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 20000000000000000, build_tx_args, queryTxHash, queryAddress, "")
@@ -260,7 +257,7 @@ func test_xrp () {
 fmt.Printf("++++++++++++\nfromPubKeyHex is %v\n++++++++++++\n", fromPubKeyHex)
 	fromAddress := "rwLc28nRV7WZiBv6vsHnpxUGAVcj8qpAtE"
 //fromAddress := "rJZaFWA5F4xq1rXKX8nBDL2kvZk4JazKuz"
-	toAddress := "rPsuTYS2WbXV7s9BMzranSfUYXJqs6ZCkn"
+	toAddress := "rLncvEJQhx2PY2R9X2TgBubTcpwjXm5xcs"
 //toAddress := "ran6MwG2XT4N7d5d35YUhPLZK8WVoe9tnV"
 //toAddress := "rwLc28nRV7WZiBv6vsHnpxUGAVcj8qpAtE"
 	build_tx_args := `{"fee":10}`
@@ -269,7 +266,7 @@ fmt.Printf("++++++++++++\nfromPubKeyHex is %v\n++++++++++++\n", fromPubKeyHex)
 	queryTxHash := "48ED82C7B3DAD0B86533B18CB5CE2BEDCE8CD841AD8930C79F428AB053FBB41C"
 //queryTxHash := "50D0DA51DEB64590011D0BEDB852A811A96E5C9D3E8F162321777F31BBB30246" // lockin 100 drops
 	//queryAddress := "raF1e6TSKtB34MZ9USrKphQAW5hYbARFWK"
-	queryAddress := "rPsuTYS2WbXV7s9BMzranSfUYXJqs6ZCkn"
+	queryAddress := "rLncvEJQhx2PY2R9X2TgBubTcpwjXm5xcs"
 
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 100000000, build_tx_args, queryTxHash, queryAddress, "")
 }
