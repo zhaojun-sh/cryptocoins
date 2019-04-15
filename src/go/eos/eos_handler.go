@@ -266,29 +266,10 @@ func hexToChecksum256(data string) eos.Checksum256 {
 	return eos.Checksum256(bytes)
 }
 
-// 根据公钥生成账户名（方案一）
-/*
+// 根据公钥生成地址
 func GenAccountName(pubKeyHex string) string {
 	b, _ := hex.DecodeString(pubKeyHex)
 	fmt.Printf("!!! %v \n!!! %v\n\n", pubKeyHex, b)
-
-	//r, _ := rand.Int(rand.Reader, big.NewInt(256))
-	//b = append(b, byte(r.Uint64()))
-
-	b = btcutil.Hash160(b)
-
-	b = append([]byte{0}, b...)
-	return crypto.Base58Encode(b, ALPHABET)[:12]
-}
-*/
-
-// 根据公钥生成地址（方案二）
-func GenAccountName(pubKeyHex string) string {
-	b, _ := hex.DecodeString(pubKeyHex)
-	fmt.Printf("!!! %v \n!!! %v\n\n", pubKeyHex, b)
-
-	//r, _ := rand.Int(rand.Reader, big.NewInt(256))
-	//b = append(b, byte(r.Uint64()))
 
 	b = btcutil.Hash160(b)
 
