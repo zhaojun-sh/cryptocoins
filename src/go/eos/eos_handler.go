@@ -44,7 +44,15 @@ func (h *EOSHandler) PublicKeyToAddress(pubKeyHex string) (acctName string, err 
 // 构造交易
 func (h *EOSHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAcctName string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 	memo := GenAccountName(fromPublicKey)
-	digest, transaction, err := EOS_newUnsignedTransaction(OWNER_ACCOUNT, toAcctName, amount, memo)
+	digest, transaction, err := EOS_newUnsignedTransaction(fromAddress, toAcctName, amount, memo)
+	digests = append(digests, digest)
+	return
+}
+
+// 构造Lockin交易, 开发用
+func (h *EOSHandler) BuildUnsignedLockinTransaction(fromAddress, toUserKey, toAcctName string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
+	memo := toUserKey
+	digest, transaction, err := EOS_newUnsignedTransaction(fromAddress, toAcctName, amount, memo)
 	digests = append(digests, digest)
 	return
 }
@@ -157,7 +165,7 @@ func checkAPIErr(res string) error {
 	return nil
 }
 
-func isCanonical(compactSig []byte) bool {
+func IsCanonical(compactSig []byte) bool {
 	// From EOS's codebase, our way of doing Canonical sigs.
 	// https://steemit.com/steem/@dantheman/steem-and-bitshares-cryptographic-security-update
 	//
@@ -343,15 +351,15 @@ func SubmitTransaction (stx *eos.SignedTransaction) string {
 
 // 创建eos账户
 // 需要一个creator账户, creator要有余额用于购买内存
-func CreateNewAccount(creatorName, creatorActivePrivKey, accountName, accountPubKey string, buyram uint32) (string, error) {
+func CreateNewAccount(creatorName, creatorActivePrivKey, accountName, ownerkey, activekey string, buyram uint32) (bool, error) {
 
-	opubKey, err := ecc.NewPublicKey(accountPubKey)
+	opubKey, err := ecc.NewPublicKey(ownerkey)
 	if err != nil {
-		return "", err
+		return false, err
 	}
-	apubKey, err := ecc.NewPublicKey(accountPubKey)
+	apubKey, err := ecc.NewPublicKey(activekey)
 	if err != nil {
-		return "", err
+		return false, err
 	}
 
 	// 创建账户action
@@ -407,7 +415,7 @@ func CreateNewAccount(creatorName, creatorActivePrivKey, accountName, accountPub
 
         signature, err := SignDigestWithPrivKey(digestStr, creatorActivePrivKey)
 	if err != nil {
-		return "", err
+		return false, err
 	}
 
         stx.Signatures = append(stx.Signatures, signature)
@@ -416,17 +424,17 @@ func CreateNewAccount(creatorName, creatorActivePrivKey, accountName, accountPub
 
         b := "{\"signatures\":[\"" + stx.Signatures[0].String() + "\"], \"compression\":\"none\", \"transaction\":" + txjson + "}"
 
-        res := rpcutils.DoCurlRequest(nodeos, "v1/chain/push_transaction", b)
+        res := rpcutils.DoPostRequest(nodeos, "v1/chain/push_transaction", b)
 	if err = checkAPIErr(res); err != nil {
-		return "", err
+		return false, err
 	}
-
-	return res, nil
+return true, nil
+	//return res, nil
 }
 
 // 预购cpu和net带宽, 用于帐号执行各种action
-func DelegateBW (fromAcctName, fromActivePrivKey, receiverName string, stakeCPU, stakeNet int64, transfer bool) (string, error){
-	from := eos.AccountName(fromAcctName,)
+func DelegateBW (fromAcctName, fromActivePrivKey, receiverName string, stakeCPU, stakeNet int64, transfer bool) (bool, error){
+	from := eos.AccountName(fromAcctName)
 	receiver := eos.AccountName(receiverName)
 	action := system.NewDelegateBW(from, receiver, eos.NewEOSAsset(stakeCPU), eos.NewEOSAsset(stakeNet), transfer)
 
@@ -444,15 +452,22 @@ func DelegateBW (fromAcctName, fromActivePrivKey, receiverName string, stakeCPU,
 	digestStr := hex.EncodeToString(digest)
 	signature, err := SignDigestWithPrivKey(digestStr, fromActivePrivKey)
 	if err != nil {
-		return "", err
+		return false, err
 	}
 	stx.Signatures = append(stx.Signatures, signature)
 
 	txjson := stx.String()
-	b := "'{\"signatures\":[\"" + stx.Signatures[0].String() + "\"], \"compression\":\"none\", \"transaction\":" + txjson + "}'"
-	res := rpcutils.DoCurlRequest(nodeos, "v1/chain/push_transaction", b)
+	b := "{\"signatures\":[\"" + stx.Signatures[0].String() + "\"], \"compression\":\"none\", \"transaction\":" + txjson + "}"
+	res := rpcutils.DoPostRequest(nodeos, "v1/chain/push_transaction", b)
 	if err = checkAPIErr(res); err != nil {
-		return "", err
+		return false, err
 	}
-	return res, nil
+return true, nil
+	//return res, nil
+}
+
+// 增加active公钥
+func AddActivePubkey (accountName,owner,ownerprivate string) string {
+	
+	return ""
 }
