@@ -56,12 +56,22 @@ const (
 )
 
 // tether
+//./omnicored -conf=~/.bitcoin/bitcoin.conf -datadir=/data/usdtdata_test
+//moneyqMan7uh8FqdCA2BV5yZ8qVrc9ikLP
 const (
 	TETHER_SERVER_HOST        = "127.0.0.1"
 	TETHER_SERVER_PORT        = 50505
 	TETHER_USER               = "xxmm"
 	TETHER_PASSWD             = "123456"
 	TETHER_USESSL             = false
+)
+
+const (
+	OMNI_SERVER_HOST        = "127.0.0.1"
+	OMNI_SERVER_PORT        = 50505
+	OMNI_USER               = "xxmm"
+	OMNI_PASSWD             = "123456"
+	OMNI_USESSL             = false
 )
 
 // litecoin

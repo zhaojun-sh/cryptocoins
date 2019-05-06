@@ -17,7 +17,7 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/erc20"
 	"github.com/gaozhengxin/cryptocoins/src/go/ltc"
 	"github.com/gaozhengxin/cryptocoins/src/go/trx"
-	"github.com/gaozhengxin/cryptocoins/src/go/tether"
+	"github.com/gaozhengxin/cryptocoins/src/go/omni"
 	"github.com/gaozhengxin/cryptocoins/src/go/ven"
 	"github.com/gaozhengxin/cryptocoins/src/go/xrp"
 	"github.com/gaozhengxin/cryptocoins/src/go/zec"
@@ -53,8 +53,8 @@ type CryptocoinHandler interface {
 }
 
 func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
-	coinType = strings.ToUpper(coinType)
-	switch coinType {
+	coinTypeC := strings.ToUpper(coinType)
+	switch coinTypeC {
 	case "BITGOLD":
 		return bitgold.NewBITGOLDHandler()
 	case "BCH":
@@ -71,14 +71,10 @@ func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
 		return eth.NewETHHandler()
 	case "ETC":
 		return etc.NewETCHandler()
-	case "ERC20":
-		return erc20.NewERC20Handler()
 	case "LTC":
 		return ltc.NewLTCHandler()
 	case "TRX":
 		return trx.NewTRXHandler()
-	case "TETHER":
-		return tether.NewTETHERHandler()
 	case "VEN":
 		return ven.NewVENHandler()
 	case "XRP":
@@ -86,9 +82,20 @@ func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
 	case "ZCASH":
 		return zec.NewZECHandler()
 	default:
-		if erc20.Tokens[coinType] != "" {
-			return erc20.NewERC20TokenHandler(coinType)
+		if isErc20(coinTypeC) {
+			return erc20.NewERC20TokenHandler(coinTypeC)
+		}
+		if isOmni(coinType) {
+			return omni.NewOMNIPropertyHandler(coinType)
 		}
 		return nil
 	}
+}
+
+func isErc20(tokentype string) bool {
+	return strings.HasPrefix(tokentype,"ERC20")
+}
+
+func isOmni(propertyname string) bool {
+	return strings.HasPrefix(propertyname,"OMNI")
 }
