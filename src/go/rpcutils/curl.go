@@ -50,3 +50,12 @@ func DoPostRequest2 (url, reqData string) string {
 	return string(body)
 }
 
+func DoGetRequest (url, api, reqData string) string {
+	resp, err := http.Get(url + "/" + api + "/" + reqData)
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	return string(body)
+}
