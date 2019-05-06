@@ -42,11 +42,11 @@ var (
 )
 
 var Tokens map[string]string = map[string]string{
-	"GUSD":"0x28a79f9b0fe54a39a0ff4c10feeefa832eeceb78",
-	"BNB":"0x7f30B414A814a6326d38535CA8eb7b9A62Bceae2",
-	"MKR":"0x2c111ede2538400F39368f3A3F22A9ac90A496c7",
-	"HT":"0x3C3d51f6BE72B265fe5a5C6326648C4E204c8B9a",
-	"BNT":"0x14D5913C8396d43aB979D4B29F2102c1C65E18Db",
+	"ERC20GUSD":"0x28a79f9b0fe54a39a0ff4c10feeefa832eeceb78",
+	"ERC20BNB":"0x7f30B414A814a6326d38535CA8eb7b9A62Bceae2",
+	"ERC20MKR":"0x2c111ede2538400F39368f3A3F22A9ac90A496c7",
+	"ERC20HT":"0x3C3d51f6BE72B265fe5a5C6326648C4E204c8B9a",
+	"ERC20BNT":"0x14D5913C8396d43aB979D4B29F2102c1C65E18Db",
 }
 
 type ERC20Handler struct {
@@ -58,6 +58,9 @@ func NewERC20Handler () *ERC20Handler {
 }
 
 func NewERC20TokenHandler (tokenType string) *ERC20Handler {
+	if Tokens[tokenType] == "" {
+		return nil
+	}
 	return &ERC20Handler{
 		TokenType: tokenType,
 	}
@@ -206,6 +209,8 @@ func (h *ERC20Handler) GetAddressBalance(address string, jsonstring string) (bal
 			return
 		}
 	} ()
+
+/*
 	var args interface{}
 	json.Unmarshal([]byte(jsonstring), &args)
 	tokenType := args.(map[string]interface{})["tokenType"]
@@ -214,6 +219,12 @@ func (h *ERC20Handler) GetAddressBalance(address string, jsonstring string) (bal
 	}
 
 	tokenAddr := Tokens[tokenType.(string)]
+	if tokenAddr == "" {
+		err = fmt.Errorf("Token not supported")
+		return
+	}
+*/
+	tokenAddr := Tokens[h.TokenType]
 	if tokenAddr == "" {
 		err = fmt.Errorf("Token not supported")
 		return
