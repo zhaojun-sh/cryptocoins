@@ -126,6 +126,7 @@ func (h *TRXHandler) SubmitTransaction(signedTransaction interface{}) (txhash st
 		panic(err.Error())
 	}
 	if ok := result.(map[string]interface{})["result"]; ok != nil && ok.(bool) == true {
+		txhash = signedTransaction.(*Transaction).TxID
 		ret = fmt.Sprintf("success/%v", signedTransaction.(*Transaction).TxID)
 	}
 	return
