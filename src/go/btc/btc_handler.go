@@ -121,8 +121,8 @@ func (h *BTCHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddr
 			changeAddress = userChangeAddress.(string)
 		}
 	}
-	unspentOutputs, err := listUnspent_blockchaininfo(fromAddress)
-//unspentOutputs, err := listUnspent(fromAddress)
+	//unspentOutputs, err := listUnspent_blockchaininfo(fromAddress)
+unspentOutputs, err := listUnspent(fromAddress)
 	if err != nil {
 		err = errContext(err, "failed to fetch unspent outputs")
 		return
@@ -163,6 +163,7 @@ func (h *BTCHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddr
 	estimatedSize := EstimateVirtualSize(0, 1, 0, txOuts, true)
 	targetFee := txrules.FeeForSerializeSize(feeRate, estimatedSize)
 	// 选择utxo作为交易输入
+	// *************************************************
 	var inputSource txauthor.InputSource
 	for i, _ := range previousOutputs {
 		inputSource = makeInputSource(previousOutputs[:i+1])
@@ -172,11 +173,13 @@ func (h *BTCHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddr
 			return
 		}
 		if inputAmount < targetAmount+targetFee {
+			fmt.Printf("=========inputAmount %v, targetAmount %v, targetFee %v=========\n",inputAmount,targetAmount,targetFee)
 			continue
 		} else {
 			break
 		}
 	}
+	// *************************************************
 	// 设置找零
 	changeAddr, _ := btcutil.DecodeAddress(changeAddress, &ChainConfig)
 	changeSource := func()([]byte,error){
@@ -235,7 +238,6 @@ func (h *BTCHandler) SignTransaction(hash []string, wif interface{}) (rsv []stri
 		}
 		rr := fmt.Sprintf("%X", signature.R)
 		ss := fmt.Sprintf("%X", signature.S)
-fmt.Printf("r, s: %v\n%v\n\n", rr, ss)
 		for len(rr) < 64 {
 			rr = "0" + rr
 		}
@@ -319,6 +321,20 @@ func (h *BTCHandler) GetTransactionInfo(txhash string) (fromAddress string, txOu
 			return
 		}
 	} ()
+
+grtreq := `{"jsonrpc":"1.0","method":"getrawtransaction","params":["` + txhash + `",true],"id":1}`
+client, _ := rpcutils.NewClient(h.serverHost,h.serverPort,h.rpcuser,h.passwd,h.usessl)
+ret1, err := client.Send(grtreq)
+if err != nil {
+	return
+} else {
+	var ret1Obj interface{}
+	fmt.Println(ret1)
+	json.Unmarshal([]byte(ret1), &ret1Obj)
+	confirmations := ret1Obj.(map[string]interface{})["result"].(map[string]interface{})["confirmations"]
+	fmt.Printf("!!!!!!!!confirmations is %v\n\n",int(confirmations.(float64)))
+}
+
 	cmd := btcjson.NewGetRawTransactionCmd(txhash, nil)
 
 	marshalledJSON, err := btcjson.MarshalCmd(1, cmd)
@@ -482,6 +498,7 @@ func newUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb btcutil.Amount,
 			return nil, err
 		}
 		if inputAmount < targetAmount+targetFee {
+			fmt.Printf("inputAmount is %v\ntargetAmount is %v\ntargetFee is%v\n",inputAmount,targetAmount,targetFee)
 			return nil, fmt.Errorf("insufficient funds")
 		}
 		// We count the types of inputs, which we'll use to estimate
@@ -588,6 +605,7 @@ func makeInputSource(outputs []btcjson.ListUnspentResult) txauthor.InputSource {
 		sourceErr       error
 	)
 	for _, output := range outputs {
+//fmt.Println("output %+v\n", output)
 		outputAmount, err := btcutil.NewAmount(output.Amount)
 		if err != nil {
 			sourceErr = fmt.Errorf(
@@ -604,6 +622,7 @@ func makeInputSource(outputs []btcjson.ListUnspentResult) txauthor.InputSource {
 				outputAmount)
 			break
 		}
+fmt.Printf("totalInputValue is %v, outputAmount is %v, outputnum is %v\n", totalInputValue, outputAmount, output.Vout)
 		totalInputValue += outputAmount
 
 		previousOutPoint, err := parseOutPoint(&output)
