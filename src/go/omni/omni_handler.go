@@ -18,6 +18,8 @@ import (
 
 var allowHighFees = true
 
+var chainconfig = &chaincfg.TestNet3Params
+
 var Properties map[string]string = map[string]string{
 	"OMNITest Omni":"2",
 	"OMNITetherUS":"100",  // TetherUS id on testnet
@@ -64,7 +66,7 @@ func (h *OmniHandler) PublicKeyToAddress(pubKeyHex string) (address string, err 
 	}
 	b := pubKey.SerializeCompressed()
 	pkHash := btcutil.Hash160(b)
-	addressPubKeyHash, err := btcutil.NewAddressPubKeyHash(pkHash, &chaincfg.MainNetParams)
+	addressPubKeyHash, err := btcutil.NewAddressPubKeyHash(pkHash, chainconfig)
 	if err != nil {
 		return
 	}

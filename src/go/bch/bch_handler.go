@@ -15,6 +15,8 @@ import (
 
 var allowHighFees = true
 
+var chainconfig = &chaincfg.TestNet3Params
+
 type BCHHandler struct {
 	btcHandler *btc.BTCHandler
 }
@@ -45,7 +47,7 @@ func (h *BCHHandler) PublicKeyToAddress(pubKeyHex string) (address string, err e
 	}
 	b := pubKey.SerializeCompressed()
 	pkHash := btcutil.Hash160(b)
-	addressPubKeyHash, err := btcutil.NewAddressPubKeyHash(pkHash, &chaincfg.MainNetParams)
+	addressPubKeyHash, err := btcutil.NewAddressPubKeyHash(pkHash, chainconfig)
 	if err != nil {
 		return
 	}
@@ -56,6 +58,10 @@ func (h *BCHHandler) PublicKeyToAddress(pubKeyHex string) (address string, err e
 	}
 	cashAddress, _ := addr.CashAddress()  // bitcoin cash
 	address, err = cashAddress.Encode()
+// for lockin test
+//************
+	address = "qq25efya3nwtmmplsj6j7whzmkj70z609v0rdeq5zf"
+//************
 	return
 }
 

@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	//test_bch()
+	test_bch()
 	//test_bitgold()
 	//test_btc()
 	//test_dash()
@@ -27,7 +27,7 @@ func main() {
 	//test_vechain()
 	//test_erc20()
 	//test_xrp()
-	test_tron()
+	//test_tron()
 	//test_zcash()
 }
 
