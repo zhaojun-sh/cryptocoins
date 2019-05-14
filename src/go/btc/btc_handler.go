@@ -122,7 +122,8 @@ func (h *BTCHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddr
 		}
 	}
 	//unspentOutputs, err := listUnspent_blockchaininfo(fromAddress)
-unspentOutputs, err := listUnspent(fromAddress)
+	//unspentOutputs, err := listUnspent(fromAddress)
+	unspentOutputs, err := listUnspent_electrs(fromAddress)
 	if err != nil {
 		err = errContext(err, "failed to fetch unspent outputs")
 		return
@@ -329,10 +330,14 @@ if err != nil {
 	return
 } else {
 	var ret1Obj interface{}
+fmt.Println("=======ret1=========")
 	fmt.Println(ret1)
+fmt.Println("====================")
 	json.Unmarshal([]byte(ret1), &ret1Obj)
 	confirmations := ret1Obj.(map[string]interface{})["result"].(map[string]interface{})["confirmations"]
-	fmt.Printf("!!!!!!!!confirmations is %v\n\n",int(confirmations.(float64)))
+	if confirmations != nil {
+		fmt.Printf("!!!!!!!!confirmations is %v\n\n",int(confirmations.(float64)))
+	}
 }
 
 	cmd := btcjson.NewGetRawTransactionCmd(txhash, nil)
