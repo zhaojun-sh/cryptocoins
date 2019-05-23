@@ -16,6 +16,7 @@ type SimpleApiConfig struct {
 }
 
 type RpcClientConfig struct {
+	ElectrsAddress string
 	Host string
 	Port int
 	User string
