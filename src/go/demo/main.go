@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	test_bch()
+	//test_bch()
 	//test_bitgold()
 	//test_btc()
 	//test_dash()
@@ -29,18 +29,19 @@ func main() {
 	//test_xrp()
 	//test_tron()
 	//test_zcash()
+	test_atom()
 }
 
 func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, value int64, build_tx_args string, queryTxHash, queryAddress string, query_balance_args string) {
-/*
+///*
 	fmt.Printf("========== %s ==========\n\n", "test pubkey to address/account_name")
 	address, err := h.PublicKeyToAddress(fromPubKeyHex)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("address from pubKeyHex is %v\n\n", address)
-*/
-
+//*/
+/*
 	fmt.Printf("========== %s ==========\n\n", "test build unsigned transfer transaction")
 	transaction, digest, err := h.BuildUnsignedTransaction(fromAddress, fromPubKeyHex, toAddress, big.NewInt(value), build_tx_args)
 	if err != nil {
@@ -68,21 +69,23 @@ func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKe
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("%s\n\n", ret)
-/*
+*/
+///*
 	fmt.Printf("========== %s ==========\n\n", "test get transaction info")
 	fromAddress2, txOutputs, jsonstring, err := h.GetTransactionInfo(queryTxHash)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("from: %v\ntxOutputs: %v\njsonstring: %v\n", fromAddress2, txOutputs, jsonstring)
-
+//*/
+///*
 	fmt.Printf("========== %s ==========\n\n", "test get balance")
 	balance, err := h.GetAddressBalance(queryAddress, query_balance_args)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("balance: %v\n\n", balance)
-*/
+//*/
 }
 
 func test_bitgold () {
@@ -132,12 +135,12 @@ func test_btc () {
 	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
-	//toAddress := "mg1KnRaekxjZbvdUNDKxxJycd3hNbxMomA"
-toAddress := "moneyqMan7uh8FqdCA2BV5yZ8qVrc9ikLP"
+	toAddress := "mp5pcwpMRzTn5DsqffjB8Kb4MUq6wNMqBd"
+//toAddress := "moneyqMan7uh8FqdCA2BV5yZ8qVrc9ikLP"
 	build_tx_args := `{"feeRate":0.0001}`
-	queryTxHash := "6bf5a5077234908b44f69f5587f92c027a68374d88ccc36012663b4ebcdbc802"
-	queryAddress := "n1hdLfSVJpYmusgAQs8KgmSr3tv3qKyGyd"
-	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 1000, build_tx_args, queryTxHash, queryAddress, "")
+	queryTxHash := "c89e489d0368a498537892e45f8825ee683f7e144bcbd6b8891c9eac0ba01807"
+	queryAddress := "mrSoEJAs83Y46CWJikDYn7ne3Mwx3CLnkM"
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 60000, build_tx_args, queryTxHash, queryAddress, "")
 }
 
 func test_ltc () {
@@ -243,7 +246,7 @@ func test_eth () {
 
 	fromAddress := "0x426B635fD6CdAf5E4e7Bf5B2A2Dd7bc6c7360FBd"
 	//toAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
-toAddress := "0xc9C0760957572F1fA90cA6Be6E43807b237C62E4"
+toAddress := "0xf1e6d992C44CA736A73355E124E1DB63338cAb2C"
 
 	build_tx_args := `{"gasPrice":8000000000,"gasLimit":50000}`
 
@@ -349,8 +352,20 @@ func test_tron() {
 	fromPubKeyHex := trx.PublicKeyToHex(&trx.PublicKey{&fromPrivateKey.PublicKey})
 	fromAddress := "417e5f4552091a69125d5dfcb7b8c2659029395bdf"
 	toAddress := "41368832d8820cf4bc4f0115975e3399348c8e0249"
-	queryTxHash := "4ec77591400e30c729f10a11d6b33ef75ea565d46b6314f2fa8d170a4b8f74e1"
+	//queryTxHash := "4ec77591400e30c729f10a11d6b33ef75ea565d46b6314f2fa8d170a4b8f74e1"
+	queryTxHash := "3299bf491b58745020aed45ebeb139fca4c2ed86eedc57ceb336285b8416f847"
 	queryAddress := fromAddress
 
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 10, "", queryTxHash, queryAddress, "")
+}
+
+func test_atom() {
+	fmt.Printf("=========================\n           COSMOSATOM           \n=========================\n\n")
+	h := api.NewCryptocoinHandler("ATOM")
+	fromPrivateKey, _ := crypto.HexToECDSA("d55b502bd4867b2c1b505af9b7cefeeb910b6cfbb570e2e47680bc89ee123eab")
+	pub := crypto.FromECDSAPub(&fromPrivateKey.PublicKey)
+	fromPubKeyHex := hex.EncodeToString(pub)
+	queryTxHash := "2A5BDD86133119F3CC3AD7BFAB986BCF8B5B7F25AA92A2A644D6B481DBBAC765"
+	queryAddress := "cosmos16gdxm24ht2mxtpz9cma6tr6a6d47x63hlq4pxt"
+	test_common (h, fromPrivateKey, fromPubKeyHex, "", "", 10, "", queryTxHash, queryAddress, "")
 }

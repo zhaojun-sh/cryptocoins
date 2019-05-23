@@ -21,6 +21,7 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/ven"
 	"github.com/gaozhengxin/cryptocoins/src/go/xrp"
 	"github.com/gaozhengxin/cryptocoins/src/go/zec"
+	"github.com/gaozhengxin/cryptocoins/src/go/atom"
 )
 
 type CryptocoinHandler interface {
@@ -81,6 +82,8 @@ func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
 		return xrp.NewXRPHandler()
 	case "ZCASH":
 		return zec.NewZECHandler()
+	case "ATOM":
+		return atom.NewAtomHandler()
 	default:
 		if isErc20(coinTypeC) {
 			return erc20.NewERC20TokenHandler(coinTypeC)
