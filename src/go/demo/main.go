@@ -29,7 +29,9 @@ func main() {
 	//test_xrp()
 	//test_tron()
 	//test_zcash()
-	test_atom()
+	//test_atom()
+	fmt.Println("Starting main function")
+	select{}
 }
 
 func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, value int64, build_tx_args string, queryTxHash, queryAddress string, query_balance_args string) {

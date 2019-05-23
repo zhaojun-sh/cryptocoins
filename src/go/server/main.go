@@ -6,7 +6,9 @@ import (
 	"log"
 	"net/http"
 	"flag"
+	"time"
 	"github.com/gaozhengxin/cryptocoins/src/go/types"
+	"github.com/gaozhengxin/cryptocoins/src/go/config"
 	api "github.com/gaozhengxin/cryptocoins/src/go"
 )
 
@@ -18,6 +20,13 @@ func main () {
 	http.HandleFunc("/pubkeytoaddress", PubkeyToAddress)
 	go http.ListenAndServe(path, nil)
 	fmt.Printf("service is running on %s\n", path)
+	go func () {
+		for {
+			log.Print("Reloading gateway configs...")
+			config.LoadApiGateways()
+			time.Sleep(time.Duration(60) * time.Second)
+		}
+	} ()
 	select{}
 }
 
