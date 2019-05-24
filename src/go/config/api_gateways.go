@@ -44,7 +44,15 @@ type ApiGatewayConfigs struct {
 
 var ApiGateways *ApiGatewayConfigs
 
+var configfile string
+
+func SetConfigFile (dir string) {
+	fmt.Println("AAAAA SetConfigDir AAAAA")
+	configfile = dir
+}
+
 func init () {
+	fmt.Println("AAAAA init config AAAAA")
 	log.Print("Loading gateway configs...")
 	err := LoadApiGateways()
 	if err != nil {
@@ -61,7 +69,7 @@ func LoadApiGateways () error {
 
 	var configfilepath string
 
-	configfilepath1 := "./gateways.toml" // Config.DataDir + "/gateways.toml"
+	configfilepath1 := configfile
 
 	binpath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	configfilepath2 := path.Dir(binpath) + "/gateways.toml"

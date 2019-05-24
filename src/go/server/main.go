@@ -14,8 +14,10 @@ import (
 
 func main () {
 	port := flag.String("port","23333","port")
+	configfile := flag.String("conf","~/.gdcrm","config file")
 	flag.Parse()
 	path := "0.0.0.0:" + *port
+	config.SetConfigFile(*configfile)
 	http.HandleFunc("/gettransaction", GetTransaction)
 	http.HandleFunc("/pubkeytoaddress", PubkeyToAddress)
 	go http.ListenAndServe(path, nil)
