@@ -71,7 +71,7 @@ func (h *AtomHandler) GetTransactionInfo(txhash string) (fromAddress string, txO
 			return
 		}
 	} ()
-	ret, err := rpcutils.HttpGet(config.CosmosHost,"txs"+"/"+txhash,nil)
+	ret, err := rpcutils.HttpGet(config.ApiGateways.CosmosGateway.ApiAddress,"txs"+"/"+txhash,nil)
 	fmt.Println(string(ret))
 	if err != nil {
 		return
@@ -126,7 +126,7 @@ func (h *AtomHandler) GetAddressBalance(address string, jsonstring string) (bala
 	} ()
 
 
-	ret, err := rpcutils.HttpGet(config.CosmosHost,"bank/balances"+"/"+address,nil)
+	ret, err := rpcutils.HttpGet(config.ApiGateways.CosmosGateway.ApiAddress,"bank/balances"+"/"+address,nil)
 	if err != nil {
 		return
 	}

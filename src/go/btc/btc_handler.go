@@ -51,11 +51,11 @@ type BTCHandler struct{
 
 func NewBTCHandler () *BTCHandler {
 	return &BTCHandler{
-		serverHost: config.BTC_SERVER_HOST,
-		serverPort: config.BTC_SERVER_PORT,
-		rpcuser: config.BTC_USER,
-		passwd: config.BTC_PASSWD,
-		usessl: config.BTC_USESSL,
+		serverHost: config.ApiGateways.BitcoinGateway.Host,
+		serverPort: config.ApiGateways.BitcoinGateway.Port,
+		rpcuser: config.ApiGateways.BitcoinGateway.User,
+		passwd: config.ApiGateways.BitcoinGateway.Passwd,
+		usessl: config.ApiGateways.BitcoinGateway.Usessl,
 	}
 }
 
@@ -323,7 +323,8 @@ func (h *BTCHandler) GetTransactionInfo(txhash string) (fromAddress string, txOu
 		}
 	} ()
 
-grtreq := `{"jsonrpc":"1.0","method":"getrawtransaction","params":["` + txhash + `",true],"id":1}`
+//grtreq := `{"jsonrpc":"1.0","method":"getrawtransaction","params":["` + txhash + `",true],"id":1}`
+grtreq := `{"jsonrpc":"1.0","method":"getrawtransaction","params":["` + txhash + `"],"id":1}`
 client, _ := rpcutils.NewClient(h.serverHost,h.serverPort,h.rpcuser,h.passwd,h.usessl)
 ret1, err := client.Send(grtreq)
 if err != nil {

@@ -19,7 +19,7 @@ func listUnspent_electrs(addr string) (list []btcjson.ListUnspentResult, err err
 		}
 	} ()
 	path := `address/` + addr + `/utxo`
-	ret, err := rpcutils.HttpGet(config.ELECTRSHOST, path, nil)
+	ret, err := rpcutils.HttpGet(config.ApiGateways.BitcoinGateway.ElectrsAddress, path, nil)
 	if err != nil {
 		return
 	}
@@ -32,7 +32,7 @@ func listUnspent_electrs(addr string) (list []btcjson.ListUnspentResult, err err
 	fmt.Printf("\n\n%+v\n\n", utxos)
 	for _, utxo := range utxos {
 		path = `tx/` + utxo.Txid
-		txret, txerr := rpcutils.HttpGet(config.ELECTRSHOST, path, nil)
+		txret, txerr := rpcutils.HttpGet(config.ApiGateways.BitcoinGateway.ElectrsAddress, path, nil)
 		if txerr != nil {
 			log.Debug("======== get utxo script ========", "error", txerr)
 			continue

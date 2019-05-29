@@ -33,9 +33,9 @@ import  (
 )
 
 var (
-	gasPrice = big.NewInt(8000000000)
+	gasPrice = big.NewInt(80000000)
 	gasLimit uint64 = 50000
-	url = config.ETH_GATEWAY
+	url = config.ApiGateways.EthereumGateway.ApiAddress
 	err error
 	chainConfig = params.RinkebyChainConfig
 	//chainID = big.NewInt(40400)
@@ -89,7 +89,7 @@ func (h *ERC20Handler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAd
 			return
 		}
 	} ()
-	var args interface{}
+/*	var args interface{}
 	json.Unmarshal([]byte(jsonstring), &args)
 	userGasPrice := args.(map[string]interface{})["gasPrice"]
 	userGasLimit := args.(map[string]interface{})["gasLimit"]
@@ -111,12 +111,12 @@ func (h *ERC20Handler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAd
 	}
 	if userGasLimit != nil {
 		gasLimit = uint64(userGasLimit.(float64))
-	}
+	}*/
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return
 	}
-	transaction, hash, err := erc20_newUnsignedTransaction(client, fromAddress, toAddress, amount, gasPrice, gasLimit, tokenType)
+	transaction, hash, err := erc20_newUnsignedTransaction(client, fromAddress, toAddress, amount, gasPrice, gasLimit, h.TokenType)
 	hashStr := hash.Hex()
 	if hashStr[:2] == "0x" {
 		hashStr = hashStr[2:]
@@ -225,6 +225,8 @@ func (h *ERC20Handler) GetAddressBalance(address string, jsonstring string) (bal
 	}
 */
 	tokenAddr := Tokens[h.TokenType]
+fmt.Printf("token type is %v \n", h.TokenType)
+fmt.Printf("tokenAddr is %v \n", tokenAddr)
 	if tokenAddr == "" {
 		err = fmt.Errorf("Token not supported")
 		return
@@ -355,11 +357,12 @@ func erc20_newUnsignedTransaction (client *ethclient.Client, dcrmAddress string,
 /*
 	nonce or pending nonce
 */
-	//nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
-	nonce, err := client.NonceAt(context.Background(), fromAddress, nil)
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	//nonce, err := client.NonceAt(context.Background(), fromAddress, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+fmt.Printf("pending nonce is %v\n", nonce)
 
 	value := big.NewInt(0)
 

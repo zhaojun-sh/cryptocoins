@@ -5,9 +5,6 @@ import (
 	"github.com/BurntSushi/toml"
 	"log"
 	"fmt"
-	"runtime"
-	"path"
-	"path/filepath"
 	"os"
 )
 
@@ -44,51 +41,30 @@ type ApiGatewayConfigs struct {
 
 var ApiGateways *ApiGatewayConfigs
 
-var configfile string
-
-func SetConfigFile (dir string) {
-	fmt.Println("AAAAA SetConfigDir AAAAA")
-	configfile = dir
-}
-
 func init () {
-	fmt.Println("AAAAA init config AAAAA")
 	log.Print("Loading gateway configs...")
-	err := LoadApiGateways()
+	err := LoadApiGateways("")
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("\n================\n%+v\n================\n\n", ApiGateways)
 }
 
-func LoadApiGateways () error {
+func LoadApiGateways (configfile string) error {
 	if ApiGateways == nil {
 		ApiGateways = new(ApiGatewayConfigs)
 	}
-	_, filename, _, _ := runtime.Caller(1)
 
-	var configfilepath string
-
-	configfilepath1 := configfile
-
-	binpath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	configfilepath2 := path.Dir(binpath) + "/gateways.toml"
-
-	configfilepath3 := path.Dir(filename) + "/gateways.toml"
-
-	if exists, _ := PathExists(configfilepath1); exists {
-		configfilepath = configfilepath1
-	} else if exists, _ := PathExists(configfilepath2); exists {
-		configfilepath = configfilepath2
-	} else if exists, _ := PathExists(configfilepath3); exists {
-		configfilepath = configfilepath3
+	if exists, _ := PathExists(configfile); exists {
+		fmt.Printf("use config file: %s\n", configfile)
+		_, err := toml.DecodeFile(configfile, ApiGateways)
+		return err
 	} else {
-		log.Fatal(fmt.Errorf("Non of the config file path exists: %s\n%s\n%s\n"), configfilepath1, configfilepath2, configfilepath3)
+		_, err := toml.Decode(defaultConfig, ApiGateways)
+		return err
 	}
 
-	_, err := toml.DecodeFile(configfilepath, ApiGateways)
-
-	return err
+	return nil
 }
 
 func PathExists(path string) (bool, error) {
@@ -105,31 +81,61 @@ func PathExists(path string) (bool, error) {
 
 
 
+var defaultConfig string = `
+# cosmos gaiad cosmoshub-2
+[CosmosGateway]
+ApiAddress = "https://stargate.cosmos.network"
 
 
+# tron shasta testnet api
+[TronGateway]
+ApiAddress = "https://api.shasta.trongrid.io"
 
 
+# bitcoind testnet3
+[BitcoinGateway]
+ElectrsAddress = "http://5.189.139.168:4000"
+Host = "5.189.139.168"
+Port = 8000
+User = "xxmm"
+Passwd = "123456"
+Usessl = false
 
 
+# omnid testnet3
+[OmniGateway]
+Host = "5.189.139.168"
+Port = 9772
+User = "xxmm"
+Passwd = "123456"
+Usessl = false
 
 
+# bitcoincashd testnet
+[BitcoincashGateway]
+Host = "5.189.139.168"
+Port = 9552
+User = "xxmm"
+Passwd = "123456"
+Usessl = false
 
 
+# geth rinkeby testnet
+[EthereumGateway]
+ApiAddress = "http://5.189.139.168:8018"
 
 
+# eos kylincrypto testnet api
+[EosGateway]
+Nodeos = "https://api.kylin.alohaeos.com" # eos api nodes support get actions (filter-on=*)
+ChainID = "5fff1dae8dc8e2fc4d5b23b2c7665c97f9e9d8edf2b6485a86ba311c25639191"
+BalanceTracker = "http://127.0.0.1:7000/"
 
 
-
-
-
-
-
-
-
-
-
-
-
+# ripple testnet api
+[RippleGateway]
+ApiAddress = "https://s.altnet.rippletest.net:51234"
+`
 
 
 
@@ -142,7 +148,7 @@ func PathExists(path string) (bool, error) {
 
 
 // ===================== OLD CONFIGS =========================
-
+/*
 // eth rinkeby testnet
 const (
 	ETH_GATEWAY = "http://54.183.185.30:8018"
@@ -195,7 +201,7 @@ const (
 	BCH_PASSWD             = "123456"
 	BCH_USESSL             = false
 )
-
+*/
 
 
 
@@ -269,3 +275,4 @@ const (
 	ZCASH_PASSWD             = "123456"
 	ZCASH_USESSL             = false
 )
+

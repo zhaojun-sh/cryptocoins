@@ -25,6 +25,14 @@ var Properties map[string]string = map[string]string{
 	"OMNITetherUS":"100",  // TetherUS id on testnet
 }
 
+var (
+	omnihost = config.ApiGateways.OmniGateway.Host
+	omniport = config.ApiGateways.OmniGateway.Port
+	omniuser = config.ApiGateways.OmniGateway.User
+	omnipasswd = config.ApiGateways.OmniGateway.Passwd
+	omniusessl = config.ApiGateways.OmniGateway.Usessl
+)
+
 type OmniHandler struct {
 	propertyName string
 	btcHandler *btc.BTCHandler
@@ -32,7 +40,7 @@ type OmniHandler struct {
 
 func NewOMNIHandler () *OmniHandler {
 	return &OmniHandler{
-		btcHandler: btc.NewBTCHandlerWithConfig(config.OMNI_SERVER_HOST,config.OMNI_SERVER_PORT,config.OMNI_USER,config.OMNI_PASSWD,config.OMNI_USESSL),
+		btcHandler: btc.NewBTCHandlerWithConfig(config.ApiGateways.OmniGateway.Host,config.ApiGateways.OmniGateway.Port,config.ApiGateways.OmniGateway.User,config.ApiGateways.OmniGateway.Passwd,config.ApiGateways.OmniGateway.Usessl),
 	}
 }
 
@@ -42,7 +50,7 @@ func NewOMNIPropertyHandler (propertyname string) *OmniHandler {
 	}
 	return &OmniHandler{
 		propertyName: propertyname,
-		btcHandler: btc.NewBTCHandlerWithConfig(config.OMNI_SERVER_HOST,config.OMNI_SERVER_PORT,config.OMNI_USER,config.OMNI_PASSWD,config.OMNI_USESSL),
+		btcHandler: btc.NewBTCHandlerWithConfig(config.ApiGateways.OmniGateway.Host,config.ApiGateways.OmniGateway.Port,config.ApiGateways.OmniGateway.User,config.ApiGateways.OmniGateway.Passwd,config.ApiGateways.OmniGateway.Usessl),
 	}
 }
 
@@ -91,7 +99,7 @@ func (h *OmniHandler) MakeSignedTransaction(rsv []string, transaction interface{
 
 // NOT completed, may or not work
 func (h *OmniHandler) SubmitTransaction(signedTransaction interface{}) (ret string, err error) {
-	c, _ := rpcutils.NewClient(config.OMNI_SERVER_HOST,config.OMNI_SERVER_PORT,config.OMNI_USER,config.OMNI_PASSWD,config.OMNI_USESSL)
+	c, _ := rpcutils.NewClient(omnihost, omniport, omniuser, omnipasswd, omniusessl)
 	ret, err= btc.SendRawTransaction (c, signedTransaction.(*btc.AuthoredTx).Tx, allowHighFees)
 	return
 }
@@ -104,7 +112,7 @@ func (h *OmniHandler) GetTransactionInfo(txhash string) (fromAddress string, txO
 		}
 	} ()
 
-	client, _ := rpcutils.NewClient(config.OMNI_SERVER_HOST,config.OMNI_SERVER_PORT,config.OMNI_USER,config.OMNI_PASSWD,config.OMNI_USESSL)
+	client, _ := rpcutils.NewClient(omnihost, omniport, omniuser, omnipasswd, omniusessl)
 	reqstr := `{"jsonrpc":"1.0","id":"1","method":"omni_gettransaction","params":["`+txhash+`"]}`
 	ret, err1 := client.Send(reqstr)
 	if err1 != nil {
@@ -143,7 +151,7 @@ func (h *OmniHandler) GetAddressBalance(address string, jsonstring string) (bala
 		}
 	} ()
 	propertyId := Properties[h.propertyName]
-	client, _ := rpcutils.NewClient(config.OMNI_SERVER_HOST,config.OMNI_SERVER_PORT,config.OMNI_USER,config.OMNI_PASSWD,config.OMNI_USESSL)
+	client, _ := rpcutils.NewClient(omnihost, omniport, omniuser, omnipasswd, omniusessl)
 	reqstr := `{"jsonrpc":"1.0","id":"1","method":"omni_getbalance","params":["`+address+`",`+propertyId+`]}`
 
 	ret, err1 := client.Send(reqstr)

@@ -17,8 +17,8 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/types"
 )
 
-const (
-	URL = config.TRON_SOLIDITY_NODE_HTTP
+var (
+	URL = config.ApiGateways.TronGateway.ApiAddress
 	ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 	prefix = byte(0x41)  // MainNet
 	//prefix = byte(0xA0)

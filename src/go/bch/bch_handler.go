@@ -23,7 +23,7 @@ type BCHHandler struct {
 
 func NewBCHHandler () *BCHHandler {
 	return &BCHHandler{
-		btcHandler: btc.NewBTCHandlerWithConfig(config.BCH_SERVER_HOST,config.BCH_SERVER_PORT,config.BCH_USER,config.BCH_PASSWD,config.BCH_USESSL),
+		btcHandler: btc.NewBTCHandlerWithConfig(config.ApiGateways.BitcoincashGateway.Host,config.ApiGateways.BitcoincashGateway.Port,config.ApiGateways.BitcoincashGateway.User,config.ApiGateways.BitcoincashGateway.Passwd,config.ApiGateways.BitcoincashGateway.Usessl),
 	}
 }
 

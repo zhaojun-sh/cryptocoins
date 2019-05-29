@@ -21,7 +21,7 @@ import (
 
 var (
 	fee int64 = 1
-	url = config.XRP_GATEWAY
+	url = config.ApiGateways.RippleGateway.ApiAddress
 )
 
 func checkErr(err error) {
