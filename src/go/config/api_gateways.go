@@ -37,6 +37,7 @@ type ApiGatewayConfigs struct {
 	EthereumGateway *SimpleApiConfig
 	EosGateway *EosConfig
 	RippleGateway *SimpleApiConfig
+	EVTGateway *SimpleApiConfig
 }
 
 var ApiGateways *ApiGatewayConfigs
@@ -135,6 +136,11 @@ BalanceTracker = "http://127.0.0.1:7000/"
 # ripple testnet api
 [RippleGateway]
 ApiAddress = "https://s.altnet.rippletest.net:51234"
+
+
+# evt testnet api
+[EVTGateway]
+ApiAddress = "https://testnet1.everitoken.io"
 `
 
 

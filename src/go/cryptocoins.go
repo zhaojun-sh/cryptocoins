@@ -22,6 +22,7 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/xrp"
 	"github.com/gaozhengxin/cryptocoins/src/go/zec"
 	"github.com/gaozhengxin/cryptocoins/src/go/atom"
+	"github.com/gaozhengxin/cryptocoins/src/go/evt"
 )
 
 type CryptocoinHandler interface {
@@ -85,6 +86,9 @@ func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
 	case "ATOM":
 		return atom.NewAtomHandler()
 	default:
+		if isEvt(coinTypeC) {
+			return evt.NewEvtHandler(coinTypeC)
+		}
 		if isErc20(coinTypeC) {
 			return erc20.NewERC20TokenHandler(coinTypeC)
 		}
@@ -95,6 +99,9 @@ func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
 	}
 }
 
+func isEvt(tokentype string) bool {
+	return strings.HasPrefix(tokentype, "EVT-")
+}
 func isErc20(tokentype string) bool {
 	return strings.HasPrefix(tokentype,"ERC20")
 }

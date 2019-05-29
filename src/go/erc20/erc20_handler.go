@@ -34,7 +34,7 @@ import  (
 
 var (
 	gasPrice = big.NewInt(80000000)
-	gasLimit uint64 = 50000
+	gasLimit uint64 = 100000
 	url = config.ApiGateways.EthereumGateway.ApiAddress
 	err error
 	chainConfig = params.RinkebyChainConfig

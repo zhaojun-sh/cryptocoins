@@ -13,6 +13,17 @@ import (
 	api "github.com/gaozhengxin/cryptocoins/src/go"
 )
 
+/*func main () {
+	h := api.NewCryptocoinHandler("ERC20GUSD")
+	fmt.Printf("========== %s ==========\n\n", "test get transaction info")
+	fromAddress, txOutputs, jsonstring, err := h.GetTransactionInfo("0x8b5992bf34ab4c30665631d69e84f6a861ec60375d9a8752fa91bed27b435075")
+	if err != nil {
+		fmt.Printf("Error: %v\n\n", err.Error())
+	}
+	fmt.Printf("from: %v\ntxOutputs: %v\njsonstring: %v\n", fromAddress, txOutputs, jsonstring)
+}*/
+
+
 func main() {
 	//test_bch()
 	//test_bitgold()
@@ -30,19 +41,20 @@ func main() {
 	//test_tron()
 	//test_zcash()
 	//test_atom()
-	fmt.Println("Starting main function")
-	select{}
+	test_evt()
+	//fmt.Println("Starting main function")
+	//select{}
 }
 
 func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, value int64, build_tx_args string, queryTxHash, queryAddress string, query_balance_args string) {
-///*
+/*
 	fmt.Printf("========== %s ==========\n\n", "test pubkey to address/account_name")
 	address, err := h.PublicKeyToAddress(fromPubKeyHex)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("address from pubKeyHex is %v\n\n", address)
-//*/
+*/
 /*
 	fmt.Printf("========== %s ==========\n\n", "test build unsigned transfer transaction")
 	transaction, digest, err := h.BuildUnsignedTransaction(fromAddress, fromPubKeyHex, toAddress, big.NewInt(value), build_tx_args)
@@ -137,10 +149,10 @@ func test_btc () {
 	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
-	toAddress := "mp5pcwpMRzTn5DsqffjB8Kb4MUq6wNMqBd"
+	toAddress := "mi7z7Nb9H2eWf6Do2qEZn68bAYavjm8fJ2"
 //toAddress := "moneyqMan7uh8FqdCA2BV5yZ8qVrc9ikLP"
 	build_tx_args := `{"feeRate":0.0001}`
-	queryTxHash := "c89e489d0368a498537892e45f8825ee683f7e144bcbd6b8891c9eac0ba01807"
+	queryTxHash := "ec12e399ddc6740ef4565360f8982dc130f18d2e9334d4dc50ed20a2a63dc8ac"
 	queryAddress := "mrSoEJAs83Y46CWJikDYn7ne3Mwx3CLnkM"
 	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 60000, build_tx_args, queryTxHash, queryAddress, "")
 }
@@ -241,16 +253,21 @@ func test_eth () {
 	h := api.NewCryptocoinHandler("ETH")
 
 	//fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
-	fromPrivateKey, _ := crypto.HexToECDSA("d55b502bd4867b2c1b505af9b7cefeeb910b6cfbb570e2e47680bc89ee123eab")
+fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
+
+	//fromPrivateKey, _ := crypto.HexToECDSA("d55b502bd4867b2c1b505af9b7cefeeb910b6cfbb570e2e47680bc89ee123eab")
+
+
 //fromPrivateKey, _ := crypto.HexToECDSA("0ea7b1364bc2d1d58f35324b4c0deaa129cc9bd2728e0942e7592f2836cbb530")
 	pub := crypto.FromECDSAPub(&fromPrivateKey.PublicKey)
 	fromPubKeyHex := hex.EncodeToString(pub)
 
-	fromAddress := "0x426B635fD6CdAf5E4e7Bf5B2A2Dd7bc6c7360FBd"
+	//fromAddress := "0x426B635fD6CdAf5E4e7Bf5B2A2Dd7bc6c7360FBd"
+	fromAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
 	//toAddress := "0x7b5Ec4975b5fB2AA06CB60D0187563481bcb6140"
-toAddress := "0xf1e6d992C44CA736A73355E124E1DB63338cAb2C"
+toAddress := "0x31341113FcDf3Eb8381D5e578CcDf06aA6720c5B"
 
-	build_tx_args := `{"gasPrice":8000000000,"gasLimit":50000}`
+	build_tx_args := `{"gasPrice":13000000000,"gasLimit":50000}`
 
 	queryTxHash := "85813592d147d0e9773fcde154622ee216e16d5274f72fd8a23347300cbb667d"
 
@@ -258,7 +275,7 @@ toAddress := "0xf1e6d992C44CA736A73355E124E1DB63338cAb2C"
 queryAddress := "0xc9C0760957572F1fA90cA6Be6E43807b237C62E4"
 	//queryAddress := fromAddress
 
-	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 20000000000000000, build_tx_args, queryTxHash, queryAddress, "")
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 20, build_tx_args, queryTxHash, queryAddress, "")
 }
 
 func test_etc () {
@@ -289,11 +306,11 @@ func test_vechain () {
 
 func test_erc20 () {
 	fmt.Printf("=========================\n           ERC20           \n=========================\n\n")
-	h := api.NewCryptocoinHandler("ERC20")
+	h := api.NewCryptocoinHandler("ERC20GUSD")
 
-	//fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
+	fromPrivateKey, _ := crypto.HexToECDSA("a751c37b0a6e4b7605512fefb28cd4bd141bc3c06863557624800140eddf13be")
 //fromPrivateKey, _ := crypto.HexToECDSA("40d6e64ce085269869b178c23a786e499ff2d6a5334fe45964211d25bea973bf")
-fromPrivateKey, _ := crypto.HexToECDSA("0ea7b1364bc2d1d58f35324b4c0deaa129cc9bd2728e0942e7592f2836cbb530")
+//fromPrivateKey, _ := crypto.HexToECDSA("0ea7b1364bc2d1d58f35324b4c0deaa129cc9bd2728e0942e7592f2836cbb530")
 
 	pub := crypto.FromECDSAPub(&fromPrivateKey.PublicKey)
 	fromPubKeyHex := hex.EncodeToString(pub)
@@ -306,11 +323,12 @@ fromPrivateKey, _ := crypto.HexToECDSA("0ea7b1364bc2d1d58f35324b4c0deaa129cc9bd2
 
 	queryTxHash := "0xf9e16303a1b5a59b12e18be82aaed2363621844d8b78961db57d1af7aa89419f"
 
-	queryAddress := "0xEc430068f392e5FBcE92016758C5111375d16f7D"
+//	queryAddress := "0xEc430068f392e5FBcE92016758C5111375d16f7D"
+	queryAddress := "0x1563E79eE9d7E4ee1246727CACabf070784F4f3b"
 
-	query_balance_args := `"tokenType":"GUSD"`
+	query_balance_args := `"tokenType":"ERC20GUSD"`
 
-	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 1, build_tx_args, queryTxHash, queryAddress, query_balance_args)
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 20, build_tx_args, queryTxHash, queryAddress, query_balance_args)
 }
 
 // transfer at least 100000000 drops to fund a new ripple account
@@ -370,4 +388,13 @@ func test_atom() {
 	queryTxHash := "2A5BDD86133119F3CC3AD7BFAB986BCF8B5B7F25AA92A2A644D6B481DBBAC765"
 	queryAddress := "cosmos16gdxm24ht2mxtpz9cma6tr6a6d47x63hlq4pxt"
 	test_common (h, fromPrivateKey, fromPubKeyHex, "", "", 10, "", queryTxHash, queryAddress, "")
+}
+
+func test_evt() {
+	h := api.NewCryptocoinHandler("EVT-1")
+	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
+	//queryTxHash := "7c3c6893594568ddaae57d25d3a770e54110c8aa2b4207266cbd3db5c6cc0ac0"
+	queryTxHash := "d08a3d35cd1f31266af715535cbc2054e9bdd8799d6664126112a1b4385a514c"
+	queryAddress := "EVT8JXJf7nuBEs8dZ8Pc5NpS8BJJLt6bMAmthWHE8CSqzX4VEFKtq"
+        test_common (h, nil, fromPubKeyHex, "", "", 1, "", queryTxHash, queryAddress, "")
 }
