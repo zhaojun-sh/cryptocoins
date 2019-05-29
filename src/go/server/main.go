@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"flag"
-	"time"
 	"github.com/gaozhengxin/cryptocoins/src/go/types"
 	"github.com/gaozhengxin/cryptocoins/src/go/config"
 	api "github.com/gaozhengxin/cryptocoins/src/go"
@@ -14,21 +13,17 @@ import (
 
 func main () {
 	port := flag.String("port","23333","port")
-	configfile := flag.String("conf","~/.gdcrm","config file")
+	configfile := flag.String("conf","","config file")
 	flag.Parse()
 	path := "0.0.0.0:" + *port
-	config.SetConfigFile(*configfile)
+	if configfile != nil {
+		config.LoadApiGateways(*configfile)
+	}
 	http.HandleFunc("/gettransaction", GetTransaction)
 	http.HandleFunc("/pubkeytoaddress", PubkeyToAddress)
 	go http.ListenAndServe(path, nil)
 	fmt.Printf("service is running on %s\n", path)
-	go func () {
-		for {
-			log.Print("Reloading gateway configs...")
-			config.LoadApiGateways()
-			time.Sleep(time.Duration(60) * time.Second)
-		}
-	} ()
+	fmt.Printf("config file is %s\n",*configfile)
 	select{}
 }
 
@@ -81,6 +76,7 @@ func PubkeyToAddress (writer http.ResponseWriter, request *http.Request) {
 }
 
 func GetTransaction (writer http.ResponseWriter, request *http.Request) {
+	fmt.Printf("GetTransaction request %v\n",request)
 	request.ParseForm()
 	txhash, ok1 := request.Form["txhash"]
 	cointype, ok2 := request.Form["cointype"]
