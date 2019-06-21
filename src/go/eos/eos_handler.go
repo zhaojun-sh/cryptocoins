@@ -166,6 +166,7 @@ func checkAPIErr(res string) error {
 }
 
 func IsCanonical(compactSig []byte) bool {
+	fmt.Printf("========= IsCanonical =========\n%v\n", compactSig)
 	// From EOS's codebase, our way of doing Canonical sigs.
 	// https://steemit.com/steem/@dantheman/steem-and-bitshares-cryptographic-security-update
 	//
@@ -175,6 +176,7 @@ func IsCanonical(compactSig []byte) bool {
 	// && !(c.data[33] == 0 && !(c.data[34] & 0x80));
 
 	d := compactSig
+	fmt.Printf("d is %v\n", d)
 	t1 := (d[1] & 0x80) == 0
 	t2 := !(d[1] == 0 && ((d[2] & 0x80) == 0))
 	t3 := (d[33] & 0x80) == 0
@@ -261,17 +263,21 @@ func GetAccountNameByPubKey(pubKey string) ([]string, error) {
 
 // dcrm签的rsv转传换成eos签名
 func RSVToSignature (rsvStr string) (ecc.Signature, error) {
-fmt.Printf("1111 rsvStr is %v\n\n", rsvStr)
+//fmt.Printf("1111 rsvStr is %v\n\n", rsvStr)
 	rsv, _ := hex.DecodeString(rsvStr)
 	rsv[64] += byte(31)
-fmt.Printf("rsv is %v\n\n", rsv)
+//fmt.Printf("rsv is %v\n\n", rsv)
 	v := rsv[64]
-fmt.Printf("v is %v\n\n", v)
+//fmt.Printf("v is %v\n\n", v)
 	rs := rsv[:64]
 	vrs := append([]byte{v}, rs...)
-fmt.Printf("1111 vrs is %v\n\n", hex.EncodeToString(vrs))
+//fmt.Printf("1111 vrs is %v\n\n", hex.EncodeToString(vrs))
 	data := append([]byte{0}, vrs...)
 	return ecc.NewSignatureFromData(data)
+}
+
+func HexToChecksum256(data string) eos.Checksum256 {
+	return hexToChecksum256(data)
 }
 
 func hexToChecksum256(data string) eos.Checksum256 {

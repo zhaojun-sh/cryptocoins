@@ -13,7 +13,7 @@ var RegExpmap map[string]string = map[string]string {
 	"ETH":"^(0x)?[0-9a-fA-F]{40}$",
 	"XRP":"^r[1-9a-km-zA-HJ-NP-Z]{33}$",
 	"EOSDCRM":"^d[1-5a-z]{33}$",
-	"EOS":"^[1-5a-z]{12}$",
+	"EOS":"^d[1-5a-z]{33}$",
 	"ATOM":"^cosmos1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{38}$",
 	"EVT":"^EVT[a-zA-Z\\d]{50}$",
 }
@@ -29,7 +29,7 @@ func NewAddressValidator (cointype string) *AddressValidator {
 	if strings.HasPrefix(cointype,"OMNI") {
 		cointype = "BTC"
 	}
-	if strings.HasPrefix(cointype,"EVT-") {
+	if strings.HasPrefix(cointype,"EVT") {
 		cointype = "EVT"
 	}
 	return &AddressValidator{
