@@ -100,7 +100,7 @@ func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
 }
 
 func isEvt(tokentype string) bool {
-	return strings.HasPrefix(tokentype, "EVT-")
+	return strings.HasPrefix(tokentype, "EVT")
 }
 func isErc20(tokentype string) bool {
 	return strings.HasPrefix(tokentype,"ERC20")

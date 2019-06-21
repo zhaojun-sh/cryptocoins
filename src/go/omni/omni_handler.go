@@ -21,6 +21,7 @@ var allowHighFees = true
 var chainconfig = &chaincfg.TestNet3Params
 
 var Properties map[string]string = map[string]string{
+	"OMNIOmni":"1",
 	"OMNITest Omni":"2",
 	"OMNITetherUS":"100",  // TetherUS id on testnet
 }
@@ -124,6 +125,7 @@ func (h *OmniHandler) GetTransactionInfo(txhash string) (fromAddress string, txO
 		err = fmt.Errorf("failed get transaction")
 		return
 	}
+	fmt.Println("GetTransaction: "+ret)
 	omniTx := DecodeOmniTx(ret)
 	if omniTx.Error != nil {
 		err = omniTx.Error
@@ -155,10 +157,11 @@ func (h *OmniHandler) GetAddressBalance(address string, jsonstring string) (bala
 	reqstr := `{"jsonrpc":"1.0","id":"1","method":"omni_getbalance","params":["`+address+`",`+propertyId+`]}`
 
 	ret, err1 := client.Send(reqstr)
-	if err != nil {
+	if err1 != nil {
 		err = err1
 		return
 	}
+	fmt.Println("GetBalance: "+ret)
 	var retObj interface{}
 	json.Unmarshal([]byte(ret), &retObj)
 
