@@ -226,6 +226,7 @@ func (h *BTCHandler) SignTransaction(hash []string, wif interface{}) (rsv []stri
 		return
 	}
 	privateKey := pkwif.PrivKey
+	fmt.Println(privateKey.ToECDSA())
 	for _, hs := range hash {
 		b, err1 := hex.DecodeString(hs)
 		if err1 != nil {
@@ -323,8 +324,8 @@ func (h *BTCHandler) GetTransactionInfo(txhash string) (fromAddress string, txOu
 		}
 	} ()
 
-//grtreq := `{"jsonrpc":"1.0","method":"getrawtransaction","params":["` + txhash + `",true],"id":1}`
-grtreq := `{"jsonrpc":"1.0","method":"getrawtransaction","params":["` + txhash + `"],"id":1}`
+grtreq := `{"jsonrpc":"1.0","method":"getrawtransaction","params":["` + txhash + `",true],"id":1}`
+//grtreq := `{"jsonrpc":"1.0","method":"getrawtransaction","params":["` + txhash + `"],"id":1}`
 client, _ := rpcutils.NewClient(h.serverHost,h.serverPort,h.rpcuser,h.passwd,h.usessl)
 ret1, err := client.Send(grtreq)
 if err != nil {
