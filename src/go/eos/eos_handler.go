@@ -355,6 +355,46 @@ func SubmitTransaction (stx *eos.SignedTransaction) string {
 	return res
 }
 
+func BuyRAM(creatorName string, creatorActivePrivKey string, accountName string, buyram uint32) (bool, error) {
+
+	// 买内存action
+	action := system.NewBuyRAMBytes(eos.AccountName(creatorName), eos.AccountName(accountName), buyram)
+
+	// 获取 head block id
+	hbid, err := GetHeadBlockID(nodeos)
+	checkErr(err)
+	opts.HeadBlockID = hexToChecksum256(hbid)
+
+	// 创建账户和买内存一定要同时执行
+	actions := []*eos.Action{action}
+
+	tx := eos.NewTransaction(actions, opts)
+
+	stx := eos.NewSignedTransaction(tx)
+
+	txdata, cfd, err := stx.PackedTransactionAndCFD()
+        checkErr(err)
+        digest := eos.SigDigest(opts.ChainID, txdata, cfd)
+        digestStr := hex.EncodeToString(digest)
+
+        signature, err := SignDigestWithPrivKey(digestStr, creatorActivePrivKey)
+	if err != nil {
+		return false, err
+	}
+
+        stx.Signatures = append(stx.Signatures, signature)
+
+        txjson := stx.String()
+
+        b := "{\"signatures\":[\"" + stx.Signatures[0].String() + "\"], \"compression\":\"none\", \"transaction\":" + txjson + "}"
+
+        res := rpcutils.DoPostRequest(nodeos, "v1/chain/push_transaction", b)
+	if err = checkAPIErr(res); err != nil {
+		return false, err
+	}
+return true, nil
+}
+
 // 创建eos账户
 // 需要一个creator账户, creator要有余额用于购买内存
 func CreateNewAccount(creatorName, creatorActivePrivKey, accountName, ownerkey, activekey string, buyram uint32) (bool, error) {
