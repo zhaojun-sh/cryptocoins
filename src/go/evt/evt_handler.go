@@ -59,7 +59,8 @@ func (h *EvtHandler) PublicKeyToAddress(pubKeyHex string) (address string, err e
 func (h *EvtHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddress string, amount *big.Int, jsonstring string) (transaction interface{}, digests []string, err error) {
 
 	key := strconv.Itoa(int(h.TokenId))
-	number := "0.00010 S#1"
+	//number := "0.00010 S#1001"
+	number := makeEVTFTNumber(amount, key)
 
 	// 1. abi_json_to_bin https://www.everitoken.io/developers/apis,_sdks_and_tools/abi_reference
 	args := chain.Args{
@@ -89,20 +90,26 @@ func (h *EvtHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddr
 		err = apierr.Error()
 		return
 	}
+	fmt.Printf("%v\n",res)
 
 	// 2. evttypes.Trxjson
 	action := evttypes.Action{
 		Name:"transferft",
+		//Name:"newfungible",
+		//Name:"issuefungible",
+		//Name:"updfungible",
 		Domain:".fungible",
+		//Domain:".group",
 		Key:key,
+		//Key:"1001",
 	}
 	trx := &evttypes.TRXJson{
 		MaxCharge: 10000,
 		Actions: []evttypes.SimpleAction{evttypes.SimpleAction{Action:action,Data:res.Binargs}},
+		//Actions: []evttypes.SimpleAction{evttypes.SimpleAction{Action:action,Data:"010003c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fd00e1f50500000000e903000005000000116920697373756520746f206d7973656c66"}},
 		Payer: fromAddress,
 		TransactionExtensions: make([]interface{},0),
 	}
-
 	// 3. chain/trx_json_to_digest expiration??? ref_block_num??? ref_block_prefix??? ...
 	layout := "2006-01-02T15:04:05"
 
@@ -140,6 +147,8 @@ func (h *EvtHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddr
 	fmt.Printf("\ncnm\nnmsl\nres is \n%+v\n\n",res3)
 
 	transaction = trx
+	fmt.Printf("transaction:\n%+v\n",transaction)
+	fmt.Printf("digests:\n%+v\n",digests)
 	digests = append(digests,res4.Digest)
 	return
 }
@@ -245,6 +254,10 @@ func (h *EvtHandler) SignTransaction (hash []string, wif interface{}) (rsv []str
 	return
 }
 
+func makeEVTFTNumber (amt *big.Int, tokenid string) string {
+	return strconv.FormatFloat(float64(amt.Int64()) / 100000, 'f', 5, 64) + " S#" + tokenid
+}
+
 func Equal(x []byte, y []byte) bool {
 	if len(x) != len(y) {
 		return false
@@ -323,6 +336,7 @@ func (h *EvtHandler) MakeSignedTransaction(rsv []string, transaction interface{}
 
 func (h *EvtHandler) SubmitTransaction(signedTransaction interface{}) (txhash string, err error) {
 	// chain/push_transaction
+	fmt.Println("!!!!!!!! SubmitTransaction !!!!!!!!")
 	evtcfg := evtconfig.New(config.ApiGateways.EVTGateway.ApiAddress)
 	clt := client.New(evtcfg, logrus.New())
 	apichain := chain.New(evtcfg, clt)
@@ -331,9 +345,11 @@ func (h *EvtHandler) SubmitTransaction(signedTransaction interface{}) (txhash st
 	res, apierr := apichain.PushTransaction(signedTransaction.(*evttypes.SignedTRXJson))
 	if apierr != nil {
 		err = apierr.Error()
+		fmt.Println(err)
 		return
 	}
 	txhash = res.TransactionId
+	fmt.Println(txhash)
 	return
 }
 

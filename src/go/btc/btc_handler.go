@@ -87,7 +87,8 @@ func (h *BTCHandler) PublicKeyToAddress(pubKeyHex string) (address string, err e
 	if err != nil {
 		return
 	}
-	b := pubKey.SerializeCompressed()
+	b := pubKey.SerializeCompressed() /// <--
+	//b := pubKey.SerializeUncompressed()
 	pkHash := btcutil.Hash160(b)
 	addressPubKeyHash, err := btcutil.NewAddressPubKeyHash(pkHash, &ChainConfig)
 	if err != nil {
@@ -221,12 +222,29 @@ func (h *BTCHandler) BuildUnsignedTransaction(fromAddress, fromPublicKey, toAddr
 }
 
 func (h *BTCHandler) SignTransaction(hash []string, wif interface{}) (rsv []string, err error){
+	//fmt.Printf("\n\n\n######## 注意 注意 wif is %v ########\n\n\n\n",wif.(string))
 	pkwif, err :=  btcutil.DecodeWIF(wif.(string))
 	if err != nil {
 		return
 	}
+	//fmt.Printf("\n\n\n######## 注意 注意 pkwif is %v ########\n\n\n\n",pkwif)
 	privateKey := pkwif.PrivKey
-	fmt.Println(privateKey.ToECDSA())
+	pkwif.CompressPubKey = true
+	privateKeyUncompressed := pkwif.String()
+	fmt.Printf("\n\n\n######## 注意 注意 privateKeyUncompressed is %v ########\n\n\n\n",privateKeyUncompressed)
+
+
+	//pubkey := privateKey.PubKey()
+	//pub := pubkey.SerializeUncompressed()
+	//pub := pubkey.SerializeCompressed()
+	//pubstr := hex.EncodeToString(pub)
+	//fmt.Printf("\n\n\n######## 注意 注意 pub is %v ########\n\n\n\n",pubstr)
+
+	//signeraddr, _ := h.PublicKeyToAddress(pubstr)
+	//fmt.Printf("\n\n\n######## 注意 注意 signeraddr is %v ########\n\n\n\n",signeraddr)
+
+
+	//fmt.Println(privateKey.ToECDSA())
 	for _, hs := range hash {
 		b, err1 := hex.DecodeString(hs)
 		if err1 != nil {
@@ -291,6 +309,7 @@ func (h *BTCHandler) MakeSignedTransaction(rsv []string, transaction interface{}
 		}
 		pk, _ := btcec.ParsePubKey(pkData, btcec.S256())
 		cPkData := pk.SerializeCompressed()
+		//cPkData := pk.SerializeUncompressed()
 
 		cPkData1 := transaction.(*AuthoredTx).PubKeyData
 		if string(cPkData) != string(cPkData1) {
@@ -473,6 +492,11 @@ type AuthoredTx struct {
 	PubKeyData	[]byte
 }
 
+func NewUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb btcutil.Amount,
+        fetchInputs txauthor.InputSource, fetchChange txauthor.ChangeSource) (*AuthoredTx, error) {
+	return newUnsignedTransaction(outputs, relayFeePerKb, fetchInputs, fetchChange)
+}
+
 // newUnsignedTransaction creates an unsigned transaction paying to one or more
 // non-change outputs.  An appropriate transaction fee is included based on the
 // transaction size.
@@ -598,6 +622,10 @@ func SendRawTransaction (c *rpcutils.RpcClient, tx *wire.MsgTx, allowHighFees bo
 
 	return txhash.(string), err
 
+}
+
+func MakeInputSource(outputs []btcjson.ListUnspentResult) txauthor.InputSource {
+	return makeInputSource(outputs)
 }
 
 // makeInputSource creates an InputSource that creates inputs for every unspent

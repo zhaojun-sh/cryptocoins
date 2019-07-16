@@ -51,11 +51,12 @@ func GetSender (coinType string) func (toAddress string, amt *big.Int) {
 		return func(toAddress string, amt *big.Int) {send_tron(toAddress, amt)}
 	case "XRP":
 		return func(toAddress string, amt *big.Int) {send_xrp(toAddress, amt)}
-	case "EVT1":
-		return func(toAddress string, amt *big.Int) {send_evt1(toAddress, amt)}
 	default:
 		if isErc20(coinTypeC) {
 			return func(toAddress string, amt *big.Int) {send_erc20(toAddress, amt, coinTypeC)}
+		}
+		if isEVT(coinTypeC) {
+			return func(toAddress string, amt *big.Int) {send_evt(toAddress, amt, coinTypeC)}
 		}
 		return nil
 	}
@@ -63,6 +64,10 @@ func GetSender (coinType string) func (toAddress string, amt *big.Int) {
 
 func isErc20(tokentype string) bool {
 	return strings.HasPrefix(tokentype,"ERC20")
+}
+
+func isEVT(tokentype string) bool {
+	return strings.HasPrefix(tokentype,"EVT")
 }
 
 func send_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, amt *big.Int, build_tx_args string, queryTxHash, queryAddress string, query_balance_args string) {
@@ -102,6 +107,7 @@ func send_btc (toAddress string, amt *big.Int) {
 	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
+	//fromAddress := "mv6iMFM84xVLh7s6tR1ryD6PkmMeJEkkuh"
 //toAddress := "moneyqMan7uh8FqdCA2BV5yZ8qVrc9ikLP"
 	build_tx_args := `{"feeRate":0.0001}`
 	queryTxHash := "c89e489d0368a498537892e45f8825ee683f7e144bcbd6b8891c9eac0ba01807"
@@ -205,9 +211,9 @@ func send_tron(toAddress string, amt *big.Int) {
 	send_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, amt, "", queryTxHash, queryAddress, "")
 }
 
-func send_evt1(toAddress string, amt *big.Int) {
-	fmt.Printf("=========================\n           EVT1           \n=========================\n\n")
-	h := api.NewCryptocoinHandler("EVT1")
+func send_evt(toAddress string, amt *big.Int, tokentype string) {
+	fmt.Printf("=========================\n           EVT           \n=========================\n\n")
+	h := api.NewCryptocoinHandler(tokentype)
 	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAddress := "EVT8JXJf7nuBEs8dZ8Pc5NpS8BJJLt6bMAmthWHE8CSqzX4VEFKtq"

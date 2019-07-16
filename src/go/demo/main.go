@@ -32,7 +32,7 @@ func main() {
 	//test_dcr()
 	//test_omni()
 	//test_ltc()
-	//test_eos()
+	test_eos()
 	//test_eth()
 	//test_etc()
 	//test_vechain()
@@ -41,10 +41,12 @@ func main() {
 	//test_tron()
 	//test_zcash()
 	//test_atom()
-	test_evt()
+	//test_evt()
 	//fmt.Println("Starting main function")
 	//select{}
 }
+
+var xx = big.NewInt(1)
 
 func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKeyHex, fromAddress, toAddress string, value int64, build_tx_args string, queryTxHash, queryAddress string, query_balance_args string) {
 /*
@@ -55,14 +57,15 @@ func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKe
 	}
 	fmt.Printf("address from pubKeyHex is %v\n\n", address)
 */
-/*
+///*
 	fmt.Printf("========== %s ==========\n\n", "test build unsigned transfer transaction")
 	transaction, digest, err := h.BuildUnsignedTransaction(fromAddress, fromPubKeyHex, toAddress, big.NewInt(value), build_tx_args)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("transaction: %+v\n\ndigest: %v\n\n", transaction, digest)
-
+//*/
+///*
 	fmt.Printf("========== %s ==========\n\n", "test sign with private key")
 	rsv, err := h.SignTransaction(digest, fromPrivateKey)
 	if err != nil {
@@ -83,23 +86,24 @@ func test_common (h api.CryptocoinHandler, fromPrivateKey interface{}, fromPubKe
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("%s\n\n", ret)
-*/
-///*
+
+//*/
+/*
 	fmt.Printf("========== %s ==========\n\n", "test get transaction info")
 	fromAddress2, txOutputs, jsonstring, err := h.GetTransactionInfo(queryTxHash)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("from: %v\ntxOutputs: %v\njsonstring: %v\n", fromAddress2, txOutputs, jsonstring)
-//*/
-///*
+*/
+/*
 	fmt.Printf("========== %s ==========\n\n", "test get balance")
 	balance, err := h.GetAddressBalance(queryAddress, query_balance_args)
 	if err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("balance: %v\n\n", balance)
-//*/
+*/
 }
 
 func test_bitgold () {
@@ -113,9 +117,11 @@ func test_bitgold () {
 func test_bch () {
 	fmt.Printf("=========================\n           BCH           \n=========================\n\n")
 	h := api.NewCryptocoinHandler("BCH")
-	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
+	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
+	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
+	//fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
 	queryTxHash := "f6f24bd236252574c1ba7086ac1178b37abf5041653127bd6b400bae0f0a9b00"
-	test_common (h, nil, fromPubKeyHex, "", "", 1, "", queryTxHash, "", "")
+	test_common (h, fromPrivateKey, fromPubKeyHex, "", "", 1, "", queryTxHash, "qq25efya3nwtmmplsj6j7whzmkj70z609v0rdeq5zf", "")
 }
 
 func test_dash () {
@@ -136,11 +142,16 @@ func test_dcr () {
 
 func test_omni () {
 	fmt.Printf("=========================\n           OMNI           \n=========================\n\n")
-	h := api.NewCryptocoinHandler("OMNITest Omni") //OMNITetherUS
-	fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
-	queryTxHash := "52be7b99f6a6943652830d88be794a046b2947a7dff9ada19f20f675371fb9f5"
+	//h := api.NewCryptocoinHandler("OMNITetherUS") //OMNITetherUS
+	h := api.NewCryptocoinHandler("OMNIOmni")
+	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
+	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
+	fromAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
+	toAddress := "mt2ciKvkbMcmeWeGWMm1mohxStKpn8SmCY"
+	//fromPubKeyHex := "032f7d0667c2f0989dfb588dedc70edfbc5aefdc02304b10a2c58105f8fe3ce38c"
+	queryTxHash := "5f2d4a16a2976f0147d73a602deec24abd81af0b15dd91131a258cbb6b12aa11"
 	queryAddress := "mtjq9RmBBDVne7YB4AFHYCZFn3P2AXv9D5"
-	test_common (h, nil, fromPubKeyHex, "", "", 1, "", queryTxHash, queryAddress, "")
+	test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 1000, "", queryTxHash, queryAddress, "")
 }
 
 func test_btc () {
@@ -179,9 +190,11 @@ func test_eos () {
 	fromPrivateKey := "5JqBVZS4shWHBhcht6bn3ecWDoZXPk3TRSVpsLriQz5J3BKZtqH"
 	//fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
 	fromAcctName := "gzx123454321"
-	toAcctName := "eosdcrm11134"
-	toUserKey := "drefigvhv1ywn2yvjpgnu53extxb1xi4l1"
+	//toAcctName := "eosdcrm11144"
+	toAcctName := "gzxshishabi1"
+	toUserKey := "dvzl22tv2jejkeq1fsgwsvd1dz2ebmlgeq"
 	//queryTxHash := "a7a8fee54901cffeeb580774a867323cde87dac848d4068ca57fc4a0b4443c58"
+	//queryTxHash := "e69f494b52fc59048a428856748bfd51653ea983217d79e3863f73910e64c275"
 	//queryUserKey := "drefigvhv1ywn2yvjpgnu53extxb1xi4l1"
 
 /*
@@ -194,7 +207,7 @@ func test_eos () {
 	fmt.Printf("address from pubKeyHex is %v\n\n", address)
 */
 
-
+///*
 	// 构建lockin交易
 	fmt.Printf("========== %s ==========\n\n", "test build unsigned transfer transaction")
 	transaction, digest, err := h.BuildUnsignedLockinTransaction(fromAcctName, toUserKey, toAcctName, big.NewInt(100), "")
@@ -225,7 +238,7 @@ func test_eos () {
 		fmt.Printf("Error: %v\n\n", err.Error())
 	}
 	fmt.Printf("%s\n\n", ret)
-
+//*/
 
 /*
 	// 查交易
@@ -391,10 +404,15 @@ func test_atom() {
 }
 
 func test_evt() {
-	h := api.NewCryptocoinHandler("EVT-1")
+	h := api.NewCryptocoinHandler("EVT1")
+	fromPrivateKey := "93N2nFzgr1cPRU8ppswy8HrgBMaoba8aH5sGZn9NdgG9weRFrA1"
 	fromPubKeyHex := "04c1a8dd2d6acd8891bddfc02bc4970a0569756ed19a2ed75515fa458e8cf979fdef6ebc5946e90a30c3ee2c1fadf4580edb1a57ad356efd7ce3f5c13c9bb4c78f"
+	fromAddress := "EVT8JXJf7nuBEs8dZ8Pc5NpS8BJJLt6bMAmthWHE8CSqzX4VEFKtq"
+	//toAddress := "EVT8PqiA7nqhaEoPXkb3zD14XK4TGugKBw3HqnkhZsvS69KrveXam"
+	toAddress := "EVT5EbwKfAUyTEpQCX2U4WGf73yUmbTVGjVgrikG3Ve5ufoQyXWYc"
 	//queryTxHash := "7c3c6893594568ddaae57d25d3a770e54110c8aa2b4207266cbd3db5c6cc0ac0"
-	queryTxHash := "d08a3d35cd1f31266af715535cbc2054e9bdd8799d6664126112a1b4385a514c"
+	//queryTxHash := "d08a3d35cd1f31266af715535cbc2054e9bdd8799d6664126112a1b4385a514c"
+	queryTxHash := "8a95dd914c8d701d992a855c447e3a828476b04e6ffcb828d0da23d0d371ea68"
 	queryAddress := "EVT8JXJf7nuBEs8dZ8Pc5NpS8BJJLt6bMAmthWHE8CSqzX4VEFKtq"
-        test_common (h, nil, fromPubKeyHex, "", "", 1, "", queryTxHash, queryAddress, "")
+        test_common (h, fromPrivateKey, fromPubKeyHex, fromAddress, toAddress, 1, "", queryTxHash, queryAddress, "")
 }

@@ -93,5 +93,15 @@ func (h *BCHHandler) GetTransactionInfo(txhash string) (fromAddress string, txOu
 // TODO
 func (h *BCHHandler) GetAddressBalance(address string, jsonstring string) (balance *big.Int, err error){
 	err = fmt.Errorf("function currently not available")
-	return nil, err
+	//return nil, err
+	//addrsUrl := "https://api.blockcypher.com/v1/bch/test3/addrs/" + address
+	//resstr := loginPre1("GET",addrsUrl)
+	//if resstr == "" {
+		//err = fmt.Errorf("cannot get address balance, blockcypher didnt response")
+	//	return
+	//}
+
+	//addrApiResult := parseAddrApiResult(resstr)
+	//balance = big.NewInt(int64(addrApiResult.Balance))
+	return
 }

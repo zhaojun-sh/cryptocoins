@@ -6,14 +6,17 @@ import (
 )
 
 var RegExpmap map[string]string = map[string]string {
-	"BTC":"^(1|3|m|n)[a-zA-Z\\d]{24,33}$",
-	"USDT":"^(1|3|m|n)[a-zA-Z\\d]{24,33}$",
+	"BTC":"^(1|3|m|n)[a-zA-Z\\d]{25,33}$",//24,33
+	"USDT":"^(1|3|m|n)[a-zA-Z\\d]{25,33}$",//24,33
 	"BCH":"^(bchtest:)?(p|q)[0-9a-z]{41}$",
 	"TRX":"",
 	"ETH":"^(0x)?[0-9a-fA-F]{40}$",
-	"XRP":"^r[1-9a-km-zA-HJ-NP-Z]{33}$",
+	"XRP":"^r[1-9a-km-zA-HJ-NP-Z]{32,33}$",
 	"EOSDCRM":"^d[1-5a-z]{33}$",
-	"EOS":"^d[1-5a-z]{33}$",
+	//"EOS":"^d[1-5a-z]{33}$",
+	"EOS":"^([a-z\\d\\.]+)$",
+	"EOS_NORMAL":"^([1-5a-z]{12})$",
+	"EOS_USERKEY":"^(d[1-5a-z]{32,33})$",
 	"ATOM":"^cosmos1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{38}$",
 	"EVT":"^EVT[a-zA-Z\\d]{50}$",
 }

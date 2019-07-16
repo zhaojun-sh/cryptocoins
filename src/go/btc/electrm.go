@@ -11,6 +11,10 @@ import (
 	"sort"
 )
 
+func ListUnspent_electrs(addr string) (list []btcjson.ListUnspentResult, err error) {
+	return listUnspent_electrs(addr)
+}
+
 func listUnspent_electrs(addr string) (list []btcjson.ListUnspentResult, err error) {
 	defer func () {
 		if e := recover(); e != nil {
