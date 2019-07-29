@@ -23,6 +23,7 @@ import (
 	"github.com/gaozhengxin/cryptocoins/src/go/zec"
 	"github.com/gaozhengxin/cryptocoins/src/go/atom"
 	"github.com/gaozhengxin/cryptocoins/src/go/evt"
+	"github.com/gaozhengxin/cryptocoins/src/go/bnb"
 )
 
 type CryptocoinHandler interface {
@@ -61,6 +62,8 @@ func NewCryptocoinHandler(coinType string) (txHandler CryptocoinHandler) {
 		return bitgold.NewBITGOLDHandler()
 	case "BCH":
 		return bch.NewBCHHandler()
+	case "BNB":
+		return bnb.NewBNBHandler()
 	case "BTC":
 		return btc.NewBTCHandler()
 	case "DASH":
